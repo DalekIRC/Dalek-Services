@@ -36,6 +36,7 @@ include "ChanServ/chanserv.php";
 include "OperServ/operserv.php";
 include "Global/global.php";
 include "HostServ/hostserv.php";
+include "MemoServ/memoserv.php";
 
 global $cf,$sql,$sqlip,$sqluser,$sqlpass,$sqldb,$server,$port,$serv,$servertime,$svs,$ns;
 
@@ -202,6 +203,8 @@ for (;;){
 					$bs->join($row['channel']);
 					$os->join($row['channel']);
 					$gb->join($row['channel']);
+					$hs->join($row['channel']);
+					$ms->join($row['channel']);
 				}
 				mysqli_free_result($result);
 			}
