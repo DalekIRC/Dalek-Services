@@ -24,6 +24,8 @@
 */
 
 //nickserv privmsg hook		 declare func with our incoming hook array
+
+
 nickserv::func("privmsg",	 function($u){
 	
 	// our global for bot $ns and config $nickserv
@@ -36,7 +38,7 @@ nickserv::func("privmsg",	 function($u){
 	if ($nickserv['login_method'] !== "default"){ return; }	// default config option
 	
 	if (strtolower($parv[0]) !== "register"){ return; } // our command
-	
+
 	if (df_IsRegUser($nick['nick'])){ $ns->notice($nick['UID'],"You are already registered."); return; }
 	
 	if (!($password = $parv[1])){ $ns->notice($nick['UID'],"Syntax: /msg $ns->nick register <password> <email>"); return; }
@@ -45,7 +47,12 @@ nickserv::func("privmsg",	 function($u){
 	
 	if (($createUser = df_create_user($nick['nick'],$password,$email)) !== true){ $ns->notice($nick['UID'],$createUser); return; }
 	
-	
+	if (!df_login($nick['UID'],$nick['nick'])){
+		
+		//account writing failed for some reason, return;
+		$ns->notice($nick['UID'],"There was an error when logging you in. Please contact staff.");
+		return;
+	}
 	$ns->sendraw(":$ns->nick SVSLOGIN * ".$nick['UID']." ".$nick['nick']." 0");
 	$ns->sendraw(":$ns->nick SVS2MODE ".$nick['UID']." +r");
 	$ns->notice($nick['UID'],"You have now registered under the account ".$nick['nick']);
@@ -60,12 +67,14 @@ function df_create_user($user,$password,$email){
 	
 	if (strlen($password) < 8){ return "That password is too short. Your password must be minimum 8 characters."; }
 	
-	$tok = explode("@",$email);
-	$tok2 = explode(".",$tok[1]);
-	
+	$tok = explode("@",$email) ?? NULL;
+	$tok2 = explode(".",$tok[1]) ?? NULL;
 	$error = NULL;
-	if (!$tok[0] || !$tok[1]) { $error = 1; }
-	elseif (!$tok2[1]){ $error = 1; }
+	
+	
+	
+	if (!$tok || !$tok[0] || !$tok[1]) { echo "wan a dem"; $error = 1; }
+	elseif (!$tok2[1]){ $error = 1; echo "dis wan"; }
 	
 	if ($error == 1){ return "That email is not valid. Please enter a valid email."; }
 	

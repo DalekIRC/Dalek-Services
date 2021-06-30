@@ -45,11 +45,16 @@ nickserv::func("privmsg",	 function($u){
 	$pass = (isset($parv[2])) ? $parv[2] : $parv[1];
 	
 	
-	if (!df_verify_userpass($account,$pass)){ $ns->notice($nick['UID'],"Could not verify identity."); return; }
+	if (!df_verify_userpass($account,$pass)){ $ns->notice($nick['UID'],"Identification failed: incorrect credentials"); return; }
 	
-	
-	$ns->sendraw(":$ns->nick SVSLOGIN * ".$nick['UID']." $account 0");
-	$ns->sendraw(":$ns->nick SVS2MODE ".$nick['UID']." +r");
+	if (!df_login($nick['UID'],$account)){
+		
+		//account writing failed for some reason, return;
+		$ns->notice($nick['UID'],"There was an error when logging you in. Please contact staff.");
+		return;
+	}
+	$ns->svslogin($nick['UID'],$account);
+	$ns->svs2mode($nick['UID']," +r");
 	$ns->notice($nick['UID'],"You are now logged into account $account");
 	
 });
@@ -79,6 +84,42 @@ function df_verify_userpass($user,$pass){
 		}
 		
 		$prep->close();
+		return $result;
+	}
+}
+
+
+function df_login($nick,$account){
+	
+	
+	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	if (!$conn) { return "ERROR"; }
+	else {
+		
+		// lmao
+		$nick = find_person($nick);
+		$nick = $nick['UID'];
+		echo $nick." ".$account;
+		
+		$prep = $conn->prepare("UPDATE dalek_user SET account = ? WHERE UID = ?");
+		$prep->bind_param("ss",$account,$nick);
+		$prep->execute();
+		$prep->close();
+		$prep = $conn->prepare("SELECT account FROM dalek_user WHERE UID = ?");
+		$prep->bind_param("s",$nick);
+		$prep->execute();
+		$sResult = $prep->get_result();
+		
+		$result = false;
+		
+		while ($row = $sResult->fetch_assoc()){
+			
+			if (!$row['account'] || $row['account'] != $account){ $result = $false; }
+			else { $result = true; }
+		}
+		$prep->close();
+		$ns->sendraw(":$ns->nick SVSMODE #pissnet:🚽 -P");
 		return $result;
 	}
 }

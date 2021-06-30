@@ -77,4 +77,20 @@ class Client {
 		
 		$this->sendraw(":$this->nick MODE $dest $string");
 	}
+	function svs2mode($nick,$string){
+		
+		if (!($nick = find_person($nick))){ return; }
+		
+		$uid = $nick['UID'];
+		
+		$this->sendraw(":$this->nick SVS2MODE $uid $string");
+	}
+	function svslogin($uid,$account){
+		
+		if (!($nick = find_person($uid))){ return; }
+		
+		$uid = $nick['UID'];
+		
+		$this->sendraw(":$this->nick SVSLOGIN * $uid $account");
+	}
 }
