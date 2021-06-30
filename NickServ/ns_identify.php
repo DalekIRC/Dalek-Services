@@ -75,8 +75,6 @@ function df_verify_userpass($user,$pass){
 		
 		while ($row = $sResult->fetch_assoc()){
 			
-			echo $pass."->".$row['pass'];
-			
 			if (password_verify($pass,$row['pass'])){ $result = true; }
 		}
 		
