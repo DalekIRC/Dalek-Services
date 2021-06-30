@@ -60,7 +60,7 @@ class Server {
 		
 		$this->sendraw("PASS $password");
 		$this->sendraw("PROTOCTL EAUTH=".$cf['servicesname']." SID=".$cf['sid']);
-		$this->sendraw("PROTOCTL NOQUIT NICKv2 SJOIN SJ3 CLK TKLEXT2 NICKIP ESVID MLOCK EXTSWHOIS SJSBY");
+		$this->sendraw("PROTOCTL NOQUIT NICKv2 SJOIN SJ3 CLK TKLEXT2 NICKIP ESVID MLOCK EXTSWHOIS SJSBY MTAGS");
 		$this->sendraw("SERVER ".$cf['servicesname']." 1 :Dalek IRC Services");
 		$this->sendraw("EOS");
 		

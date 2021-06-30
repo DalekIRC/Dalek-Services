@@ -22,11 +22,12 @@
 \\	Author:		Valware
 //				
 */
-
+global $cf,$sql,$sqlip,$sqluser,$sqlpass,$sqldb,$server,$port,$serv,$servertime,$svs,$ns;
 
 include "hook.php";
 include "dalek.conf";
-include "protocol.php";
+
+if ($cf['proto'] == 'unreal5'){ include "protocol/unreal5.php"; }
 include "sql.php";
 include "client.php";
 
@@ -37,8 +38,6 @@ include "OperServ/operserv.php";
 include "Global/global.php";
 include "HostServ/hostserv.php";
 include "MemoServ/memoserv.php";
-
-global $cf,$sql,$sqlip,$sqluser,$sqlpass,$sqldb,$server,$port,$serv,$servertime,$svs,$ns;
 
 // Server config
 $server = $cf['uplink'];
