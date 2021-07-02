@@ -2,7 +2,7 @@
 /*				
 //	(C) 2021 DalekIRC Services
 \\				
-//			pathweb.org
+//			dalek.services
 \\				
 //	GNU GENERAL PUBLIC LICENSE
 \\				v3
@@ -75,7 +75,7 @@ function df_verify_userpass($user,$pass){
 
 		if ($sResult->num_rows == 0 || !isset($sResult)){ $prep->close(); return false; }
 		
-		// pre-fail this lol
+	
 		$result = false;
 		
 		while ($row = $sResult->fetch_assoc()){
@@ -100,7 +100,6 @@ function df_login($nick,$account){
 		// lmao
 		$nick = find_person($nick);
 		$nick = $nick['UID'];
-		echo $nick." ".$account;
 		
 		$prep = $conn->prepare("UPDATE dalek_user SET account = ? WHERE UID = ?");
 		$prep->bind_param("ss",$account,$nick);
@@ -115,11 +114,11 @@ function df_login($nick,$account){
 		
 		while ($row = $sResult->fetch_assoc()){
 			
-			if (!$row['account'] || $row['account'] != $account){ $result = $false; }
+			if (!$row['account'] || $row['account'] != $account){ $result = false; }
 			else { $result = true; }
 		}
 		$prep->close();
-		$ns->sendraw(":$ns->nick SVSMODE #pissnet:🚽 -P");
+	
 		return $result;
 	}
 }
