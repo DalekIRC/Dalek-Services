@@ -41,9 +41,14 @@ nickserv::func("privmsg",	 function($u){
 	if (!isset($parv[1])){ $ns->notice($nick['UID'],"Syntax: /msg $ns->nick identify [account] <password>"); return; }
 	
 	// user is logging into account for their nick or notice
-	$account = (isset($parv[2])) ? $parv[1] : $nick['nick'];
-	$pass = (isset($parv[2])) ? $parv[2] : $parv[1];
-	
+	if (isset($parv[2])){
+		$account = $parv[1];
+		$pass = $parv[2];
+	}
+	else {
+		$account = $nick['nick'];
+		$pass = $parv[1];
+	}
 	
 	if (!df_verify_userpass($account,$pass)){ $ns->notice($nick['UID'],"Identification failed: incorrect credentials"); return; }
 	
@@ -122,3 +127,30 @@ function df_login($nick,$account){
 		return $result;
 	}
 }
+
+
+
+nickserv::func("helplist", function($u){
+	
+	global $ns;
+	
+	$nick = $u['nick'];
+	
+	$ns->notice($nick,"IDENTIFY            Identify to your account.");
+	
+});
+
+
+
+nickserv::func("help", function($u){
+	
+	global $ns;
+	
+	if ($u['key'] !== "identify"){ return; }
+	
+	$nick = $u['nick'];
+	
+	$ns->notice($nick,"Command: IDENTIFY");
+	$ns->notice($nick,"Syntax: /msg $ns->nick identify [account] password");
+	$ns->notice($nick,"Example: /msg $ns->nick identify Sup3r-S3cur3");
+});

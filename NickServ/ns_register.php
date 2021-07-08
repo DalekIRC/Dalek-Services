@@ -53,8 +53,8 @@ nickserv::func("privmsg",	 function($u){
 		$ns->notice($nick['UID'],"There was an error when logging you in. Please contact staff.");
 		return;
 	}
-	$ns->sendraw(":$ns->nick SVSLOGIN * ".$nick['UID']." ".$nick['nick']." 0");
-	$ns->sendraw(":$ns->nick SVS2MODE ".$nick['UID']." +r");
+	$ns->svslogin($nick['UID'],$nick['nick']);
+	$ns->svs2mode($nick['UID']," +r");
 	$ns->notice($nick['UID'],"You have now registered under the account ".$nick['nick']);
 	
 });
@@ -122,3 +122,29 @@ function df_IsRegUser($user){
 		return true;
 	}
 }
+
+
+nickserv::func("helplist", function($u){
+	
+	global $ns;
+	
+	$nick = $u['nick'];
+	
+	$ns->notice($nick,"REGISTER            Register your username.");
+	
+});
+
+
+
+nickserv::func("help", function($u){
+	
+	global $ns;
+	
+	if ($u['key'] !== "register"){ return; }
+	
+	$nick = $u['nick'];
+	
+	$ns->notice($nick,"Command: REGISTER");
+	$ns->notice($nick,"Syntax: /msg $ns->nick register password email");
+	$ns->notice($nick,"Example: /msg $ns->nick register Sup3r-S3cur3 yourname@example.com");
+});
