@@ -41,7 +41,7 @@ hook::func("connect", function($u){
 
 hook::func("privmsg", function($u){
 	
-	global $ns;
+	global $ns,$nickserv;
 	if (strpos($u['dest'],"@") !== false){
 		$n = explode("@",$u['dest']);
 		$dest = $n[0];
@@ -49,7 +49,7 @@ hook::func("privmsg", function($u){
 	else { $dest = $u['dest']; }
 	
 	
-	if (strtolower($dest) == strtolower($ns->nick)){ 
+	if (strtolower($dest) == strtolower($ns->nick) || $dest == $nickserv['uid']){ 
 		nickserv::run("privmsg", array(
 			"msg" => $u['parv'],
 			"nick" => $u['nick'])

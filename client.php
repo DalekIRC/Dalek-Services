@@ -86,11 +86,15 @@ class Client {
 		$this->sendraw(":$this->nick SVS2MODE $uid $string");
 	}
 	function svslogin($uid,$account){
+		global $sasl;
 		
-		if (!($nick = find_person($uid))){ return; }
+		if (isset($sasl[$uid])){ goto svsloginexists; }
+		elseif (!($nick = find_person($uid))){ return; }
+		
 		
 		$uid = $nick['UID'];
 		
+		svsloginexists:
 		$this->sendraw(":$this->nick SVSLOGIN * $uid $account");
 	}
 }

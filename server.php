@@ -208,15 +208,18 @@ for (;;){
 				mysqli_free_result($result);
 			}
 			elseif ($action == "QUIT"){
-				$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
-				if (!$conn) { return "ERROR"; }
-				else {
-					$user = find_person(mb_substr($splittem[0],1));
-					$user = $user['UID'];
-					$prep = $conn->prepare("DELETE FROM dalek_user WHERE UID = ?");
-					$prep->bind_param("s",$user);
-					$prep->execute();
-				}
+				
+				$quitmessage = str_replace($splittem[0]." ".$splittem[2]." ","",$strippem);
+				
+				hook::run("quit", array(
+					'uid' => mb_substr($splittem[0],1),
+					'quitmsg' => $quitmessage)
+				);
+			}
+			elseif ($action == "SASL"){
+				nickserv::run("sasl", array(
+					'sasl' => $strippem)
+				);
 			}
 					
 		}
