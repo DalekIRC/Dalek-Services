@@ -79,6 +79,7 @@ nickserv::func("sasl", function($u){
 				$ns->svslogin($uid,$account);
 				$ns->sendraw(":$ns->nick SASL $origin $uid L $account");
 				$ns->sendraw(":$ns->nick SASL $origin $uid D S");
+				$sasl[$uid] = NULL;
 			}
 			else {
 				$ns->sendraw(":$ns->nick SASL $origin $uid D F");
