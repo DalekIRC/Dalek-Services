@@ -49,6 +49,7 @@ class SQL {
 				timestamp,
 				ident,
 				realhost,
+				account,
 				UID,
 				usermodes,
 				cloak,
@@ -63,10 +64,11 @@ class SQL {
 				?,
 				?,
 				?,
+				?,
 				?
 			)");
-			$ip = base64_decode($u['ipb64']);
-			$prep->bind_param("sssssssss",$u['nick'],$u['timestamp'],$u['ident'],$u['realhost'],$u['uid'],$u['usermodes'],$u['cloak'],$u['ipb64'],$u['sid']);
+			$ip = inet_ntop(base64_decode($u['ipb64']));
+			$prep->bind_param("ssssssssss",$u['nick'],$u['timestamp'],$u['ident'],$u['realhost'],$u['account'],$u['uid'],$u['usermodes'],$u['cloak'],$ip,$u['sid']);
 			$prep->execute();
 			$prep->close();
 		}

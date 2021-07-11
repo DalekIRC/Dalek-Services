@@ -83,4 +83,20 @@ hook::func("preconnect", function($u){
 });
 
 	
+nickserv::func("privmsg", function($u){
 	
+	global $ns,$cf;
+	
+	$parv = explode(" ",$u['msg']);
+	$nick = $u['nick'];
+	if ($parv[0] == chr(1)."VERSION".chr(1)){
+		$ns->notice($nick,chr(1)."VERSION Dalek IRC Services v0.1 on ".$cf['servicesname']." Protocol: ".$cf['proto'].chr(1));
+		return;
+	}
+	
+	if ($parv[0] == chr(1)."PING"){
+		if (!is_numeric(str_replace(chr(1),"",$parv[1]))){ $ns->sendraw(":69L SVSKILL $nick :Client misbehaving"); return; }
+		$ns->notice($nick,chr(1)."PING ".$parv[1].chr(1));
+		return;
+	}
+});

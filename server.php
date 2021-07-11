@@ -22,7 +22,7 @@
 \\	Author:		Valware
 //				
 */
-global $cf,$sql,$sqlip,$sqluser,$sqlpass,$sqldb,$server,$port,$serv,$servertime,$svs,$ns;
+global $cf,$sql,$sqlip,$sqluser,$sqlpass,$sqldb,$server,$port,$serv,$servertime,$svs,$ns,$cs;
 
 include "hook.php";
 include "dalek.conf";
@@ -130,6 +130,16 @@ for (;;){
 					"mtags" => $tagmsg)
 				);
 			}
+			if ($action == "TAGMSG"){
+
+				$nick = mb_substr($splittem[0],1);
+				$dest = $splittem[2];
+				hook::run("tagmsg", array(
+					"nick" => $nick,
+					"dest" => $dest,
+					"mtags" => $tagmsg)
+				);
+			}
 			elseif ($action == "UID"){
 				$sid = mb_substr($splittem[0],1);
 				$nick = $splittem[2];
@@ -137,7 +147,7 @@ for (;;){
 				$ident = $splittem[5];
 				$realhost = $splittem[6];
 				$uid = $splittem[7];
-				$account = ($splittem[8] == "0") ? NULL : $splittem[8];
+				$account = ($splittem[8] == "0") ? false : $splittem[8];
 				$usermodes = $splittem[9];
 				$cloak = $splittem[11];
 				$ipb64 = $splittem[12];
@@ -152,6 +162,7 @@ for (;;){
 					"ident" => $ident,
 					"realhost" => $realhost,
 					"uid" => $uid,
+					"account" => $account,
 					"usermodes" => $usermodes,
 					"cloak" => $cloak,
 					"ipb64" => $ipb64,
@@ -191,21 +202,17 @@ for (;;){
 				);
 			}
 			elseif ($splittem[0] == "NETINFO"){
-				
-				$query = "SELECT * FROM dalek_channels";
-				$result = $sql::query($query);
-				if (!$result){ return; }
-				if (mysqli_num_rows($result) == 0) { return; }
-				while ($row = mysqli_fetch_assoc($result)){
-					$ns->join($row['channel']);
-					$cs->join($row['channel']);
-					$bs->join($row['channel']);
-					$os->join($row['channel']);
-					$gb->join($row['channel']);
-					$hs->join($row['channel']);
-					$ms->join($row['channel']);
-				}
-				mysqli_free_result($result);
+			
+				$ns->join("#services");
+				$cs->join("#services");
+				$cs->join("#Valeyard");
+				$bs->join("#services");
+				$os->join("#services");
+				$gb->join("#services");
+				$hs->join("#services");
+				$ms->join("#services");
+				$serv->sendraw("MD client ".$cf['sid']." saslmechlist :PLAIN");
+				hook::run("start", array());
 			}
 			elseif ($action == "QUIT"){
 				

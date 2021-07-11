@@ -24,8 +24,40 @@
 \\	Author:	Valware
 //				
 */
-
-
+hook::func("start", function($u){
+	
+	global $sql,$ns,$cf;
+	if ($cf['login_method'] !== "default"){ return; }
+	$query = "SELECT * FROM dalek_user";
+	$result = $sql::query($query);
+	
+	if (!$result){ return; }
+	
+	if (mysqli_num_rows($result) == 0){ return; }
+	
+	while($row = mysqli_fetch_assoc($result)){
+		if (df_IsRegUser($row['nick']) && !$row['account']){
+			$ns->notice($row['UID'],"This account is registered. If this is your account,");
+			$ns->notice($row['UID'],"please identify for it using:");
+			$ns->notice($row['UID'],"/msg $ns->nick identify password");
+		}
+		elseif ($row['account']){ $ns->svs2mode($row['UID'],"+r"); }
+	}
+	
+});
+hook::func("UID", function($u){
+	global $ns;
+	
+	if (!$ns){ return; } // not loaded yet
+	
+	if (!$u['account']){
+		if (!df_IsRegUser($u['uid'])){ return; }
+		$ns->notice($u['uid'],"This account is registered. If this is your account,");
+		$ns->notice($u['uid'],"please identify for it using:");
+		$ns->notice($u['uid'],"/msg $ns->nick identify password");
+	}
+});
+		
 nickserv::func("sasl", function($u){
 	
 	global $ns,$nickserv,$sasl;
@@ -56,7 +88,11 @@ nickserv::func("sasl", function($u){
 		
 			$sasl[$uid]["mech"] = $param1;
 			$sasl[$uid]["fingerprint"] = $param2;
-			if ($param1 !== "PLAIN"){ break; }
+			if ($param1 !== "PLAIN"){
+				
+				$ns->sendraw(":$ns->nick SASL $origin $uid D F");
+				break; 
+			}
 			$ns->sendraw(":$ns->nick SASL $origin $uid C +");
 			break;
 		
@@ -76,12 +112,14 @@ nickserv::func("sasl", function($u){
 			}
 			
 			if (df_verify_userpass($account,$pass)){
+				$ns->log("[".$sasl[$uid]["host"]."|".$sasl[$uid]["ip"]."] $uid identified for account $account"); 
 				$ns->svslogin($uid,$account);
 				$ns->sendraw(":$ns->nick SASL $origin $uid L $account");
 				$ns->sendraw(":$ns->nick SASL $origin $uid D S");
 				$sasl[$uid] = NULL;
 			}
 			else {
+				$ns->log("[".$sasl[$uid]["host"]."|".$sasl[$uid]["ip"]."] $uid failed to identify for account $account"); 
 				$ns->sendraw(":$ns->nick SASL $origin $uid D F");
 			}
 			break;

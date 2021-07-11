@@ -58,6 +58,7 @@ nickserv::func("privmsg",	 function($u){
 		$ns->notice($nick['UID'],"There was an error when logging you in. Please contact staff.");
 		return;
 	}
+	$ns->log($nick['nick']." (".$nick['UID'].") identified for account $account"); 
 	$ns->svslogin($nick['UID'],$account);
 	$ns->svs2mode($nick['UID']," +r");
 	$ns->notice($nick['UID'],"You are now logged into account $account");
