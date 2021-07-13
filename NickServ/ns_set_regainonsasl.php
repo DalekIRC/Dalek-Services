@@ -31,8 +31,9 @@ nickserv::func("setcmd", function($u){
 	$parv = explode(" ",$u['cmd']);
 	if ($parv[0] !== "set"){ return; }
 
-	if (!($account = IsLoggedIn($u['nick']))){ $ns->notice($u['nick'],"You must be logged in to use this command."); return; }
+	
 	if ($parv[1] !== "regainonsasl"){ return; }
+	if (!($account = IsLoggedIn($u['nick']))){ $ns->notice($u['nick'],"You must be logged in to use this command."); return; }
 	if ($cf['login_method'] !== "default"){ return; }
 	if (!isset($parv[2])){ return; }
 	if ($parv[2] !== "on" && $parv[2] !== "off"){ return; }
@@ -116,7 +117,9 @@ nickserv::func("saslconf", function($u){
 	if (!IsRegainOnSasl($u['account'])){ return; }
 		
 	else {
-		if ($person = find_person($u['account'])){ $ns->sendraw(":$ns->nick KILL ".$person['nick']." :Automatic recovery in progress"); }
+		if ($person = find_person($u['account'])){ 
+			if ($person['UID'] !== $u['uid']){ $ns->sendraw(":$ns->nick KILL ".$person['nick']." :Automatic recovery in progress"); }
+		}
 		$recovery[$u['uid']] = $u['account'];
 		if ($recov = find_person($u['uid'])){
 			$ns->sendraw(":".$cf['sid']." SVSNICK ".$recov['nick']." ".$recovery[$u['uid']]." $servertime"); $recovery[$u['uid']] = NULL;
