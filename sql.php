@@ -235,3 +235,21 @@ function find_channel($channel){
 	mysqli_free_result($result);
 	return $row;
 }
+
+function update_nick($uid,$nick,$ts){
+	
+	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	if (!$conn) { return "ERROR"; }
+	else {
+		
+		// lmao
+		$person = find_person($uid);
+		$uid = $person['UID'];
+		
+		$prep = $conn->prepare("UPDATE dalek_user SET nick = ?, timestamp = ? WHERE UID = ?");
+		$prep->bind_param("sis",$nick,$ts,$uid);
+		$prep->execute();
+		$prep->close();
+	}
+}

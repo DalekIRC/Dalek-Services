@@ -212,6 +212,7 @@ for (;;){
 				$hs->join("#services");
 				$ms->join("#services");
 				$serv->sendraw("MD client ".$cf['sid']." saslmechlist :PLAIN");
+				$gb->notice("$*","Services is back online. Have a great day!");
 				hook::run("start", array());
 			}
 			elseif ($action == "QUIT"){
@@ -228,7 +229,10 @@ for (;;){
 					'sasl' => $strippem)
 				);
 			}
-					
+			elseif ($action == "NICK"){
+				$uid = mb_substr($splittem[0],1);
+				update_nick($uid,$splittem[2],$splittem[3]);
+			}
 		}
 	}
 }
