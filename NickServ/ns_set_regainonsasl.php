@@ -31,8 +31,9 @@ nickserv::func("setcmd", function($u){
 	$parv = explode(" ",$u['cmd']);
 	if ($parv[0] !== "set"){ return; }
 
-	if (!($account = IsLoggedIn($u['nick']))){ $ns->notice($u['nick'],"You must be logged in to use this command."); return; }
+	
 	if ($parv[1] !== "regainonsasl"){ return; }
+	if (!($account = IsLoggedIn($u['nick']))){ $ns->notice($u['nick'],"You must be logged in to use this command."); return; }
 	if ($cf['login_method'] !== "default"){ return; }
 	if (!isset($parv[2])){ return; }
 	if ($parv[2] !== "on" && $parv[2] !== "off"){ return; }
