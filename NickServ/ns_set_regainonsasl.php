@@ -63,49 +63,62 @@ nickserv::func("setcmd", function($u){
 
 function RegainOnSasl($account,$option){
 	
-	global $sql;
-	
-	$query = "SELECT setting_value FROM dalek_account_settings WHERE account='$account' AND setting_key = 'regainonsasl'";
-	$result = $sql::query($query);
-	
-	if (mysqli_num_rows($result) == 0){
-		
-		$query = "INSERT INTO dalek_account_settings (account, setting_key, setting_value) VALUES ('$account', 'regainonsasl', '$option')";
-		$sql::query($query);
-		$return = true;
-	}
-	
+	global $sqlip,$sqluser,$sqlpass,$sqldb;
+	$opt = "regainonsasl";
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	if (!$conn) { return "ERROR"; }
 	else {
+		$prep = $conn->prepare("SELECT setting_value FROM dalek_account_settings WHERE account = ? AND setting_key = 'regainonsasl'");
+		$prep->bind_param("s",$account);
+		$prep->execute();
+		$result = $prep->get_result();
 		
-		while($row = mysqli_fetch_assoc($result)){
-			$switch = $row['setting_value'];
+		if ($result->num_rows == 0){
+		
+			$prep = $conn->prepare("INSERT INTO dalek_account_settings (account, setting_key, setting_value) VALUES (?, ?, ?)");
+			$prep->bind_param("sss", $account, $opt, $option);
+			$prep->execute();
+			$return = true;
+		}
+		
+		else {
 			
-			if (($switch == "on" && $option == "on") || ($switch == "off" && $option == "off")){ $return = false; }
-			else {
-				$query = "UPDATE dalek_account_settings SET setting_value='$option' WHERE account = '$account' AND setting_key = 'regainonsasl'";
-				$sql::query($query);
-				$return = true;
+			while($row = $result->fetch_assoc()){
+				$switch = $row['setting_value'];
+				
+				if (($switch == "on" && $option == "on") || ($switch == "off" && $option == "off")){ $return = false; }
+				else {
+					$prep = $conn->prepare("UPDATE dalek_account_settings SET setting_value = ? WHERE account = ? AND setting_key = ?");
+					$prep->bind_param("sss", $option, $account, $opt);
+					$prep->execute();
+					$return = true;
+				}
 			}
 		}
 	}
-	mysqli_free_result($result);
+	$prep->close();
 	return $return;
 }
 function IsRegainOnSasl($account){
+	global $sqlip,$sqluser,$sqlpass,$sqldb;
 	
-	global $sql;
-	
-	$query = "SELECT setting_value FROM dalek_account_settings WHERE account='$account' AND setting_key = 'regainonsasl'";
-	$result = $sql::query($query);
-	
-	if (mysqli_num_rows($result) == 0){ return false; }
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	if (!$conn) { return "ERROR"; }
 	else {
+		$prep = $conn->prepare("SELECT setting_value FROM dalek_account_settings WHERE account = ? AND setting_key = 'regainonsasl'");
+		$prep->bind_param("s", $account);
+		$prep->execute();
+		$result = $prep->get_result();
 		
-		$row = mysqli_fetch_assoc($result);
-		if ($row['setting_value'] == "on"){ $return = true; }
-		if ($row['setting_value'] == "off"){ $return = false; }
+		if ($result->num_rows == 0){ return false; }
+		else {
+			
+			$row = $result->fetch_assoc();
+			if ($row['setting_value'] == "on"){ $return = true; }
+			if ($row['setting_value'] == "off"){ $return = false; }
+		}
 	}
-	mysqli_free_result($result);
+	$prep->close();;
 	return $return;
 }
 		
@@ -114,12 +127,14 @@ function IsRegainOnSasl($account){
 nickserv::func("saslconf", function($u){
 	
 	global $ns,$recovery,$serv,$cf,$servertime;
+	echo "aaaaaaaaaaaaa";
 	if (!IsRegainOnSasl($u['account'])){ return; }
-		
 	else {
 		if ($person = find_person($u['account'])){ 
+		echo "aaaaaaaaaaa3";
 			if ($person['UID'] !== $u['uid']){ $ns->sendraw(":$ns->nick KILL ".$person['nick']." :Automatic recovery in progress"); }
 		}
+		echo "aaaaaaaaaaa2";
 		$recovery[$u['uid']] = $u['account'];
 		if ($recov = find_person($u['uid'])){
 			$ns->sendraw(":".$cf['sid']." SVSNICK ".$recov['nick']." ".$recovery[$u['uid']]." $servertime"); $recovery[$u['uid']] = NULL;
