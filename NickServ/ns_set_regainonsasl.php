@@ -117,7 +117,7 @@ nickserv::func("saslconf", function($u){
 	if (!IsRegainOnSasl($u['account'])){ return; }
 		
 	else {
-		if ($person = find_person($u['account'])){ $ns->sendraw(":$ns->nick KILL ".$person['nick']." :Automatic recovery in progress"); }
+		if ($person = find_person($u['account']) && $person['UID'] !== $u['uid']){ $ns->sendraw(":$ns->nick KILL ".$person['nick']." :Automatic recovery in progress"); }
 		$recovery[$u['uid']] = $u['account'];
 		if ($recov = find_person($u['uid'])){
 			$ns->sendraw(":".$cf['sid']." SVSNICK ".$recov['nick']." ".$recovery[$u['uid']]." $servertime"); $recovery[$u['uid']] = NULL;
