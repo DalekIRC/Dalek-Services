@@ -112,6 +112,10 @@ nickserv::func("sasl", function($u){
 			}
 			
 			if (df_verify_userpass($account,$pass)){
+				nickserv::run("saslconf", array(
+					'uid' => $uid,
+					'account' => $account)
+				);
 				$ns->log("[".$sasl[$uid]["host"]."|".$sasl[$uid]["ip"]."] $uid identified for account $account"); 
 				$ns->svslogin($uid,$account);
 				$ns->sendraw(":$ns->nick SASL $origin $uid L $account");

@@ -129,7 +129,25 @@ function df_login($nick,$account){
 	}
 }
 
-
+function IsLoggedIn($nick){
+	
+	global $sql;
+	
+	if (!($person = find_person($nick))){ return false; }
+	
+	$uid = $person['UID'];
+	
+	$query = "SELECT account FROM dalek_user WHERE UID = '$uid'";
+	$result = $sql::query($query);
+	
+	if (mysqli_num_rows($result) == 0){ return false; }
+	
+	$row = mysqli_fetch_assoc($result);
+	$account = $row['account'];
+	mysqli_free_result($result);
+	return $account;
+}
+	
 
 nickserv::func("helplist", function($u){
 	

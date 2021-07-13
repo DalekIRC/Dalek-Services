@@ -90,7 +90,7 @@ nickserv::func("privmsg", function($u){
 	$parv = explode(" ",$u['msg']);
 	$nick = $u['nick'];
 	if ($parv[0] == chr(1)."VERSION".chr(1)){
-		$ns->notice($nick,chr(1)."VERSION Dalek IRC Services v0.1 on ".$cf['servicesname']." Protocol: ".$cf['proto'].chr(1));
+		$ns->notice($nick,chr(1)."VERSION Dalek IRC Services v0.2 on ".$cf['servicesname']." Protocol: ".$cf['proto'].chr(1));
 		return;
 	}
 	

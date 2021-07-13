@@ -33,9 +33,9 @@ nickserv::func("privmsg", function($u){
 	
 	$parv = explode(" ",$u['msg']);
 	$nick = $u['nick'];
-	
+	if (!($cmd = (isset($parv[2])) ? $parv[1]." ".$parv[2] : ($p2 = isset($parv[1]) ? $parv[1] : NULL))){ $cmd = NULL; }
 	if ($parv[0] == "help"){
-		if (!isset($parv[1])){
+		if (!$cmd){
 		
 			$ns->notice($nick,"NickServ allows you to register and retain");
 			$ns->notice($nick,"ownership of a username and enforce certain");
@@ -50,7 +50,7 @@ nickserv::func("privmsg", function($u){
 			$ns->notice($nick,"For more information on a command, type:");
 			$ns->notice($nick,"/msg $ns->nick help command");
 		}
-		else { nickserv::run("help", array('nick' => $nick, 'key' => $parv[1])); }
+		else { nickserv::run("help", array('nick' => $nick, 'key' => $cmd, 'string' => str_replace($cmd." ","",$u['msg']))); }
 		
 	}
 });
