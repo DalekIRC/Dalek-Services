@@ -67,8 +67,7 @@ class SQL {
 				?,
 				?
 			)");
-			$ip = inet_ntop(base64_decode($u['ipb64']));
-			$prep->bind_param("ssssssssss",$u['nick'],$u['timestamp'],$u['ident'],$u['realhost'],$u['account'],$u['uid'],$u['usermodes'],$u['cloak'],$ip,$u['sid']);
+			$prep->bind_param("ssssssssss",$u['nick'],$u['timestamp'],$u['ident'],$u['realhost'],$u['account'],$u['uid'],$u['usermodes'],$u['cloak'],$u['ip'],$u['sid']);
 			$prep->execute();
 			$prep->close();
 		}
@@ -179,9 +178,9 @@ hook::func("preconnect", function($u){
 
 hook::func("UID", function($u){
 	
-	global $sql;
-	
+	global $sql,$ns;
 	$sql::user_insert($u);
+	if (isset($ns)){ $ns->log($u['nick']." (".$u['ident']."@".$u['realhost'].") [".$u['ip']."] connected to the network (".$u['sid'].")"); }
 	
 });
 	
@@ -258,7 +257,6 @@ function update_nick($uid,$nick,$ts){
 	if (!$conn) { return "ERROR"; }
 	else {
 		
-		// lmao
 		$person = find_person($uid);
 		$uid = $person['UID'];
 		
@@ -266,5 +264,36 @@ function update_nick($uid,$nick,$ts){
 		$prep->bind_param("sis",$nick,$ts,$uid);
 		$prep->execute();
 		$prep->close();
+	}
+}
+
+function find_serv($serv){
+	
+	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	if (!$conn) { return "ERROR"; }
+	else {
+		$prep = $conn->prepare("SELECT * FROM dalek_server WHERE servername = ?");
+		$prep->bind_param("s",$serv);
+		$prep->execute();
+		$result = $prep->get_result();
+		
+		if (!$result){ goto sidcheck; }
+		if ($result->num_rows == 0){ goto sidcheck; }
+		$row = $result->fetch_assoc();
+		return $row;
+		
+		sidcheck:
+		
+		$prep = $conn->prepare("SELECT * FROM dalek_server WHERE sid = ?");
+		$prep->bind_param("s",$serv);
+		$prep->execute();
+		$result = $prep->get_result();
+		
+		if (!$result){ return; }
+		if ($result->num_rows == 0){ return false; }
+		$row = $result->fetch_assoc();
+		$prep->close();
+		return $row;
 	}
 }

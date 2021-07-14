@@ -38,7 +38,7 @@ nickserv::func("privmsg",	 function($u){
 	
 	if (strtolower($parv[0]) !== "identify" && strtolower($parv[0]) !== "login" && strtolower($parv[0]) !== "id"){ return; } // our command
 	
-	if (!isset($parv[1])){ $ns->notice($nick['UID'],"Syntax: /msg $ns->nick identify [account] <password>"); return; }
+	if (!isset($parv[1])){ $ns->notice($nick['UID'],IRC("MSG_IDENTIFY_SYNTAX")); return; }
 	
 	// user is logging into account for their nick or notice
 	if (isset($parv[2])){
@@ -50,18 +50,19 @@ nickserv::func("privmsg",	 function($u){
 		$pass = $parv[1];
 	}
 	
-	if (!df_verify_userpass($account,$pass)){ $ns->notice($nick['UID'],"Identification failed: incorrect credentials"); return; }
+	if (!df_verify_userpass($account,$pass)){ $ns->notice($nick['UID'],IRC("MSG_IDENTIFAIL")); return; }
 	
 	if (!df_login($nick['UID'],$account)){
 		
 		//account writing failed for some reason, return;
-		$ns->notice($nick['UID'],"There was an error when logging you in. Please contact staff.");
+		$ns->log(IRC("LOG_IDENTIFAIL"));
+		$ns->notice($nick['UID'],IRC("ERR_IDENTIFAIL"));
 		return;
 	}
-	$ns->log($nick['nick']." (".$nick['UID'].") identified for account $account"); 
+	$ns->log($nick['nick']." (".$nick['UID'].") ".IRC("LOG_IDENTIFY")." $account"); 
 	$ns->svslogin($nick['UID'],$account);
 	$ns->svs2mode($nick['UID']," +r");
-	$ns->notice($nick['UID'],"You are now logged into account $account");
+	$ns->notice($nick['UID'],IRC("MSG_IDENTIFY")." $account");
 	
 });
 

@@ -60,6 +60,12 @@ class Client {
 		
 		$this->sendraw(":$this->nick PRIVMSG $dest :$string");
 	}
+	function log($string){
+		global $cf;
+		
+		$this->msg($cf['logchan'],$string);
+	}
+		
 	function join($dest){
 		global $servertime;
 		

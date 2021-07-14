@@ -26,11 +26,10 @@ global $cf,$sql,$sqlip,$sqluser,$sqlpass,$sqldb,$server,$port,$serv,$servertime,
 
 include "hook.php";
 include "dalek.conf";
-
+include "language.php";
 if ($cf['proto'] == 'unreal5'){ include "protocol/unreal5.php"; }
 include "sql.php";
 include "client.php";
-
 include "NickServ/nickserv.php";
 include "BotServ/botserv.php";
 include "ChanServ/chanserv.php";
@@ -150,8 +149,9 @@ for (;;){
 				$account = ($splittem[8] == "0") ? false : $splittem[8];
 				$usermodes = $splittem[9];
 				$cloak = $splittem[11];
-				$ipb64 = $splittem[12];
-				
+				$ipb64 = ($splittem[12] !== "*") ? $splittem[12] : NULL;
+				$ip = inet_ntop(base64_decode($ipb64)) ?? "*";
+				if (!$ip){ $ip = "*"; }
 				$tok = explode(":",$strippem);
 				$gecos = $tok[count($tok) - 1];
 				
@@ -165,7 +165,7 @@ for (;;){
 					"account" => $account,
 					"usermodes" => $usermodes,
 					"cloak" => $cloak,
-					"ipb64" => $ipb64,
+					"ip" => $ip ?? $ipb64,
 					"gecos" => $gecos)
 				);	
 			}
@@ -233,6 +233,7 @@ for (;;){
 				$uid = mb_substr($splittem[0],1);
 				update_nick($uid,$splittem[2],$splittem[3]);
 			}
+			
 		}
 	}
 }
