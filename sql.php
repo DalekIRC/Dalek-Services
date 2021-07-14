@@ -203,36 +203,51 @@ hook::func("SJOIN", function($u){
 
 function find_person($person){
 	
-	global $sql,$ns;
-	$query = "SELECT * FROM dalek_user WHERE nick = '$person'";
-	$result = $sql::query($query);
-	
-	if (!$result){ goto uidcheck; }
-	if (mysqli_num_rows($result) == 0){ goto uidcheck; }
-	$row = mysqli_fetch_assoc($result);
-	return $row;
-	
-	uidcheck:
-	
-	$query = "SELECT * FROM dalek_user WHERE UID = '$person'";
-	$result = $sql::query($query);
-	
-	if (!$result){ return; }
-	if (mysqli_num_rows($result) == 0){ return false; }
-	$row = mysqli_fetch_assoc($result);
-	mysqli_free_result($result);
-	return $row;
+	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	if (!$conn) { return "ERROR"; }
+	else {
+		$prep = $conn->prepare("SELECT * FROM dalek_user WHERE nick = ?");
+		$prep->bind_param("s",$person);
+		$prep->execute();
+		$result = $prep->get_result();
+		
+		if (!$result){ goto uidcheck; }
+		if ($result->num_rows == 0){ goto uidcheck; }
+		$row = $result->fetch_assoc();
+		return $row;
+		
+		uidcheck:
+		
+		$prep = $conn->prepare("SELECT * FROM dalek_user WHERE UID = ?");
+		$prep->bind_param("s",$person);
+		$prep->execute();
+		$result = $prep->get_result();
+		
+		if (!$result){ return; }
+		if ($result->num_rows == 0){ return false; }
+		$row = $result->fetch_assoc();
+		$prep->close();
+		return $row;
+	}
 }
 
 function find_channel($channel){
 	
-	global $sql,$ns;
-	$query = "SELECT * FROM dalek_channels WHERE channel = '$channel'";
-	$result = $sql::query($query);
-	if (!$result){ return false; }
-	if (mysqli_num_rows($result) == 0){ return false; }
-	$row = mysqli_fetch_assoc($result);
-	mysqli_free_result($result);
+	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	if (!$conn) { return "ERROR"; }
+	else {
+		$prep = $conn->prepare("SELECT * FROM dalek_channels WHERE channel = ?");
+		$prep->bind_param("s",$channel);
+		$prep->execute();
+		$result = $prep->get_result();
+		
+		if (!$result){ return false; }
+		if ($result->num_rows == 0){ return false; }
+		$row = $result->fetch_assoc();
+		$prep->close();
+	}
 	return $row;
 }
 
