@@ -156,7 +156,7 @@ nickserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$ns->notice($nick,"IDENTIFY            Identify to your account.");
+	$ns->notice($nick,"IDENTIFY            ".IRC("HELPCMD_IDENTIFY"));
 	
 });
 

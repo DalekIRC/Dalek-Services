@@ -36,13 +36,16 @@ nickserv::func("privmsg", function($u){
 	
 	$nick = find_person($u['nick']);
 	
-	if (!IsLoggedIn($nick['UID'])){ $ns->notice($nick['UID'],"You are not logged in."); return; }
+	if (!IsLoggedIn($nick['UID'])){ $ns->notice($nick['UID'],IRC("ERR_NOTLOGGEDIN")); return; }
+	
+	$account = $nick['account'];
 	
 	$query = "UPDATE dalek_user SET account=NULL WHERE UID='".$nick['UID']."'";
 	$sql::query($query);
 	$ns->svslogin($nick['UID'],"0");
 	$ns->svs2mode($nick['UID'],"-r");
-	$ns->notice($nick['UID'],"You have been logged out.");
+	$ns->log($nick['nick']." (".$nick['UID'].") ".IRC("LOG_LOGGEDOUT")." $account"); 
+	$ns->notice($nick['UID'],IRC("MSG_LOGGEDOUT"));
 });
 
 
@@ -52,6 +55,6 @@ nickserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$ns->notice($nick,"LOGOUT              Log out of your account.");
+	$ns->notice($nick,"LOGOUT              ".IRC("HELPCMD_LOGOUT"));
 	
 });

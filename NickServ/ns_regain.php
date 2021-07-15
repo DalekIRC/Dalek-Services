@@ -37,20 +37,24 @@ nickserv::func("privmsg", function($u){
 	$account = (isset($parv[1])) ? $parv[1] : NULL;
 	$password = (isset($parv[2])) ? $parv[2] : NULL;
 	
+	/* TO DO: Make better response for incorrect parameters */
 	if (!$account || !$password){ $ns->notice($nick['UID'],"Incorrect parameters."); return; }
 	
-	if (!($nickToRegain = find_person($account))){ $ns->notice($nick['UID'],"Nick is not online."); return; }
+	if (!($nickToRegain = find_person($account))){ $ns->notice($nick['UID'],IRC("ERR_NICKNOTONLINE")); return; }
 	
-	if (!df_verify_userpass($account,$password)){ $ns->notice($nick['UID'],"Incorrect credentials."); return; }
+	if (!df_verify_userpass($account,$password)){ $ns->notice($nick['UID'],IRC("MSG_IDENTFAIL")); return; }
 	
-	$ns->sendraw(":$ns->nick KILL ".$nickToRegain['nick']." :Recovery in progress");
+	$ns->log($nickToRegain['nick']." (".$nickToRegain['UID'].") ".IRC("LOG_REGAIN")." ".$nick['nick']." (".$nick['uid'].")");
+	
+	$ns->sendraw(":$this->uid KILL ".$nickToRegain['nick']." :".IRC("QUITMSG_REGAIN"));
 	$ns->sendraw(":".$cf['sid']." SVSNICK ".$nick['UID']." ".$nickToRegain['nick']." $servertime");
 	
+
 	df_login($nickToRegain['nick'],$account);
 	
 	$ns->svslogin($nick['UID'],$account);
 	$ns->svs2mode($nick['UID'],"+r");
-	$ns->notice($nick['UID'],"$account has been regained. You are now logged in.");
+	$ns->notice($nick['UID'],"$account ".IRC("MSG_REGAIN"));
 });
 nickserv::func("helplist", function($u){
 	
@@ -58,6 +62,6 @@ nickserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$ns->notice($nick,"REGAIN              Also RECOVER. Recovers, and identifies you to your account.");
+	$ns->notice($nick,"REGAIN              ".IRC("HELPCMD_REGAIN"));
 	
 });

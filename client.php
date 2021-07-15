@@ -30,6 +30,7 @@ class Client {
 		global $servertime,$cf;
 		
 		$this->nick = $nick;
+		$this->uid = $uid;
 		
 		$this->sendraw("UID $nick 0 $servertime $ident $hostmask $uid $nick +oiqS * * * :$gecos");
 		
@@ -58,7 +59,7 @@ class Client {
 	}
 	function msg($dest,$string){
 		
-		$this->sendraw(":$this->nick PRIVMSG $dest :$string");
+		$this->sendraw(":$this->uid PRIVMSG $dest :$string");
 	}
 	function log($string){
 		global $cf;
@@ -72,16 +73,18 @@ class Client {
 		$chan = find_channel($dest);
 		if (!$chan){ return; }
 		
-		$this->sendraw("SJOIN ".$chan['timestamp']." $dest :~".$this->nick);
+		$this->sendraw("SJOIN ".$chan['timestamp']." $dest :~".$this->uid);
 	}
 	function notice($dest,$string){
-		
-		$this->sendraw(":$this->nick NOTICE $dest :$string");
-		
+		$uid = $this->uid;
+		$tok = explode("<lf>",$string);
+		for ($i = 0; isset($tok[$i]); $i++){
+			$this->sendraw(":$uid NOTICE $dest :".$tok[$i]);
+		}
 	}
 	function mode($dest,$string){
 		
-		$this->sendraw(":$this->nick MODE $dest $string");
+		$this->sendraw(":$this->uid MODE $dest $string");
 	}
 	function svs2mode($nick,$string){
 		
@@ -89,7 +92,7 @@ class Client {
 		
 		$uid = $nick['UID'];
 		
-		$this->sendraw(":$this->nick SVS2MODE $uid $string");
+		$this->sendraw(":$this->uid SVS2MODE $uid $string");
 	}
 	function svslogin($uid,$account){
 		global $sasl;
@@ -101,6 +104,6 @@ class Client {
 		$uid = $nick['UID'];
 		
 		svsloginexists:
-		$this->sendraw(":$this->nick SVSLOGIN * $uid $account");
+		$this->sendraw(":$this->uid SVSLOGIN * $uid $account");
 	}
 }

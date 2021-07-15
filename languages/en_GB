@@ -24,6 +24,9 @@
 	
 	'LOG_IDENTIFY' => "identified to account:",
 	'MSG_IDENTIFY' => "You are now logged into account:",
+	'HELPCMD_IDENTIFY' => "Identify to your account.",
+	
+	'MSG_PLZIDENT' => "This account is registered. If this is your account,<lf>please register for it using:",
 	
 	'LOG_IDENTIFAIL' => "failed to identify to account:",
 	'MSG_IDENTIFAIL' => "Identification failed: incorrect credentials.",
@@ -31,6 +34,27 @@
 	'ERR_IDENTIFAIL' => "There was an error when logging you in. Please contact staff.",
 	
 	'MSG_IDENTIFY_SYNTAX' => "Syntax: /msg NickServ identify [account] <password>",
+	
+	'LOG_LOGGEDOUT' => "has logged out of account:",
+	'MSG_LOGGEDOUT' => "You have been logged out.",
+	'HELPCMD_LOGOUT' => "Log out of your account.",
+	
+	'ERR_NOTLOGGEDIN' => "You are not logged in.",
+	
+	'HELPCMD_REGISTER' => "Register your username.",
+	'LOG_REGISTER' => "used REGISTER to register account name:",
+	'MSG_REGISTER' => "You have now registered under the account:",
+	'ERR_PASSTOOSHORT' => "That password is too short. Your password must be minimum 8 characters.",
+	'ERR_BADEMAIL' => "That email is not valid. Please enter a valid email.",
+	'ERR_ALREADYREG' => "You are already registered.",
+	
+	'LOG_REGAIN' => "has been disconnected due to REGAIN used by",
+	'HELPCMD_REGAIN' => "Also RECOVER. Recovers, and identifies you to your account.",
+	'MSG_REGAIN' => "has been regained. You are now logged in.",
+	'REGAIN_QUITMSG' => "Recovery in progress",
+	
+	'ERR_NICKNOTONLINE' => "Nick not online.",
+	
 
 	
 ];
