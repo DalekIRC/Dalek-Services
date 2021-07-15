@@ -122,6 +122,8 @@ for (;;){
 				$nick = mb_substr($splittem[0],1);
 				$dest = $splittem[2];
 				$string = mb_substr(str_replace(":$nick PRIVMSG $dest ","",$strippem),1);
+				$token = explode(" ",$string);
+				$string = str_replace($token[0],strtolower($token[0]),$string);
 				hook::run("privmsg", array(
 					"nick" => $nick,
 					"dest" => $dest,
@@ -202,7 +204,7 @@ for (;;){
 				);
 			}
 			elseif ($splittem[0] == "NETINFO"){
-			
+				$serv->sendraw(":".$cf['sid']." MD client ".$cf['sid']." link-security :2");
 				$ns->join("#services");
 				$cs->join("#services");
 				$cs->join("#Valeyard");
