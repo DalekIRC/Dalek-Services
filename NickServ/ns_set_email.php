@@ -43,8 +43,7 @@ nickserv::func("setcmd", function($u){
 	$email = $parv[2];
 	$account = df_AccountDetails($account);
 	
-	
-	for ($i = 0; isset($account[$i]); $i++){ echo $account[$i]; }
+
 	if ($account['email'] == $email){ $ns->notice($nick['UID'],"That is already your email address."); return; }
 	
 	if (!validate_email($email)){ $ns->notice($nick['UID'],IRC("ERR_BADEMAIL")); return ; }
