@@ -41,9 +41,9 @@ nickserv::func("privmsg",	 function($u){
 
 	if (df_IsRegUser($nick['nick'])){ $ns->notice($nick['UID'],IRC("ERR_ALREADYREG")); return; }
 	
-	if (!($password = $parv[1])){ $ns->notice($nick['UID'],"Syntax: /msg $this->uid register <password> <email>"); return; }
+	if (!($password = $parv[1])){ $ns->notice($nick['UID'],"Syntax: /msg $ns->nick register <password> <email>"); return; }
 	
-	if (!($email = $parv[2])){ $ns->notice($nick['UID'],"Syntax: /msg $this->uid register <password> <email>"); return; }
+	if (!($email = $parv[2])){ $ns->notice($nick['UID'],"Syntax: /msg $ns->nick register <password> <email>"); return; }
 	
 	if (($createUser = df_create_user($nick['nick'],$password,$email)) !== true){ $ns->notice($nick['UID'],$createUser); return; }
 	
@@ -68,16 +68,7 @@ function df_create_user($user,$password,$email){
 	
 	if (strlen($password) < 8){ return IRC("ERR_PASSTOOSHORT"); }
 	
-	$tok = explode("@",$email) ?? NULL;
-	$tok2 = explode(".",$tok[1]) ?? NULL;
-	$error = NULL;
-	
-	
-	
-	if (!$tok || !$tok[0] || !$tok[1]) { $error = 1; }
-	elseif (!$tok2[1]){ $error = 1; }
-	
-	if ($error == 1){ return IRC("ERR_BADEMAIL"); }
+	if (!validate_email($email)){ return IRC("ERR_BADEMAIL"); }
 	
 	$password = password_hash($password, PASSWORD_DEFAULT);
 	
@@ -102,6 +93,18 @@ function df_create_user($user,$password,$email){
 	return true;
 }
 
+function validate_email($email){
+	$tok = explode("@",$email) ?? NULL;
+	$tok2 = explode(".",$tok[1]) ?? NULL;
+	$error = NULL;
+	
+	if (!isset($tok) || !isset($tok[0]) || !isset($tok[1])) { $error = 1; }
+	elseif (!$tok2[1]){ $error = 1; }
+	
+	if (!$error){ return true; }
+	else { return false; }
+}
+
 // check if is registered user using default
 function df_IsRegUser($user){
 	
@@ -124,6 +127,25 @@ function df_IsRegUser($user){
 	}
 }
 
+function df_AccountDetails($account){
+	
+	global $sqlip,$sqluser,$sqlpass,$sqldb;
+	
+	
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	if (!$conn) { return false; }
+	else {
+		$prep = $conn->prepare("SELECT * FROM dalek_accounts WHERE display = ?");
+		$prep->bind_param("s",$account);
+		$prep->execute();
+		$check = $prep->get_result();
+		
+		if ($check->num_rows == 0){ $prep->close(); return false; }
+		$row = $check->fetch_assoc();
+		$prep->close();
+		return $row;
+	}
+}
 
 nickserv::func("helplist", function($u){
 	
@@ -146,6 +168,6 @@ nickserv::func("help", function($u){
 	$nick = $u['nick'];
 	
 	$ns->notice($nick,"Command: REGISTER");
-	$ns->notice($nick,"Syntax: /msg $this->uid register password email");
-	$ns->notice($nick,"Example: /msg $this->uid register Sup3r-S3cur3 yourname@example.com");
+	$ns->notice($nick,"Syntax: /msg $ns->nick register password email");
+	$ns->notice($nick,"Example: /msg $ns->nick register Sup3r-S3cur3 yourname@example.com");
 });
