@@ -46,7 +46,7 @@ nickserv::func("privmsg", function($u){
 	
 	$ns->log($nickToRegain['nick']." (".$nickToRegain['UID'].") ".IRC("LOG_REGAIN")." ".$nick['nick']." (".$nick['uid'].")");
 	
-	$ns->sendraw(":$this->uid KILL ".$nickToRegain['nick']." :".IRC("QUITMSG_REGAIN"));
+	$ns->sendraw(":$ns->uid KILL ".$nickToRegain['nick']." :".IRC("REGAIN_QUITMSG"));
 	$ns->sendraw(":".$cf['sid']." SVSNICK ".$nick['UID']." ".$nickToRegain['nick']." $servertime");
 	
 

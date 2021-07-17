@@ -41,7 +41,10 @@ hook::func("start", function($u){
 			$ns->notice($row['UID'],"please identify for it using:");
 			$ns->notice($row['UID'],"/msg $ns->nick identify password");
 		}
-		elseif ($row['account']){ $ns->svs2mode($row['UID'],"+r"); }
+		elseif ($row['account']){ 
+			$ns->svs2mode($row['UID'],"+r");
+			nickserv::run("identify", array('nick' => $row, 'account' => $row['account']));
+		}
 	}
 	
 });
