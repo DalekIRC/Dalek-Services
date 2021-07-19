@@ -1,3 +1,5 @@
+<?php global $ns; $language = [
+
 /*
 // Turkish language file. 
 \\
@@ -11,8 +13,6 @@
 \\ 
 */
 
-<?php global $ns; $language = [
-	
 	'NAME' => "Turkish (TR)",	
 	'AUTHOR' => "OmerAti",
 	'EMAIL' => "omerati6363@gmail.com",
