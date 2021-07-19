@@ -52,7 +52,7 @@
 	'ERR_ALREADYREG' => "Zaten kayitlisiniz.",
 	
 	'LOG_REGAIN' => "tarafindan kullanilan REGAIN nedeniyle baglanti kesildi",
-	'HELPCMD_REGAIN' => "has been regained. You are now logged in.",
+	'HELPCMD_REGAIN' => "REGAIN kullanilarak Giris yaptiniz.",
 	'MSG_REGAIN' => "Yeniden giris yaptiniz.",
 	'REGAIN_QUITMSG' => "Recovery islemi devam ediyor",
 	
