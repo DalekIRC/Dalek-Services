@@ -53,7 +53,7 @@ hook::func("UID", function($u){
 	
 	if (!$ns){ return; } // not loaded yet
 	
-	if (!$u['account']){
+	if (!isset($u['account'])){
 		if (!df_IsRegUser($u['uid'])){ return; }
 		$ns->notice($u['uid'],"This account is registered. If this is your account,");
 		$ns->notice($u['uid'],"please identify for it using:");
