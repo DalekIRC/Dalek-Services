@@ -1,0 +1,63 @@
+/*
+// Turkish language file. 
+\\
+// Dalek IRC Services is copyright (c) 2021 Valware.
+\\     E-mail: <v.a.pond@outlook.com>
+//	 
+\\ LANG_NAME
+//	Turkce (Turkish)
+\\
+// Translated by OmerAti (omerati6363@gmail.com) 
+\\ 
+*/
+
+<?php global $ns; $language = [
+	
+	'NAME' => "Turkish (TR)",	
+	'AUTHOR' => "OmerAti",
+	'EMAIL' => "omerati6363@gmail.com",
+	'ERR_NOSUCHSTRING' => "Dil dizesi getirilirken bir hata olustu.",	
+	
+	
+	
+	
+	/* NickServ */
+	
+	//Identify
+	
+	'LOG_IDENTIFY' => "hesaba tanimli:",
+	'MSG_IDENTIFY' => "Hesaba giris yaptiniz:",
+	'HELPCMD_IDENTIFY' => "Hesabinizi tanimlayin.",
+	
+	'MSG_PLZIDENT' => "Bu hesap kayitlidir. Bu sizin hesabinizsa,<lf>lutfen sunu kullanarak kaydolun:",
+	
+	'LOG_IDENTIFAIL' => "hesap tanimlanmadi:",
+	'MSG_IDENTIFAIL' => "Kimlik basarisiz oldu: yanlis kimlik bilgileri.",
+	
+	'ERR_IDENTIFAIL' => "Giris yaparken bir hata olustu.",
+	
+	'MSG_IDENTIFY_SYNTAX' => "Kullanim: /msg NickServ identify [hesap] <sifre>",
+	
+	'LOG_LOGGEDOUT' => "hesaptan cikis yapildi:",
+	'MSG_LOGGEDOUT' => "Cikis yaptiniz.",
+	'HELPCMD_LOGOUT' => "Hesabinizdan cikis yapin.",
+	
+	'ERR_NOTLOGGEDIN' => "Giris yapmadiniz.",
+	
+	'HELPCMD_REGISTER' => "Lutfen kullanici adinizi kayit edin.",
+	'LOG_REGISTER' => "hesap adini kaydetmek icin REGISTER komutu kullanildi:",
+	'MSG_REGISTER' => "Kayit oldunuz:",
+	'ERR_PASSTOOSHORT' => "Sifre cok kisa. sifreniz en az 8 karakter olmalidir.",
+	'ERR_BADEMAIL' => "Bu e-posta gecerli degil. lutfen gecerli eposta adresini giriniz.",
+	'ERR_ALREADYREG' => "Zaten kayitlisiniz.",
+	
+	'LOG_REGAIN' => "tarafindan kullanilan REGAIN nedeniyle baglanti kesildi",
+	'HELPCMD_REGAIN' => "has been regained. You are now logged in.",
+	'MSG_REGAIN' => "Yeniden giris yaptiniz.",
+	'REGAIN_QUITMSG' => "Recovery islemi devam ediyor",
+	
+	'ERR_NICKNOTONLINE' => "Nick Online Degil.",
+	
+
+	
+];
