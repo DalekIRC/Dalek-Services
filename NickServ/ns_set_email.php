@@ -19,7 +19,7 @@
 //	Syntax: SET EMAIL <new email>
 \\	
 //	
-\\	Version: 1
+\\	Version: 1.1
 //				
 \\	Author:	Valware
 //				
@@ -30,7 +30,7 @@
 nickserv::func("setcmd", function($u){
 	
 	global $ns,$cf;
-	$nick = find_person($u['nick']);
+	$nick = new User($u['nick']);
 	$parv = explode(" ",$u['cmd']);
 	if ($parv[0] !== "set"){ return; }
 
@@ -44,14 +44,14 @@ nickserv::func("setcmd", function($u){
 	$account = df_AccountDetails($account);
 	
 
-	if ($account['email'] == $email){ $ns->notice($nick['UID'],"That is already your email address."); return; }
+	if ($account['email'] == $email){ $ns->notice($nick->uid,"That is already your email address."); return; }
 	
-	if (!validate_email($email)){ $ns->notice($nick['UID'],IRC("ERR_BADEMAIL")); return ; }
+	if (!validate_email($email)){ $ns->notice($nick->uid,IRC("ERR_BADEMAIL")); return ; }
 	
-	if (!df_UpdateEmail($account['display'],$email)){ $ns->notice($nick['UID'],"An error occurred."); return; }
+	if (!df_UpdateEmail($account['display'],$email)){ $ns->notice($nick->uid,"An error occurred."); return; }
 	
-	$ns->log($nick['nick']." (account: ".$account['display'].") has updated their email address to be $email");
-	$ns->notice($nick['UID'],"Your email has been updated to be $email");
+	$ns->log($nick->nick." (account: ".$account['display'].") has updated their email address to be $email");
+	$ns->notice($nick->uid,"Your email has been updated to be $email");
 	return;
 	
 	

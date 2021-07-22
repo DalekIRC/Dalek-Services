@@ -17,7 +17,7 @@
 //	Syntax: <identify|id|login> [account] <password>
 \\	
 //	
-\\	Version: 1
+\\	Version: 1.1
 //				
 \\	Author:	Valware
 //				
@@ -30,7 +30,7 @@ nickserv::func("privmsg",	 function($u){
 	// our global for bot $ns and config $nickserv
 	global $ns,$nickserv;
 	
-	$nick = find_person($u['nick']); // find 'em
+	$nick = new User($u['nick']); // find 'em
 	
 	$parv = explode(" ",$u['msg']); // splittem
 	
@@ -38,7 +38,7 @@ nickserv::func("privmsg",	 function($u){
 	
 	if (strtolower($parv[0]) !== "identify" && strtolower($parv[0]) !== "login" && strtolower($parv[0]) !== "id"){ return; } // our command
 	
-	if (!isset($parv[1])){ $ns->notice($nick['UID'],IRC("MSG_IDENTIFY_SYNTAX")); return; }
+	if (!isset($parv[1])){ $ns->notice($nick->uid,IRC("MSG_IDENTIFY_SYNTAX")); return; }
 	
 	// user is logging into account for their nick or notice
 	if (isset($parv[2])){
@@ -46,23 +46,23 @@ nickserv::func("privmsg",	 function($u){
 		$pass = $parv[2];
 	}
 	else {
-		$account = $nick['nick'];
+		$account = $nick->nick;
 		$pass = $parv[1];
 	}
 	
-	if (!df_verify_userpass($account,$pass)){ $ns->notice($nick['UID'],IRC("MSG_IDENTIFAIL")); return; }
+	if (!df_verify_userpass($account,$pass)){ $ns->notice($nick->uid,IRC("MSG_IDENTIFAIL")); return; }
 	
-	if (!df_login($nick['UID'],$account)){
+	if (!df_login($nick->uid,$account)){
 		
 		//account writing failed for some reason, return;
 		$ns->log(IRC("LOG_IDENTIFAIL"));
-		$ns->notice($nick['UID'],IRC("ERR_IDENTIFAIL"));
+		$ns->notice($nick->uid,IRC("ERR_IDENTIFAIL"));
 		return;
 	}
-	$ns->log($nick['nick']." (".$nick['UID'].") ".IRC("LOG_IDENTIFY")." $account"); 
-	$ns->svslogin($nick['UID'],$account);
-	$ns->svs2mode($nick['UID']," +r");
-	$ns->notice($nick['UID'],IRC("MSG_IDENTIFY")." $account");
+	$ns->log($nick->nick." (".$nick->uid.") ".IRC("LOG_IDENTIFY")." $account"); 
+	$ns->svslogin($nick->uid,$account);
+	$ns->svs2mode($nick->uid," +r");
+	$ns->notice($nick->uid,IRC("MSG_IDENTIFY")." $account");
 	
 	nickserv::run("identify", array('nick' => $nick, 'account' => $account));
 	
@@ -107,8 +107,8 @@ function df_login($nick,$account){
 	else {
 		
 		// lmao
-		$nick = find_person($nick);
-		$nick = $nick['UID'];
+		$nick = new User($nick);
+		$nick = $nick->uid;
 		
 		$prep = $conn->prepare("UPDATE dalek_user SET account = ? WHERE UID = ?");
 		$prep->bind_param("ss",$account,$nick);
@@ -136,9 +136,10 @@ function IsLoggedIn($nick){
 	
 	global $sql;
 	
-	if (!($person = find_person($nick))){ return false; }
+	$person = new User($nick);
+	if (!$person->IsUser){ return false; }
 	
-	$uid = $person['UID'];
+	$uid = $person->uid;
 	
 	$query = "SELECT account FROM dalek_user WHERE UID = '$uid'";
 	$result = $sql::query($query);

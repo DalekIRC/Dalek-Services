@@ -30,6 +30,7 @@ include "language.php";
 if ($cf['proto'] == 'unreal5'){ include "protocol/unreal5.php"; }
 include "sql.php";
 include "client.php";
+include "user.php";
 include "NickServ/nickserv.php";
 include "BotServ/botserv.php";
 include "ChanServ/chanserv.php";
@@ -204,7 +205,7 @@ for (;;){
 				);
 			}
 			elseif ($splittem[0] == "NETINFO"){
-				$serv->sendraw(":".$cf['sid']." MD client ".$cf['sid']." link-security :2");
+				$serv->sendraw("MD client ".$cf['sid']." saslmechlist :PLAIN");
 				$ns->join("#services");
 				$cs->join("#services");
 				$cs->join("#Valeyard");
@@ -213,7 +214,6 @@ for (;;){
 				$gb->join("#services");
 				$hs->join("#services");
 				$ms->join("#services");
-				$serv->sendraw("MD client ".$cf['sid']." saslmechlist :PLAIN");
 				$gb->notice("$*","Services is back online. Have a great day!");
 				hook::run("start", array());
 			}
@@ -234,6 +234,13 @@ for (;;){
 			elseif ($action == "NICK"){
 				$uid = mb_substr($splittem[0],1);
 				update_nick($uid,$splittem[2],$splittem[3]);
+			}
+			elseif ($action == "MOTD"){
+				$nick = new User(mb_substr($splittem[0],1));
+				$serv->sendraw(":".$cf['sid']." 422 $nick->nick :Not yet implemented.");
+			}
+			else {
+				hook::run("raw", array('string' => $strippem));
 			}
 			
 		}

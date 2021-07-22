@@ -18,7 +18,7 @@
 //	
 \\	
 //	
-\\	Version: 1
+\\	Version: 1.1
 //				
 \\	Author:	Valware
 //				
@@ -29,43 +29,43 @@ nickserv::func("privmsg", function($u){
 	
 	global $ns;
 	
-	$nick = find_person($u['nick']);
-	$account = $nick['account'] ?? NULL;
+	$nick = new User($u['nick']);
+	$account = $nick->account ?? NULL;
 	$parv = explode(" ",$u['msg']);
 	$cmd = $parv[0] ?? NULL;
 	$flag = (isset($parv[1])) ? strtolower($parv[1]) : NULL;
 	
 	if ($cmd !== "ajoin") { return; }
 
-	if (!$account){ $ns->notice($nick['nick'],IRC("ERR_NOTLOGGEDIN")); return; }
+	if (!$account){ $ns->notice($nick->nick,IRC("ERR_NOTLOGGEDIN")); return; }
 	if (!$flag){ goto badsyntax_ajoin; }
 	if ($flag !== "add" && $flag !== "del" && $flag !== "list"){ goto badsyntax_ajoin; }
 	
 	if ($flag == "add"){
-		if (!($channel = find_channel($parv[2]))){ $ns->notice($nick['nick'],"Channel does not exist"); return; }
-		if (($reply = ajoin_add($account,$channel['channel'])) !== true){ $ns->notice($nick['nick'],$reply); return; }
-		$ns->notice($nick['nick'],$reply);
-		$ns->log($nick['nick']." added ".$channel['channel']." to the ajoin list for account $account");
+		if (!($channel = find_channel($parv[2]))){ $ns->notice($nick->nick,"Channel does not exist"); return; }
+		if (($reply = ajoin_add($account,$channel['channel'])) !== true){ $ns->notice($nick->nick,$reply); return; }
+		$ns->notice($nick->nick,$reply);
+		$ns->log($nick->nick." added ".$channel['channel']." to the ajoin list for account $account");
 		return;
 	}
 	elseif ($flag == "del"){
 		$channel = $parv[2];
-		if (($reply = ajoin_del($account,$channel)) !== true){ $ns->notice($nick['nick'],$reply); return ;}
-		$ns->log($nick['nick']." deleted $channel from the ajoin list for account $account");
-		$ns->notice($nick['nick'],$reply);
+		if (($reply = ajoin_del($account,$channel)) !== true){ $ns->notice($nick->nick,$reply); return ;}
+		$ns->log($nick->nick." deleted $channel from the ajoin list for account $account");
+		$ns->notice($nick->nick,$reply);
 		return;
 	}
 	elseif ($flag == "list"){
-		if (!($list = ajoin_list($account))){ $ns->notice($nick['nick'],"Your autojoin list is empty."); return; }
-		$ns->notice($nick['nick'],"Listing your autojoin list:");
+		if (!($list = ajoin_list($account))){ $ns->notice($nick->nick,"Your autojoin list is empty."); return; }
+		$ns->notice($nick->nick,"Listing your autojoin list:");
 		while($row = $list->fetch_assoc()){
-			$ns->notice($nick['nick'],$row['channel']);
+			$ns->notice($nick->nick,$row['channel']);
 		}
 		return;
 	}
 	
 	badsyntax_ajoin:
-	$ns->notice($nick['nick'],"Syntax: AJOIN <[add|del]|list> [<channel>]");
+	$ns->notice($nick->nick,"Syntax: AJOIN <[add|del]|list> [<channel>]");
 	return;
 });
 
@@ -87,9 +87,9 @@ nickserv::func("identify", function($u){
 	
 	global $ns,$cf;
 	
-	if (!($list = ajoin_list($u['nick']['account']))){ return; }
+	if (!($list = ajoin_list($u['nick']->account))){ return; }
 	while($row = $list->fetch_assoc()){
-		if (isset($row['channel'])){ $ns->sendraw(":".$cf['sid']." SVSJOIN ".$u['nick']['nick']." ".$row['channel']); }
+		if (isset($row['channel'])){ $ns->sendraw(":".$cf['sid']." SVSJOIN ".$u['nick']->nick." ".$row['channel']); }
 	}
 	
 });

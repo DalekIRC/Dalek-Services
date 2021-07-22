@@ -17,7 +17,7 @@
 //				
 \\				Syntax:		register <password> <email>
 //				
-\\	Version:	1
+\\	Version:	1.1
 //				
 \\	Author:		Valware
 //				
@@ -31,7 +31,7 @@ nickserv::func("privmsg",	 function($u){
 	// our global for bot $ns and config $nickserv
 	global $ns,$nickserv;
 	
-	$nick = find_person($u['nick']); // find 'em
+	if (!($nick = new User($u['nick']))->IsUser){ return; } // find 'em
 	
 	$parv = explode(" ",$u['msg']); // splittem
 	
@@ -39,24 +39,24 @@ nickserv::func("privmsg",	 function($u){
 	
 	if (strtolower($parv[0]) !== "register"){ return; } // our command
 
-	if (df_IsRegUser($nick['nick'])){ $ns->notice($nick['UID'],IRC("ERR_ALREADYREG")); return; }
+	if (df_IsRegUser($nick->nick)){ $ns->notice($nick->uid,IRC("ERR_ALREADYREG")); return; }
 	
-	if (!($password = $parv[1])){ $ns->notice($nick['UID'],"Syntax: /msg $ns->nick register <password> <email>"); return; }
+	if (!($password = $parv[1])){ $ns->notice($nick->uid,"Syntax: /msg $ns->nick register <password> <email>"); return; }
 	
-	if (!($email = $parv[2])){ $ns->notice($nick['UID'],"Syntax: /msg $ns->nick register <password> <email>"); return; }
+	if (!($email = $parv[2])){ $ns->notice($nick->uid,"Syntax: /msg $ns->nick register <password> <email>"); return; }
 	
-	if (($createUser = df_create_user($nick['nick'],$password,$email)) !== true){ $ns->notice($nick['UID'],$createUser); return; }
+	if (($createUser = df_create_user($nick->nick,$password,$email)) !== true){ $ns->notice($nick->uid,$createUser); return; }
 	
-	if (!df_login($nick['UID'],$nick['nick'])){
+	if (!df_login($nick->uid,$nick->nick)){
 		
 		//account writing failed for some reason, return;
-		$ns->notice($nick['UID'],IRC("ERR_IDENTIFAIL"));
+		$ns->notice($nick->uid,IRC("ERR_IDENTIFAIL"));
 		return;
 	}
-	$ns->log("REGISTER: ".$nick['nick']." (".$nick['UID'].") ".IRC("LOG_REGISTER")." ".$nick['nick']);
-	$ns->svslogin($nick['UID'],$nick['nick']);
-	$ns->svs2mode($nick['UID']," +r");
-	$ns->notice($nick['UID'],IRC("MSG_REGISTER")." ".$nick['nick']);
+	$ns->log("REGISTER: ".$nick->nick." (".$nick->uid.") ".IRC("LOG_REGISTER")." ".$nick->nick);
+	$ns->svslogin($nick->uid,$nick->nick);
+	$ns->svs2mode($nick->uid," +r");
+	$ns->notice($nick->uid,IRC("MSG_REGISTER")." ".$nick->nick);
 	
 });
 	
@@ -109,8 +109,6 @@ function validate_email($email){
 function df_IsRegUser($user){
 	
 	global $sqlip,$sqluser,$sqlpass,$sqldb;
-	
-	if (!($nick = find_person($user))){ return false; }
 	
 	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 	if (!$conn) { return "ERROR"; }

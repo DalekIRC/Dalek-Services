@@ -77,8 +77,10 @@ class Client {
 	}
 	function notice($dest,$string){
 		$uid = $this->uid;
-		$tok = explode("<lf>",$string);
+		$tok = explode("<lf>",$string) ?? $string;
+		if ($string == "Array"){ $tok = $string; }
 		for ($i = 0; isset($tok[$i]); $i++){
+			
 			$this->sendraw(":$uid NOTICE $dest :".$tok[$i]);
 		}
 	}

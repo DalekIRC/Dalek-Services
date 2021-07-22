@@ -180,7 +180,7 @@ hook::func("UID", function($u){
 	
 	global $sql,$ns;
 	$sql::user_insert($u);
-	if (isset($ns)){ $ns->log($u['nick']." (".$u['ident']."@".$u['realhost'].") [".$u['ip']."] connected to the network (".$u['sid'].")"); }
+	//if (isset($ns)){ $ns->log($u['nick']." (".$u['ident']."@".$u['realhost'].") [".$u['ip']."] connected to the network (".$u['sid'].")"); }
 	
 });
 	

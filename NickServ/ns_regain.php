@@ -18,7 +18,7 @@
 //	
 \\	
 //	
-\\	Version: 1
+\\	Version: 1.1
 //				
 \\	Author:	Valware
 //				
@@ -31,30 +31,30 @@ nickserv::func("privmsg", function($u){
 	
 	$parv = explode(" ",$u['msg']);
 	
-	if (!($nick = find_person($u['nick']))){ return; }
+	if (!($nick = new User($u['nick']))->IsUser){ return; }
 	if ($parv[0] !== "recover" && $parv[0] !== "regain") { return; }
 	
 	$account = (isset($parv[1])) ? $parv[1] : NULL;
 	$password = (isset($parv[2])) ? $parv[2] : NULL;
 	
 	/* TO DO: Make better response for incorrect parameters */
-	if (!$account || !$password){ $ns->notice($nick['UID'],"Incorrect parameters."); return; }
+	if (!$account || !$password){ $ns->notice($nick->uid,"Incorrect parameters."); return; }
 	
-	if (!($nickToRegain = find_person($account))){ $ns->notice($nick['UID'],IRC("ERR_NICKNOTONLINE")); return; }
+	if (!($nickToRegain = new User($u['nick']))->IsUser){ $ns->notice($nick->uid,IRC("ERR_NICKNOTONLINE")); return; }
 	
-	if (!df_verify_userpass($account,$password)){ $ns->notice($nick['UID'],IRC("MSG_IDENTFAIL")); return; }
+	if (!df_verify_userpass($account,$password)){ $ns->notice($nick->uid,IRC("MSG_IDENTFAIL")); return; }
 	
-	$ns->log($nickToRegain['nick']." (".$nickToRegain['UID'].") ".IRC("LOG_REGAIN")." ".$nick['nick']." (".$nick['uid'].")");
+	$ns->log($nickToRegain->nick." (".$nickToRegain->uid.") ".IRC("LOG_REGAIN")." ".$nick->nick." (".$nick->uid.")");
 	
-	$ns->sendraw(":$ns->uid KILL ".$nickToRegain['nick']." :".IRC("REGAIN_QUITMSG"));
-	$ns->sendraw(":".$cf['sid']." SVSNICK ".$nick['UID']." ".$nickToRegain['nick']." $servertime");
+	$ns->sendraw(":$ns->uid KILL ".$nickToRegain->nick." :".IRC("REGAIN_QUITMSG"));
+	$ns->sendraw(":".$cf['sid']." SVSNICK ".$nick->uid." ".$nickToRegain->nick." $servertime");
 	
 
-	df_login($nickToRegain['nick'],$account);
+	df_login($nickToRegain->nick,$account);
 	
-	$ns->svslogin($nick['UID'],$account);
-	$ns->svs2mode($nick['UID'],"+r");
-	$ns->notice($nick['UID'],"$account ".IRC("MSG_REGAIN"));
+	$ns->svslogin($nick->uid,$account);
+	$ns->svs2mode($nick->uid,"+r");
+	$ns->notice($nick->uid,"$account ".IRC("MSG_REGAIN"));
 });
 nickserv::func("helplist", function($u){
 	

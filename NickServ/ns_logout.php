@@ -18,7 +18,7 @@
 //	
 \\	
 //	
-\\	Version: 1
+\\	Version: 1.1
 //				
 \\	Author:	Valware
 //				
@@ -34,18 +34,18 @@ nickserv::func("privmsg", function($u){
 
 	if ($cmd !== "logout"){ return; }
 	
-	$nick = find_person($u['nick']);
+	$nick = new User($u['nick']);
 	
-	if (!IsLoggedIn($nick['UID'])){ $ns->notice($nick['UID'],IRC("ERR_NOTLOGGEDIN")); return; }
+	if (!IsLoggedIn($nick->uid)){ $ns->notice($nick->uid,IRC("ERR_NOTLOGGEDIN")); return; }
 	
-	$account = $nick['account'];
+	$account = $nick->account;
 	
-	$query = "UPDATE dalek_user SET account=NULL WHERE UID='".$nick['UID']."'";
+	$query = "UPDATE dalek_user SET account=NULL WHERE UID='".$nick->uid."'";
 	$sql::query($query);
-	$ns->svslogin($nick['UID'],"0");
-	$ns->svs2mode($nick['UID'],"-r");
-	$ns->log($nick['nick']." (".$nick['UID'].") ".IRC("LOG_LOGGEDOUT")." $account"); 
-	$ns->notice($nick['UID'],IRC("MSG_LOGGEDOUT"));
+	$ns->svslogin($nick->uid,"0");
+	$ns->svs2mode($nick->uid,"-r");
+	$ns->log($nick->nick." (".$nick->uid.") ".IRC("LOG_LOGGEDOUT")." $account"); 
+	$ns->notice($nick->uid,IRC("MSG_LOGGEDOUT"));
 });
 
 

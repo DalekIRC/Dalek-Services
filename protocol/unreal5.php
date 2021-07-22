@@ -41,6 +41,8 @@ class Server {
 		
 		// Anything we wanna initialise before we connect
 		
+		$this->sid = $cf['sid'];
+		$this->name = $cf['servicesname'];
 		/* pre connect shit */
 		
 		// we are disabling verification for now until built upon more :>
@@ -73,6 +75,15 @@ class Server {
 		fputs($socket, ircstrip($string)."\n");
 		
 	}
+	function Send($string){
+		$this->sendraw(":".$this->sid." ".$string);
+	}
+	function svskill($uid,$string){
+		global $cf;
+		$sid = $cf['sid'];
+		
+		$this->sendraw(":$sid SVSKILL $uid :$string");
+	}
 	function shout($string){
 		global $me;
 		echo "[".$me."][-->] ".$string."\n";
@@ -82,3 +93,44 @@ class Server {
 		echo "[".$me."][<--] ".$string."\n";
 	}
 }
+
+
+hook::func("raw", function($u){
+	
+	global $serv,$cf;
+	
+	$parv = explode(" ",$u['string']);
+	if ($parv[1] !== "WHOIS"){ return; }
+
+	if (!($nick = new User(mb_substr($parv[0],1)))){ return; }
+	if ($parv[2] == $cf['sid']){
+		$user = mb_substr($parv[3],1);
+		$whois = new User($user);
+		if (!$whois->IsUser){
+			$serv->Send("401 $nick->nick $user :No such nick/channel");
+			$serv->Send("318 $nick->nick $user :End of /WHOIS list.");
+			return;
+		}
+		$serv->Send("311 $nick->nick $whois->nick $whois->ident $whois->cloak * :");
+		
+		if (strpos($nick->usermode,"o")){
+			
+			$serv->Send("379 $nick->nick $whois->nick :is using modes $whois->usermode");
+			$serv->Send("378 $nick->nick $whois->nick :is connecting from *@$whois->realhost");
+		}
+		if (strpos($whois->usermode,"r")){
+			
+			$serv->Send("307 $nick->nick $whois->nick :is identified for this nick (+r)");
+		}
+		if (strpos($whois->usermode,"z")){
+			
+			$serv->Send("671 $nick->nick $whois->nick :is using a Secure Connection (+z)");
+		}
+		if ($whois->account){
+			
+			$serv->Send("330 $nick->nick $whois->nick $whois->account :is logged in as");
+		}
+		
+		$serv->Send("318 $nick->nick $whois->nick :End of /WHOIS list.");
+	}
+});
