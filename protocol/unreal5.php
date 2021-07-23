@@ -141,9 +141,15 @@ hook::func("raw", function($u){
 	
 	$parv = explode(" ",$u['string']);
 	
-	if ($parv[1] !== "MOTD" || $cf['sid'] !== mb_substr($parv[2],1)){ return; }
+	if ($parv[1] !== "MOTD" || $cf['sid'] !== mb_substr($parv[2],1))
+	{
+		return;
+	}
 	
-	if (!($nick = new User(mb_substr($parv[0],1)))->IsUser){ return; }
+	if (!($nick = new User(mb_substr($parv[0],1)))->IsUser)
+	{
+		return; 	
+	}
 	
 	$motd = fopen("dalek.motd","r") ?? false;
 	if (!$motd){
