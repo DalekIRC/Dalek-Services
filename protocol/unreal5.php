@@ -134,3 +134,26 @@ hook::func("raw", function($u){
 		$serv->Send("318 $nick->nick $whois->nick :End of /WHOIS list.");
 	}
 });
+
+hook::func("raw", function($u){
+	
+	global $serv,$cf;
+	
+	$parv = explode(" ",$u['string']);
+	
+	if ($parv[1] !== "MOTD" || $cf['sid'] !== mb_substr($parv[2],1)){ return; }
+	
+	if (!($nick = new User(mb_substr($parv[0],1)))->IsUser){ return; }
+	
+	$motd = fopen("dalek.motd","r") ?? false;
+	if (!$motd){
+		$serv->Send("422 $nick->nick :No MOTD found.");
+		return;
+	}
+	$serv->Send("375 $nick->nick :--------oOo------- MOTD from ".$cf['servicesname']." --------oOo-------");
+	while(!feof($motd)){
+		$serv->Send("372 $nick->nick :".fgets($motd));
+	}
+	$serv->Send("376 $nick->nick :--------oOo -------        End of MOTD         --------oOo-------");
+	return;
+});
