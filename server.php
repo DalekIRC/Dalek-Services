@@ -88,7 +88,7 @@ for (;;){
 				goto start;
 			}
 			elseif (strpos($input,'Timeout') !== false) {
-				$serv->hear("Hmmmm. It seems there was a problem. Please check config.conf that 'nick', 'ident' and 'realname' are correct");
+				$serv->hear("Hmmmm. It seems there was a problem. Please check dalek.conf");
 				die();
 			}
 			elseif (strpos($input,'brb lmoa') !== false) {
@@ -96,7 +96,8 @@ for (;;){
 				goto start;
 			}
 			else {
-				$serv->hear("Unknown exit issue! Restarting");
+				$serv->hear("Unknown exit issue! Waiting 40 seconds and restarting");
+				sleep(40);
 				goto start;
 			}
 		}
@@ -142,103 +143,6 @@ for (;;){
 					"mtags" => $tagmsg)
 				);
 			}
-			elseif ($action == "UID"){
-				$sid = mb_substr($splittem[0],1);
-				$nick = $splittem[2];
-				$ts = $splittem[4];
-				$ident = $splittem[5];
-				$realhost = $splittem[6];
-				$uid = $splittem[7];
-				$account = ($splittem[8] == "0") ? false : $splittem[8];
-				$usermodes = $splittem[9];
-				$cloak = $splittem[11];
-				$ipb64 = ($splittem[12] !== "*") ? $splittem[12] : NULL;
-				$ip = inet_ntop(base64_decode($ipb64)) ?? "*";
-				if (!$ip){ $ip = "*"; }
-				$tok = explode(":",$strippem);
-				$gecos = $tok[count($tok) - 1];
-				
-				hook::run("UID", array(
-					"sid" => $sid,
-					"nick" =>$nick,
-					"timestamp" => $ts,
-					"ident" => $ident,
-					"realhost" => $realhost,
-					"uid" => $uid,
-					"account" => $account,
-					"usermodes" => $usermodes,
-					"cloak" => $cloak,
-					"ip" => $ip ?? $ipb64,
-					"gecos" => $gecos)
-				);	
-			}
-			elseif ($action == "SID"){
-				$us = mb_substr($splittem[0],1);
-				$servername = $splittem[2];
-				$hops = $splittem[3];
-				$sid = $splittem[4];
-				$description = mb_substr(str_replace($splittem[0]." ".$splittem[1]." ".$splittem[2]." ".$splittem[3]." ".$splittem[4]." ","",$strippem),1);
-				
-				hook::run("SID", array(
-					"server" => $servername,
-					"hops" => $hops,
-					"sid" => $sid,
-					"desc" => $description)
-				);
-			}
-			elseif ($action == "SJOIN"){
-				$sid = mb_substr($splittem[0],1);
-				$timestamp = $splittem[2];
-				$chan = $splittem[3];
-				$modes = ($splittem[4][0] == ":") ? "" : $splittem[4];
-				
-				$tok = explode(" :",$strippem);
-				$topic = $tok[1] ?? "";
-				
-				hook::run("SJOIN", array(
-					"sid" => $sid,
-					"timestamp" => $timestamp,
-					"channel" => $chan,
-					"modes" => $modes,
-					"topic" => $topic,
-					"full" => $strippem)
-				);
-			}
-			elseif ($splittem[0] == "NETINFO"){
-				$serv->sendraw("MD client ".$cf['sid']." saslmechlist :PLAIN");
-				$ns->join("#services");
-				$cs->join("#services");
-				$cs->join("#Valeyard");
-				$bs->join("#services");
-				$os->join("#services");
-				$gb->join("#services");
-				$hs->join("#services");
-				$ms->join("#services");
-				$gb->notice("$*","Services is back online. Have a great day!");
-				hook::run("start", array());
-			}
-			elseif ($action == "QUIT"){
-				
-				$quitmessage = str_replace($splittem[0]." ".$splittem[2]." ","",$strippem);
-				
-				hook::run("quit", array(
-					'uid' => mb_substr($splittem[0],1),
-					'quitmsg' => $quitmessage)
-				);
-			}
-			elseif ($action == "SASL"){
-				nickserv::run("sasl", array(
-					'sasl' => $strippem)
-				);
-			}
-			elseif ($action == "NICK"){
-				$uid = mb_substr($splittem[0],1);
-				update_nick($uid,$splittem[2],$splittem[3]);
-			}
-			elseif ($action == "MOTD"){
-				$nick = new User(mb_substr($splittem[0],1));
-				$serv->sendraw(":".$cf['sid']." 422 $nick->nick :Not yet implemented.");
-			}
 			else {
 				hook::run("raw", array('string' => $strippem));
 			}
@@ -264,3 +168,4 @@ function ircstrip($string){
             ), '', $string);
 	return $_ircstrip;
 }
+

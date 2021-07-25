@@ -26,7 +26,8 @@
 
 class Client {
 	
-	function __construct($nick,$ident,$hostmask,$uid,$gecos){
+	function __construct($nick,$ident,$hostmask,$uid,$gecos)
+	{
 		global $servertime,$cf;
 		
 		$this->nick = $nick;
@@ -50,14 +51,16 @@ class Client {
 		
 		
 	}
-	function sendraw($string){
+	function sendraw($string)
+	{
 		// Declare de globals;
 		global $socket;
 		
 		fputs($socket, ircstrip($string)."\n");
 		
 	}
-	function msg($dest,$string){
+	function msg($dest,$string)
+	{
 		
 		$this->sendraw(":$this->uid PRIVMSG $dest :$string");
 	}
@@ -67,7 +70,8 @@ class Client {
 		$this->msg($cf['logchan'],$string);
 	}
 		
-	function join($dest){
+	function join($dest)
+	{
 		global $servertime;
 		
 		$chan = find_channel($dest);
@@ -75,7 +79,8 @@ class Client {
 		
 		$this->sendraw("SJOIN ".$chan['timestamp']." $dest :~".$this->uid);
 	}
-	function notice($dest,$string){
+	function notice($dest,$string)
+	{
 		$uid = $this->uid;
 		$tok = explode("<lf>",$string) ?? $string;
 		if ($string == "Array"){ $tok = $string; }
@@ -84,7 +89,8 @@ class Client {
 			$this->sendraw(":$uid NOTICE $dest :".$tok[$i]);
 		}
 	}
-	function mode($dest,$string){
+	function mode($dest,$string)
+	{
 		
 		$this->sendraw(":$this->uid MODE $dest $string");
 	}
@@ -96,7 +102,8 @@ class Client {
 		
 		$this->sendraw(":$this->uid SVS2MODE $uid $string");
 	}
-	function svslogin($uid,$account){
+	function svslogin($uid,$account)
+	{
 		global $sasl;
 		
 		if (isset($sasl[$uid])){ goto svsloginexists; }
@@ -108,4 +115,22 @@ class Client {
 		svsloginexists:
 		$this->sendraw(":$this->uid SVSLOGIN * $uid $account");
 	}
+	function exit()
+	{
+		global $sql;
+		$sql::user_delete($uid);
+	}
 }
+
+hook::func("start", function(){
+	global $ns,$cs,$bs,$os,$gb,$hs,$ms;
+	$ns->join("#services");
+	$cs->join("#services");
+	$cs->join("#Valeyard");
+	$bs->join("#services");
+	$os->join("#services");
+	$gb->join("#services");
+	$hs->join("#services");
+	$ms->join("#services");
+	$gb->notice("$*","Services is back online. Have a great day!");
+});

@@ -32,7 +32,7 @@ class SQL {
 	function query($query){
 		global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
 		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
-		if (!$conn) { return "ERROR"; }
+		if (!$conn) { return false; }
 		else {
 			$result = mysqli_query($conn,$query);
 			return $result;
@@ -41,7 +41,7 @@ class SQL {
 	function user_insert($u){
 		global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
 		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
-		if (!$conn) { return "ERROR"; }
+		if (!$conn) { return false; }
 		else {
 			$prep = $conn->prepare("INSERT INTO dalek_user (
 				
@@ -72,10 +72,21 @@ class SQL {
 			$prep->close();
 		}
 	}
+	function user_delete($u){
+		global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
+		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+		if (!$conn) { return false; }
+		else {
+			$prep = $conn->prepare("DELETE FROM dalek_user WHERE UID = ?");
+			$prep->bind_param("s",$u);
+			$prep->execute();
+			$prep->close();
+		}
+	}
 	function sid($u){
 		global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
 		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
-		if (!$conn) { return "ERROR"; }
+		if (!$conn) { return false; }
 		else {
 			$prep = $conn->prepare("INSERT INTO dalek_server (
 				
@@ -98,7 +109,7 @@ class SQL {
 	function sjoin($u){
 		global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
 		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
-		if (!$conn) { return "ERROR"; }
+		if (!$conn) { return false; }
 		else {
 
 			$prep = $conn->prepare("INSERT INTO dalek_channels (
@@ -199,12 +210,11 @@ hook::func("SJOIN", function($u){
 	$sql::sjoin($u);
 });
 
-
 function find_person($person){
 	
 	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
 	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
-	if (!$conn) { return "ERROR"; }
+	if (!$conn) { return false; }
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_user WHERE nick = ?");
 		$prep->bind_param("s",$person);
@@ -235,7 +245,7 @@ function find_channel($channel){
 	
 	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
 	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
-	if (!$conn) { return "ERROR"; }
+	if (!$conn) { return false; }
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_channels WHERE channel = ?");
 		$prep->bind_param("s",$channel);
@@ -254,7 +264,7 @@ function update_nick($uid,$nick,$ts){
 	
 	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
 	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
-	if (!$conn) { return "ERROR"; }
+	if (!$conn) { return false; }
 	else {
 		
 		$person = find_person($uid);
@@ -266,12 +276,27 @@ function update_nick($uid,$nick,$ts){
 		$prep->close();
 	}
 }
-
+function update_usermode($uid,$new){
+	
+	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	if (!$conn) { return false; }
+	else {
+		
+		$person = find_person($uid);
+		$uid = $person['UID'];
+		
+		$prep = $conn->prepare("UPDATE dalek_user SET usermodes = ? WHERE UID = ?");
+		$prep->bind_param("ss",$new,$uid);
+		$prep->execute();
+		$prep->close();
+	}
+}
 function find_serv($serv){
 	
 	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
 	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
-	if (!$conn) { return "ERROR"; }
+	if (!$conn) { return false; }
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_server WHERE servername = ?");
 		$prep->bind_param("s",$serv);

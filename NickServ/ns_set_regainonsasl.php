@@ -24,56 +24,68 @@
 //				
 */
 
-nickserv::func("setcmd", function($u){
+nickserv::func("setcmd", function($u)
+{
 	
 	global $ns,$cf;
 	
 	$parv = explode(" ",$u['cmd']);
 	if ($parv[0] !== "set"){ return; }
-
-	
 	if ($parv[1] !== "regainonsasl"){ return; }
-	if (!($account = IsLoggedIn($u['nick']))){ $ns->notice($u['UID'],"You must be logged in to use this command."); return; }
+	$nick = new User($u['nick']);
+	if (!($account = $nick->account))
+	{
+		$ns->notice($nick->uid,"You must be logged in to use this command.");
+		return;
+	}
 	if ($cf['login_method'] !== "default"){ return; }
 	if (!isset($parv[2])){ return; }
 	if ($parv[2] !== "on" && $parv[2] !== "off"){ return; }
 	
-	if ($parv[2] == "on"){ 
-		if (!RegainOnSasl($account,"on")){
-			$ns->notice($account,"REGAINONSASL is already set to 'on'");
+	if ($parv[2] == "on")
+	{ 
+		if (!RegainOnSasl($account,"on"))
+		{
+			$ns->notice($nick->uid,"REGAINONSASL is already set to 'on'");
 			return;
 		}
-		else {
-			$ns->notice($account,"REGAINONSASL is now set to 'on'");
+		else
+		{
+			$ns->notice($nick->uid,"REGAINONSASL is now set to 'on'");
 			return;
 		}	
 	}
-	if ($parv[2] == "off"){ 
+	if ($parv[2] == "off")
+	{ 
 		if (!RegainOnSasl($account,"off")){
-			$ns->notice($account,"REGAINONSASL is already set to 'off'");
+			$ns->notice($nick->uid,"REGAINONSASL is already set to 'off'");
 			return;
 		}
-		else {
-			$ns->notice($account,"REGAINONSASL is now set to 'off'");
+		else
+		{
+			$ns->notice($nick->uid,"REGAINONSASL is now set to 'off'");
 			return;
 		}	
 	}
 });
 
 
-function RegainOnSasl($account,$option){
+function RegainOnSasl($account,$option)
+{
 	
 	global $sqlip,$sqluser,$sqlpass,$sqldb;
 	$opt = "regainonsasl";
 	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
-	if (!$conn) { return "ERROR"; }
-	else {
+	if (!$conn) { return false; }
+	else
+	{
 		$prep = $conn->prepare("SELECT setting_value FROM dalek_account_settings WHERE account = ? AND setting_key = 'regainonsasl'");
 		$prep->bind_param("s",$account);
 		$prep->execute();
 		$result = $prep->get_result();
 		
-		if ($result->num_rows == 0){
+		if ($result->num_rows == 0)
+		{
 		
 			$prep = $conn->prepare("INSERT INTO dalek_account_settings (account, setting_key, setting_value) VALUES (?, ?, ?)");
 			$prep->bind_param("sss", $account, $opt, $option);
@@ -81,13 +93,16 @@ function RegainOnSasl($account,$option){
 			$return = true;
 		}
 		
-		else {
+		else
+		{
 			
-			while($row = $result->fetch_assoc()){
+			while($row = $result->fetch_assoc())
+			{
 				$switch = $row['setting_value'];
 				
 				if (($switch == "on" && $option == "on") || ($switch == "off" && $option == "off")){ $return = false; }
-				else {
+				else
+				{
 					$prep = $conn->prepare("UPDATE dalek_account_settings SET setting_value = ? WHERE account = ? AND setting_key = ?");
 					$prep->bind_param("sss", $option, $account, $opt);
 					$prep->execute();
@@ -99,19 +114,22 @@ function RegainOnSasl($account,$option){
 	$prep->close();
 	return $return;
 }
-function IsRegainOnSasl($account){
+function IsRegainOnSasl($account)
+{
 	global $sqlip,$sqluser,$sqlpass,$sqldb;
 	
 	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
-	if (!$conn) { return "ERROR"; }
-	else {
+	if (!$conn) { return false; }
+	else
+	{
 		$prep = $conn->prepare("SELECT setting_value FROM dalek_account_settings WHERE account = ? AND setting_key = 'regainonsasl'");
 		$prep->bind_param("s", $account);
 		$prep->execute();
 		$result = $prep->get_result();
 		
 		if ($result->num_rows == 0){ return false; }
-		else {
+		else
+		{
 			
 			$row = $result->fetch_assoc();
 			if ($row['setting_value'] == "on"){ $return = true; }
@@ -124,32 +142,42 @@ function IsRegainOnSasl($account){
 		
 		
 	
-nickserv::func("saslconf", function($u){
+nickserv::func("saslconf", function($u)
+{
 	
 	global $ns,$recovery,$serv,$cf,$servertime;
 	
 	if (!IsRegainOnSasl($u['account'])){ return; }
 	else {
-		if ($person = new User($u['account'])){ 
+		if ($person = new User($u['account']))
+		{ 
 		
-			if ($person->uid !== $u['uid']){ $ns->sendraw(":$ns->nick KILL $person->nick :Automatic recovery in progress"); }
+			if ($person->uid !== $u['uid']){
+				$ns->sendraw(":$ns->nick KILL $person->nick :Automatic recovery in progress");
+			}
 		}
 		
 		$recovery[$u['uid']] = $u['account'];
-		if ($recov = new User($u['uid'])){
-			$ns->sendraw(":".$cf['sid']." SVSNICK $recov->nick ".$recovery[$u['uid']]." $servertime"); $recovery[$u['uid']] = NULL;
+		if ($recov = new User($u['uid']))
+		{
+			$ns->sendraw(":".$cf['sid']." SVSNICK $recov->uid ".$recovery[$u['uid']]." $servertime"); $recovery[$u['uid']] = NULL;
 		}
 	}
 });
 
-hook::func("UID", function($u){
+hook::func("UID", function($u)
+{
 	
 	global $ns,$recovery,$cf,$servertime;
-	if (isset($recovery[$u['uid']])){ $ns->sendraw(":".$cf['sid']." SVSNICK ".$u['nick']." ".$recovery[$u['uid']]." $servertime"); $recovery[$u['uid']] = NULL; }
+	if (isset($recovery[$u['uid']]))
+	{ 
+		$ns->sendraw(":".$cf['sid']." SVSNICK ".$u['nick']." ".$recovery[$u['uid']]." $servertime"); $recovery[$u['uid']] = NULL;
+	}
 	return;
 });
 
-nickserv::func("setlist", function($u){
+nickserv::func("setlist", function($u)
+{
 	
 	global $ns;
 	

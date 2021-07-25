@@ -24,37 +24,65 @@
 \\	Author:	Valware
 //				
 */
-hook::func("start", function($u){
+
+
+hook::func("raw", function($u)
+{ 
+	$tok = explode(" ",$u['string']);
+	if ($tok[1] !== "SASL")
+	{
+		return;
+	}
+	nickserv::run("sasl", array('sasl' => $u['string']));
+}); 
+
+hook::func("start", function($u)
+{
 	
 	global $sql,$ns,$cf;
-	if ($cf['login_method'] !== "default"){ return; }
+	if ($cf['login_method'] !== "default"){
+		return;
+	}
 	$query = "SELECT * FROM dalek_user";
 	$result = $sql::query($query);
 	
-	if (!$result){ return; }
+	if (!$result){
+		return;
+	}
 	
-	if (mysqli_num_rows($result) == 0){ return; }
+	if (mysqli_num_rows($result) == 0)
+	{
+		return;
+	}
 	
-	while($row = mysqli_fetch_assoc($result)){
-		if (df_IsRegUser($row['nick']) && !$row['account']){
+	while($row = mysqli_fetch_assoc($result))
+	{
+		if (df_IsRegUser($row['nick']) && !$row['account'])
+		{
 			$ns->notice($row['UID'],"This account is registered. If this is your account,");
 			$ns->notice($row['UID'],"please identify for it using:");
 			$ns->notice($row['UID'],"/msg $ns->nick identify password");
 		}
-		elseif ($row['account']){ 
+		elseif ($row['account'])
+		{ 
 			$ns->svs2mode($row['UID'],"+r");
 			nickserv::run("identify", array('nick' => $row, 'account' => $row['account']));
 		}
 	}
 	
 });
-hook::func("UID", function($u){
+hook::func("UID", function($u)
+{
 	global $ns;
 	
-	if (!$ns){ return; } // not loaded yet
+	if (!$ns){
+		return;
+	} // not loaded yet
 	
 	if (!isset($u['account'])){
-		if (!df_IsRegUser($u['uid'])){ return; }
+		if (!df_IsRegUser($u['uid'])){
+			return;
+		}
 		$ns->notice($u['uid'],"This account is registered. If this is your account,");
 		$ns->notice($u['uid'],"please identify for it using:");
 		$ns->notice($u['uid'],"/msg $ns->nick identify password");
