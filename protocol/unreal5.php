@@ -203,7 +203,7 @@ hook::func("raw", function($u)
 		{
 			
 			$serv->Send("379 $nick->nick $whois->nick :is using modes $whois->usermode");
-			$serv->Send("378 $nick->nick $whois->nick :is connecting from *@$whois->realhost");
+			$serv->Send("378 $nick->nick $whois->nick :is connecting from *@$whois->realhost $whois->ip");
 		}
 		if (strpos($whois->usermode,"r"))
 		{
