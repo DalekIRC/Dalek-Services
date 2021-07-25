@@ -87,7 +87,7 @@ nickserv::func("identify", function($u){
 	
 	global $ns,$cf;
 	
-	if (!($list = ajoin_list($u['nick']->account))){ return; }
+	if (!($list = ajoin_list($u['nick']->account ?? NULL))){ return; }
 	while($row = $list->fetch_assoc()){
 		if (isset($row['channel'])){ $ns->sendraw(":".$cf['sid']." SVSJOIN ".$u['nick']->nick." ".$row['channel']); }
 	}

@@ -154,13 +154,17 @@ nickserv::func("saslconf", function($u)
 		
 			if ($person->uid !== $u['uid']){
 				$ns->sendraw(":$ns->nick KILL $person->nick :Automatic recovery in progress");
+				$person->exit();
 			}
 		}
 		
 		$recovery[$u['uid']] = $u['account'];
 		if ($recov = new User($u['uid']))
 		{
-			$ns->sendraw(":".$cf['sid']." SVSNICK $recov->uid ".$recovery[$u['uid']]." $servertime"); $recovery[$u['uid']] = NULL;
+			if ($recov->IsUser)
+			{
+				$ns->sendraw(":".$cf['sid']." SVSNICK $recov->uid ".$recovery[$u['uid']]." $servertime"); $recovery[$u['uid']] = NULL;
+			}
 		}
 	}
 });
