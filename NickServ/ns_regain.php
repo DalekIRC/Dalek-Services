@@ -40,7 +40,7 @@ nickserv::func("privmsg", function($u){
 	/* TO DO: Make better response for incorrect parameters */
 	if (!$account || !$password){ $ns->notice($nick->uid,"Incorrect parameters."); return; }
 	
-	if (!($nickToRegain = new User($u['nick']))->IsUser){ $ns->notice($nick->uid,IRC("ERR_NICKNOTONLINE")); return; }
+	if (!($nickToRegain = new User($account))->IsUser){ $ns->notice($nick->uid,IRC("ERR_NICKNOTONLINE")); return; }
 	
 	if (!df_verify_userpass($account,$password)){ $ns->notice($nick->uid,IRC("MSG_IDENTFAIL")); return; }
 	
