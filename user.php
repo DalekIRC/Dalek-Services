@@ -43,12 +43,14 @@ class User {
 		$this->ident = $u['ident'];
 		$this->usermode = $u['usermodes'];
 		$this->realhost = $u['realhost'];
+		$this->gecos = $u['gecos'];
 		$this->cloak = $u['cloak'];
 		$this->ip = $u['ip'];
 		$this->account = (isset($u['account'])) ? $u['account'] : false;
 		$this->fingerprint = (isset($u['fingerprint'])) ? $u['fingerprint'] : false;
 		$this->sid = $u['SID'];
 		$this->tls = (strpos($u['usermodes'],"z")) ? true : false;
+		$this->last = $u['last'];
 	}
 	function NewNick($nick)
 	{
@@ -118,6 +120,11 @@ class User {
 		sendumode($this->uid,$validate['ToSet']);
 		update_usermode($this->uid,$validate['NewModes']);
 		return true;
+	}
+	function exit()
+	{
+		global $sql;
+		$sql::user_delete($this->uid);
 	}
 		
 }

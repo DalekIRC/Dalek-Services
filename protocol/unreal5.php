@@ -112,11 +112,69 @@ class Server
 	}
 }
 
+
+/* UMODE2 */
+hook::func("raw", function($u)
+{
+	$parv = explode(" ",$u['string']);
+	if ($parv[1] !== "UMODE2")
+	{ 
+		return;
+	}
+	$user = new User(mb_substr($parv[0],1));
+	if (!$user->IsUser)
+	{
+		return;
+	}
+	
+	$user->SetMode($parv[2]);
+});
+
+
 /* WHOIS */
 hook::func("raw", function($u)
 {
 	
-	global $serv,$cf;
+	global $_LINK;
+	
+	$parv = explode(" ",$u['string']);
+	if ($parv[0] !== "PROTOCTL")
+	{ 
+		return;
+	}
+	for ($i = 1; isset($parv[$i]); $i++)
+	{
+		$tok = explode("=",$parv[$i]);
+		if ($tok[0] == "SID")
+		{
+			$_LINK = $tok[1];
+		}
+	}
+});
+hook::func("raw", function($u)
+{
+	
+	global $_LINK,$sql;
+	
+	$parv = explode(" ",$u['string']);
+	if ($parv[0] !== "SERVER")
+	{ 
+		return;
+	}
+	$sid = $_LINK;
+	$_LINK = NULL;
+	$name = $parv[1];
+	$hops = $parv[2];
+	$desc = str_replace("$parv[0] $parv[1] $parv[2] $parv[3] ","",$u['string']);
+	
+	$sql::sid(array('server' => $name,'hops' => $hops,'sid' => $sid,'desc' => $desc));
+});
+
+/* WHOIS */
+hook::func("raw", function($u)
+{
+	
+	global $serv,$cf,$servertime;
 	
 	$parv = explode(" ",$u['string']);
 	if ($parv[1] !== "WHOIS")
@@ -138,9 +196,10 @@ hook::func("raw", function($u)
 			$serv->Send("318 $nick->nick $user :End of /WHOIS list.");
 			return;
 		}
-		$serv->Send("311 $nick->nick $whois->nick $whois->ident $whois->cloak * :");
+		$hostmask = (strpos($whois->usermode,"x")) ? $whois->cloak : $whois->realhost;
+		$serv->Send("311 $nick->nick $whois->nick $whois->ident $hostmask * $whois->gecos");
 		
-		if (strpos($nick->usermode,"o"))
+		if (strpos($nick->usermode,"o") || $nick->uid == $whois->uid)
 		{
 			
 			$serv->Send("379 $nick->nick $whois->nick :is using modes $whois->usermode");
@@ -151,6 +210,70 @@ hook::func("raw", function($u)
 			
 			$serv->Send("307 $nick->nick $whois->nick :is identified for this nick (+r)");
 		}
+		$chanlist = get_ison($whois->uid);
+		$full_list = NULL;
+		for ($p = 0; isset($chanlist['list'][$p]); $p++)
+		{
+			
+			$secret = NULL;
+			$chanmode = NULL;
+			$chan = find_channel($chanlist['list'][$p]);
+			
+			if (strpos($chan['modes'],"s") || strpos($chan['modes'],"p"))
+			{
+				$secret = true;
+			}
+			else
+			{
+				$secret = false;
+			}
+			if ($chanlist['mode'])
+			{
+				
+				$char = $chanlist['mode'][$p];
+				
+				if ($char == "q")
+				{
+					$chanmode .= "~";
+				}
+				elseif ($char == "a")
+				{
+					$chanmode .= "&";
+				}
+				elseif ($char == "o")
+				{
+					$chanmode .= "@";
+				}
+				elseif ($char == "h")
+				{
+					$chanmode .= "%";
+				}
+				elseif ($char == "v")
+				{
+					$chanmode .= "+";
+				}
+			
+			}
+			$sec = ($secret) ? "!" : "";
+			if ($secret && (strpos($nick->usermode,"o") || $whois->uid == $nick->uid))
+			{
+				$full_list .= $sec.$chanmode.$chanlist['list'][$p]." ";
+			}
+			if (!$secret)
+			{
+				$full_list .= $chanmode.$chanlist['list'][$p]." ";
+			}
+		}
+		$serv->Send("319 $nick->nick $whois->nick :$full_list");
+		
+		$sv = find_serv($nick->sid);
+		$serv->Send("312 $nick->nick $whois->nick ".$sv['servername']." :".$sv['version']);
+		
+		if (strpos($whois->usermode,"o"))
+		{
+			$serv->Send("313 $nick->nick $whois->nick :is an IRC Operator (+o)");
+		}
+			
 		if (strpos($whois->usermode,"z"))
 		{
 			
@@ -161,11 +284,136 @@ hook::func("raw", function($u)
 			
 			$serv->Send("330 $nick->nick $whois->nick $whois->account :is logged in as");
 		}
-		
+		if ($swhois = GetSWhois($whois->uid))
+		{
+			foreach ($swhois['swhois'] as $whoistok)
+			{
+				$serv->Send("320 $nick->nick $whois->nick :$whoistok ");
+			}
+		}
+		$idle = ($servertime - $whois->last);
+		if (!strpos($whois->usermode,"I"))
+		{
+			$serv->Send("317 $nick->nick $whois->nick $idle $whois->ts :seconds idle, signon time");
+		}
 		$serv->Send("318 $nick->nick $whois->nick :End of /WHOIS list.");
 	}
 });
 
+/* SWHOIS */
+hook::func("raw", function($u)
+{
+	$parv = explode(" ",$u['string']);
+	
+	if ($parv[1] !== "SWHOIS")
+	{ 
+		return;
+	}
+	
+	$user = new User($parv[2]);
+	$username = $user->uid;
+	$switch = $parv[3];
+	$tag = $parv[4];
+	$priority = $parv[5];
+	$whois = str_replace("$parv[0] $parv[1] $parv[2] $switch $tag $priority :","",$u['string']);
+	
+	SWHOIS("$username $switch $tag $priority $whois");
+});
+
+/* GetSwhois command (lookup) */
+function GetSWhois($uid)
+{
+	
+	global $sqlip,$sqluser,$sqlpass,$sqldb;
+	
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$user = new User($uid);
+	if (!$user->IsUser)
+	{
+		return;
+	}
+	
+	if (!$conn) { return false; }
+	else
+	{
+		$prep = $conn->prepare("SELECT * FROM dalek_swhois WHERE uid = ? ORDER BY priority DESC");
+		$prep->bind_param("s", $uid);
+		$prep->execute();
+		$result = $prep->get_result();
+		
+		if ($result->num_rows == 0){ return false; }
+		else
+		{
+			$swhois = array();
+			$tag = array();
+			
+			while($row = $result->fetch_assoc())
+			{
+				$swhois[] = $row['swhois'];
+				$tag[] = $row['tag'];
+			}
+		}
+	}
+	$return = array('swhois' => $swhois, 'tag' => $tag);
+	$prep->close();;
+	return $return;
+}
+
+
+
+/*	SWHOIS command (incoming)
+	$parv[1] = UID,
+	$parv[2] = +/-,
+	$parv[3] = tag,
+	$parv[4] = priority,
+	$parv[5] = swhois
+*/
+function SWHOIS($string){
+	global $sqlip,$sqluser,$sqlpass,$sqldb;
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$parv = explode(" ",$string);
+	
+	$user = $parv[0];
+	$switch = $parv[1];
+	$tag = $parv[2];
+	$priority = $parv[3];
+	$whois = str_replace("$user $switch $tag $priority ","",$string);
+	
+	
+	if ($switch == "+")
+	{
+		if (!$conn) { return false; }
+		else
+		{
+			$prep = $conn->prepare("INSERT INTO dalek_swhois (tag, uid, priority, swhois) VALUES (?, ?, ?, ?)");
+			$prep->bind_param("ssss",$tag,$user,$priority,$whois);
+			$prep->execute();
+			$prep->close();
+		}
+		
+	}
+	if ($switch == "-")
+	{
+		if (!$conn){ return false; }
+		else
+		{
+			if ($whois == "*")
+			{
+				$prep = $conn->prepare("DELETE FROM dalek_swhois WHERE uid = ? AND tag = ?");
+				$prep->bind_param("ss",$user,$tag);
+				$prep->execute();
+				$prep->close();
+			}
+			else
+			{
+				$prep = $conn->prepare("DELETE FROM dalek_swhois WHERE uid = ? AND tag = ? AND swhois = ?");
+				$prep->bind_param("sss",$user,$tag,$whois);
+				$prep->execute();
+				$prep->close();
+			}
+		}
+	}
+};
 
 /* MOTD */
 hook::func("raw", function($u)
@@ -315,7 +563,6 @@ hook::func("raw", function($u)
 	if (!$ip){ $ip = ""; }
 	$tok = explode(":",$u['string']);
 	$gecos = $tok[count($tok) - 1];
-	
 	hook::run("UID", array(
 		"sid" => $sid,
 		"nick" =>$nick,
@@ -331,3 +578,68 @@ hook::func("raw", function($u)
 	);	
 });
 
+hook::func("SJOIN", function($u)
+{	
+	global $sql;
+	
+	$tokens = explode(" ",$u['full']);
+	$chan = $tokens[3];
+	$list = explode(":",$u['full']);
+	$parv = explode(" ",$list[count($list) - 1]);
+	
+	if (!$parv)
+	{
+		return;
+	}
+	for ($p = 0; $parv[$p]; $p++)
+	{
+		echo $parv[$p];
+		$mode = "";
+		$item = $parv[$p];
+		loopback:
+		if (!isset($item[0]))
+		{
+			continue;
+		}
+		if ($item[0] == "+")
+		{
+			echo "Item: $item\n";
+			$mode .= "v";
+			$item = mb_substr($item,1);
+			goto loopback;
+		}
+		if ($item[0] == "%")
+		{
+			$mode .= "h";
+			$item = mb_substr($item,1);
+			goto loopback;
+		}
+		if ($item[0] == "@")
+		{
+			$mode .= "o";
+			$item = mb_substr($item,1);
+			goto loopback;
+		}
+		if ($item[0] == "~")
+		{
+			$mode .= "a";
+			$item = mb_substr($item,1);
+			goto loopback;
+		}
+		if ($item[0] == "*")
+		{
+			$mode .= "q";
+			$item = mb_substr($item,1);
+			goto loopback;
+		}
+		
+		$user = new User($item);
+		if ($user->IsUser)
+		{
+			if (isset($mode))
+			{
+				$sql::insert_ison($chan,$user->uid,$mode);
+			}
+		}
+	}
+});

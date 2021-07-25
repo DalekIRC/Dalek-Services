@@ -53,6 +53,7 @@ class SQL {
 				UID,
 				usermodes,
 				cloak,
+				gecos,
 				ip,
 				SID
 			) VALUES (
@@ -65,9 +66,10 @@ class SQL {
 				?,
 				?,
 				?,
+				?,
 				?
 			)");
-			$prep->bind_param("ssssssssss",$u['nick'],$u['timestamp'],$u['ident'],$u['realhost'],$u['account'],$u['uid'],$u['usermodes'],$u['cloak'],$u['ip'],$u['sid']);
+			$prep->bind_param("sssssssssss",$u['nick'],$u['timestamp'],$u['ident'],$u['realhost'],$u['account'],$u['uid'],$u['usermodes'],$u['cloak'],$u['gecos'],$u['ip'],$u['sid']);
 			$prep->execute();
 			$prep->close();
 		}
@@ -127,6 +129,27 @@ class SQL {
 			$prep->close();
 		}
 	}
+	function insert_ison($chan,$uid,$mode){
+		global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
+		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+		if (!$conn) { return false; }
+		else {
+
+			$prep = $conn->prepare("INSERT INTO dalek_ison (
+				chan,
+				nick,
+				mode
+			) VALUES (
+				?,
+				?,
+				?
+			)");
+			
+			$prep->bind_param("sss",$chan,$uid,$mode);
+			$prep->execute();
+			$prep->close();
+		}
+	}
 }
 			
 
@@ -142,6 +165,7 @@ hook::func("preconnect", function($u){
 		UID varchar(255) NOT NULL,
 		usermodes varchar(255),
 		cloak varchar(255) NOT NULL,
+		gecos varchar(255) NOT NULL,
 		ip varchar(255) NOT NULL,
 		account varchar(255),
 		secure varchar(1),
@@ -150,7 +174,8 @@ hook::func("preconnect", function($u){
 		oper varchar(1),
 		away varchar(1),
 		awaymsg varchar(255),
-		version varchar(255),		
+		version varchar(255),
+		last int,
 		PRIMARY KEY (id)
 	)";
 	$sql::query($query);
@@ -168,7 +193,7 @@ hook::func("preconnect", function($u){
 	)";
 	$sql::query($query);
 	
-	$query = "CREATE TABLE IF NOT EXISTS dalek_channels {
+	$query = "CREATE TABLE IF NOT EXISTS dalek_channels (
 		id int NOT NULL AUTO_INCREMENT,
 		timestamp int NOT NULL,
 		channel varchar(255),
@@ -177,24 +202,49 @@ hook::func("preconnect", function($u){
 		PRIMARY KEY (id)
 	)";
 	$sql::query($query);
+	
+	$query =	"CREATE TABLE IF NOT EXISTS dalek_swhois (
+		id int AUTO_INCREMENT NOT NULL,
+		tag varchar(255),
+		uid varchar(255),
+		priority varchar(255),
+		swhois varchar(255),
+		PRIMARY KEY(id)
+	)";
+	$sql::query($query);
+	
+	$query =	"CREATE TABLE IF NOT EXISTS dalek_ison (
+		id int AUTO_INCREMENT NOT NULL,
+		chan varchar(255),
+		nick varchar(255),
+		mode varchar(255),
+		PRIMARY KEY(id)
+	)";
+	$sql::query($query);
+	
 	$query = 	"TRUNCATE TABLE dalek_user";
 	$sql::query($query);
 	$query = 	"TRUNCATE TABLE dalek_channels";
 	$sql::query($query);
 	$query = 	"TRUNCATE TABLE dalek_server";
 	$sql::query($query);
+	$query = 	"TRUNCATE TABLE dalek_swhois";
+	$sql::query($query);
+	$query =	"TRUNCATE TABLE dalek_ison";
+	$sql::query($query);
 });
 
-	
+
 
 hook::func("UID", function($u){
 	
 	global $sql,$ns;
 	$sql::user_insert($u);
-	//if (isset($ns)){ $ns->log($u['nick']." (".$u['ident']."@".$u['realhost'].") [".$u['ip']."] connected to the network (".$u['sid'].")"); }
+	update_last($u['nick']);
+	if (isset($ns)){ $ns->log($u['nick']." (".$u['ident']."@".$u['realhost'].") [".$u['ip']."] connected to the network (".$u['sid'].")"); }
 	
 });
-	
+
 
 hook::func("SID", function($u){
 	
@@ -210,6 +260,25 @@ hook::func("SJOIN", function($u){
 	$sql::sjoin($u);
 });
 
+function update_last($person)
+{
+	
+	global $sqlip,$sqluser,$sqlpass,$sqldb,$servertime;
+	
+	$user = new User($person);
+	if (!$user->IsUser){ return false; }
+	
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	if (!$conn) { return false; }
+	else {
+		$prep = $conn->prepare("UPDATE dalek_user SET last = ? WHERE UID = ?");
+		$prep->bind_param("is",$servertime,$user->uid);
+		$prep->execute();
+		$prep->close();
+	}
+}
+		
+		
 function find_person($person){
 	
 	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
@@ -320,5 +389,33 @@ function find_serv($serv){
 		$row = $result->fetch_assoc();
 		$prep->close();
 		return $row;
+	}
+}
+function get_ison($uid){
+	
+	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	if (!$conn) { return false; }
+	else {
+		$prep = $conn->prepare("SELECT * FROM dalek_ison WHERE nick = ?");
+		$prep->bind_param("s",$uid);
+		$prep->execute();
+		$result = $prep->get_result();
+		
+		if (!$result){ return false; }
+		if ($result->num_rows == 0)
+		{
+			return false;
+		}
+		$list = array();
+		$mode = array();
+		while ($row = $result->fetch_assoc()){
+			$list[] = $row['chan'];
+			$mode[] = $row['mode'];
+		}
+		$big = array('list' => $list, 'mode' => $mode);
+		
+		$prep->close();
+		return $big;
 	}
 }

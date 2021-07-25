@@ -55,15 +55,14 @@ $sqldb = $cf['sqldb'];
 start:
 
 for (;;){
-		
-	$timeget = microtime(true);	
-	$timetok = explode(".",$timeget);
-	$servertime = $timetok[0];
+	
 	if (!isset($sql)){ $sql = new SQL($sqlip,$sqluser,$sqlpass,$sqldb); hook::run("preconnect", array()); }
 	
 	if (!isset($serv)){ $serv = new Server($server,$port,$mypass); }
 	while ($input = fgets($socket, 1000)) {
-	
+		$timeget = microtime(true);	
+		$timetok = explode(".",$timeget);
+		if ($servertime != $timetok){ $servertime = $timetok[0]; }
 		if (!$socket){ die(); }
 	
 		if ($cf['debugmode'] == "on") { echo $input."\n"; if ($ns){ /*$ns->msg("#dalek",$input);*/ } }
@@ -132,6 +131,7 @@ for (;;){
 					"parv" => $string,
 					"mtags" => $tagmsg)
 				);
+				update_last($nick);
 			}
 			if ($action == "TAGMSG"){
 

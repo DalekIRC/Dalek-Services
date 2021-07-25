@@ -115,11 +115,6 @@ class Client {
 		svsloginexists:
 		$this->sendraw(":$this->uid SVSLOGIN * $uid $account");
 	}
-	function exit()
-	{
-		global $sql;
-		$sql::user_delete($uid);
-	}
 }
 
 hook::func("start", function(){
@@ -132,5 +127,5 @@ hook::func("start", function(){
 	$gb->join("#services");
 	$hs->join("#services");
 	$ms->join("#services");
-	$gb->notice("$*","Services is back online. Have a great day!");
+	//$gb->notice("$*","Services is back online. Have a great day!");
 });
