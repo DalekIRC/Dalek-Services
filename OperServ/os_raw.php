@@ -27,7 +27,7 @@
 
 operserv::func("privmsg", function($u){
 
-	global $os;
+	global $os,$operserv;
 	$nick = new User($u['nick']);
 	if (!$nick->IsUser)
 	{
