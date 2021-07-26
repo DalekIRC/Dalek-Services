@@ -70,4 +70,3 @@ operserv::func("privmsg", function($u){
 	}
 });
 	
-	
