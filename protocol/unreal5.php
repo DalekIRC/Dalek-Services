@@ -197,7 +197,7 @@ hook::func("raw", function($u)
 			return;
 		}
 		$hostmask = (strpos($whois->usermode,"x")) ? $whois->cloak : $whois->realhost;
-		$serv->Send("311 $nick->nick $whois->nick $whois->ident $hostmask * $whois->gecos");
+		$serv->Send("311 $nick->nick $whois->nick $whois->ident $hostmask * :$whois->gecos");
 		
 		if (strpos($nick->usermode,"o") || $nick->uid == $whois->uid)
 		{
