@@ -131,7 +131,7 @@ hook::func("raw", function($u)
 });
 
 
-/* WHOIS */
+/* WHOIS (server info) */
 hook::func("raw", function($u)
 {
 	
