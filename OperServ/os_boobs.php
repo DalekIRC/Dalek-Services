@@ -16,5 +16,5 @@ operserv::func("privmsg", function($u){
   {
     return;
   }
-  $os->notice($nick-uid,"LOL at your fuckin self lmao");
+  $os->notice($nick->uid,"LOL at your fuckin self lmao");
 });
