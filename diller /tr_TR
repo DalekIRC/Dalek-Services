@@ -29,7 +29,7 @@
 	'MSG_IDENTIFY' => "Hesaba giris yaptiniz:",
 	'HELPCMD_IDENTIFY' => "Hesabinizi tanimlayin.",
 	
-	'MSG_PLZIDENT' => "Bu hesap kayitlidir. Bu sizin hesabinizsa,<lf>lutfen sunu kullanarak kaydolun:",
+	'MSG_PLZIDENT' => "Bu hesap kayitlidir. Bu sizin hesabinizsa,<lf>lutfen sunu kullanarak tanimlayin:",
 	
 	'LOG_IDENTIFAIL' => "hesap tanimlanmadi:",
 	'MSG_IDENTIFAIL' => "Kimlik basarisiz oldu: yanlis kimlik bilgileri.",
