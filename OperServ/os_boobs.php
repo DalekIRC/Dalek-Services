@@ -14,6 +14,7 @@ operserv::func("privmsg", function($u){
   
   if ($parv[0] !== "lol")
   {
-    $os->notice($nick-uid,"LOL at your fuckin self lmao");
+    return;
   }
+  $os->notice($nick->uid,"LOL at your fuckin self lmao");
 });
