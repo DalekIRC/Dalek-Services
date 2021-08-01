@@ -26,7 +26,7 @@
 	'MSG_IDENTIFY' => "You are now logged into account:",
 	'HELPCMD_IDENTIFY' => "Identify to your account.",
 	
-	'MSG_PLZIDENT' => "This account is registered. If this is your account,<lf>please register for it using:",
+	'MSG_PLZIDENT' => "This account is registered. If this is your account,<lf>please identify for it using:",
 	
 	'LOG_IDENTIFAIL' => "failed to identify to account:",
 	'MSG_IDENTIFAIL' => "Identification failed: incorrect credentials.",
