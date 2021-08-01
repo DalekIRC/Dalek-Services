@@ -2,8 +2,8 @@
 
 // This modules provides command "LOL" which returns some stupid stuff
 
-nickserv::func("privmsg", function($u){
-  global $ns;
+operserv::func("privmsg", function($u){
+  global $os;
   
   $parv = explode(" ",$u['msg']);
   
@@ -14,6 +14,6 @@ nickserv::func("privmsg", function($u){
   
   if ($parv[0] !== "lol")
   {
-    $ns->notice($nick-uid,"LOL at your fuckin self lmao");
+    $os->notice($nick-uid,"LOL at your fuckin self lmao");
   }
 });
