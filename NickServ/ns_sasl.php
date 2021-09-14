@@ -75,9 +75,8 @@ hook::func("UID", function($u)
 {
 	global $ns;
 	
-	if (!$ns){
+	if (!$ns)
 		return;
-	} // not loaded yet
 	
 	if (!isset($u['account'])){
 		if (!df_IsRegUser($u['uid'])){
