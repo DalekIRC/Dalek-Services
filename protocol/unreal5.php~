@@ -319,7 +319,7 @@ hook::func("raw", function($u)
 function version_response(User $user)
 {
 	global $serv,$cf;
-	$serv->sendraw("351 $user->nick Version response from ".$cf['servicesname'].": :Dalek IRC Services v1.1 - https://github.com/DalekIRC");
+	$serv->sendraw("351 $user->nick Version response from ".$cf['servicesname']." :Dalek IRC Services");
 }
 
 function module_response(User $user, $string)

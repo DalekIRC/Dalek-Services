@@ -32,8 +32,10 @@ class Client {
 		
 		$this->nick = $nick;
 		$this->uid = $uid;
-		
-		$this->sendraw("UID $nick 0 $servertime $ident $hostmask $uid $nick +oiqS * * * :$gecos");
+		$user = new User($nick);
+		if ($user->IsUser)
+			return;
+		$this->sendraw("UID $nick 1 $servertime $ident $hostmask $uid $nick +oiqzS * * * :$gecos");
 		
 		hook::run("UID", array(
 			'nick' => $nick,
@@ -41,7 +43,7 @@ class Client {
 			'ident' => $ident,
 			'realhost' => $hostmask,
 			'uid' => $uid,
-			'usermodes' => "+oiqS",
+			'usermodes' => "+oiqSz",
 			'cloak' => $hostmask,
 			'ip' => "",
 			'sid' => $cf['sid'],
@@ -72,12 +74,20 @@ class Client {
 		
 	function join($dest)
 	{
-		global $servertime;
+		global $servertime,$cf;
 		
 		$chan = find_channel($dest);
 		if (!$chan){ return; }
 		
 		$this->sendraw("SJOIN ".$chan['timestamp']." $dest :~".$this->uid);
+		hook::run("SJOIN", array(
+			"sid" => $cf['sid'],
+			"timestamp" => $servertime,
+			"channel" => $chan['channel'],
+			"modes" => $chan['modes'],
+			"topic" => "",
+			"full" =>"SJOIN ".$chan['timestamp']." $dest :~".$this->uid)
+		);
 	}
 	function notice($dest,$string)
 	{
@@ -117,15 +127,3 @@ class Client {
 	}
 }
 
-hook::func("start", function(){
-	global $ns,$cs,$bs,$os,$gb,$hs,$ms;
-	$ns->join("#services");
-	$cs->join("#services");
-	$cs->join("#Valeyard");
-	$bs->join("#services");
-	$os->join("#services");
-	$gb->join("#services");
-	$hs->join("#services");
-	$ms->join("#services");
-	//$gb->notice("$*","Services is back online. Have a great day!");
-});

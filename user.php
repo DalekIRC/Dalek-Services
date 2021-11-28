@@ -51,6 +51,7 @@ class User {
 		$this->sid = $u['SID'];
 		$this->tls = (strpos($u['usermodes'],"z")) ? true : false;
 		$this->last = $u['last'];
+		$this->meta = $this->get_user_meta();
 	}
 	function NewNick($nick)
 	{
@@ -93,7 +94,6 @@ class User {
 			
 			elseif ($tok == "-")
 			{
-				echo "Changed switch to del\n";
 				$switch = "del";
 				$i++;
 			}
@@ -121,6 +121,26 @@ class User {
 		update_usermode($this->uid,$validate['NewModes']);
 		return true;
 	}
+	function get_user_meta()
+	{
+		$meta = array();
+
+		$conn = sqlnew();
+		$prep = $conn->prepare("SELECT * FROM dalek_user_meta WHERE UID = ?");
+		$prep->bind_param("s",$this->uid);
+		$prep->execute();
+		$result = $prep->get_result();
+		if (!$result)
+		{
+			$prep->close();
+			return NULL;
+		}
+		while($row = $result->fetch_assoc())
+			$meta[$row['meta_key']] = $row['meta_data'];
+
+		$prep->close();
+		return $meta;
+	}
 	function exit()
 	{
 		global $sql;
@@ -142,6 +162,8 @@ function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 {
 	$AddModeString = NULL;
 	$DelModeString = NULL;
+	$SetTheMode = NULL;
+	$UnsetTheMode = NULL;
 
 	$NewModes = $modesThatWeHave;
 	

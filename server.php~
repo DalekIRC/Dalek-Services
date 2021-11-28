@@ -35,12 +35,13 @@ include "timer.php";
 include "squit.php";
 
 include "NickServ/nickserv.php";
+/*
 include "BotServ/botserv.php";
 include "ChanServ/chanserv.php";
 include "OperServ/operserv.php";
 include "Global/global.php";
 include "HostServ/hostserv.php";
-include "MemoServ/memoserv.php";
+include "MemoServ/memoserv.php"; */
 //include "plugins/PATHWEB/uplink.php";
 // Server config
 $server = $cf['uplink'];
