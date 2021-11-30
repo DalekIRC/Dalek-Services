@@ -8,12 +8,12 @@ hook::func("squit", function($u)
 
 function squit($sid)
 {
-	global $ns;
+	global $ns,$cf;
 	/* loop through the server and attached servers */
 	$r = recurse_serv_attach($sid);
 	$s = find_serv($sid);
 	$l = count($r) - 1;
-	$ns->msg("#valerie_login","SQUIT: Removing information about 4".$s['servername']." and ".$l." servers beyond.");
+	$ns->msg($cf['logchan'],"SQUIT: Removing information about 4".$s['servername']." and ".$l." servers beyond.");
 	foreach ($r as $v)
 		del_sid($v);
 }
