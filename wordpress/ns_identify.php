@@ -81,12 +81,13 @@ function wp_verify_userpass($account,$pass)
 	if (!($result = $prep->get_result()))
 		return false;
 	$row = $result->fetch_assoc();
-	$p = base64_encode($pass);
-	$h = base64_encode($row['user_pass']);
-	 $data = json_decode(file_get_contents($wpconfig['siteurl']."/wp-content/plugins/ircservices/verify.php?pass=$p&hash=$h"));
-
-	if ($data->verify == true)
-		return true;
-	var_dump($data);
-	return false;
+	$p = $pass;
+	$h = $row['user_pass'];
+	  $wp_hasher = new PasswordHash( 8, true );
+	if ($wp_hasher->CheckPassword($p,$h))
+		$return = true;
+	else
+		$return = false;
+	$conn->close();
+	return $return;
 }

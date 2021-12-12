@@ -1,7 +1,7 @@
 <?php
 global $wpconfig;
 include "wordpress.conf";
-
+include "wp-phpass.php";
 
 if (!isset($wpconfig['siteurl']) || empty($wpconfig['siteurl']))
 {
@@ -20,5 +20,6 @@ if (!isset($wpconfig['siteurl']) || empty($wpconfig['siteurl']))
 
 
 include "ns_identify.php";
-
+include "ns_register.php";
+include "ns_sasl.php";
 
