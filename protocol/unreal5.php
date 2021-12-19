@@ -170,20 +170,6 @@ hook::func("raw", function($u)
 	$sql::sid(array('server' => $name,'hops' => $hops,'sid' => $sid,'desc' => $desc));
 });
 
-hook::func("raw", function($u)
-{
-	global $ns,$nickserv;
-	$parv = explode(" ",$u['string']);
-	if ($parv[1] !== "KILL")
-		return;
-	if ($parv[2] !== $ns->nick && $parv[2] !== $ns->uid)
-		return;
-
-	$ns = new Client($nickserv['nick'],$nickserv['ident'],$nickserv['hostmask'],$nickserv['uid'],$nickserv['gecos']);
-	hook::run("start", array());
-	if (strpos($parv[0],".") >= 0)
-		$ns->sendraw(":".$ns->uid." KILL ".mb_substr($parv[0],1)." :killsies lololol");
-});
 
 /* WHOIS */
 hook::func("raw", function($u)
@@ -192,6 +178,8 @@ hook::func("raw", function($u)
 	global $serv,$cf,$servertime;
 	
 	$parv = explode(" ",$u['string']);
+	if (!isset($parv[1]))
+		return;
 	if ($parv[1] !== "WHOIS")
 	{ 
 		return;
@@ -308,18 +296,20 @@ hook::func("raw", function($u)
 		}
 		$idle = ($servertime - $whois->last);
 		if (!strpos($whois->usermode,"I"))
-		{
 			$serv->Send("317 $nick->nick $whois->nick $idle $whois->ts :seconds idle, signon time");
-		}
+
 		$serv->Send("318 $nick->nick $whois->nick :End of /WHOIS list.");
-		$serv->Send("NOTICE $whois->nick :OI FUCKER!! ".$nick->nick." just did a /WHOIS on you!! *PISS*");
+
+		if (strpos($whois->usermode,"W"))
+			$serv->Send("NOTICE $whois->nick :$nick->nick did a /WHOIS on you.");
 	}
 });
 
 function version_response(User $user)
 {
 	global $serv,$cf;
-	$serv->sendraw("351 $user->nick Version response from ".$cf['servicesname'].": :Dalek IRC Services v1.1 - https://github.com/DalekIRC");
+	$user_agent = php_uname();
+	$serv->sendraw("351 $user->nick Dalek-Services ".$cf['servicesname']." 0 [".$user_agent."]");
 }
 
 function module_response(User $user, $string)
@@ -414,7 +404,7 @@ hook::func("raw", function($u)
 	module_response($user,"Listing modules for ".$cf['servicesname']);
 	foreach (get_included_files() as $module)
 		if (mb_substr($module,-4) == ".php")
-			module_response($user,str_replace(getcwd()."/","",$module));
+			module_response($user,"*** ".str_replace(getcwd()."/","",$module));
 });
 
 
@@ -570,7 +560,7 @@ hook::func("raw", function($u)
 	
 	$parv = explode(" ",$u['string']);
 	
-	if ($parv[1] !== "MOTD" || $cf['sid'] !== mb_substr($parv[2],1))
+	if ($parv[1] !== "MOTD")
 	{
 		return;
 	}
@@ -587,7 +577,11 @@ hook::func("raw", function($u)
 	}
 	$serv->Send("375 $nick->nick :--------oOo------- MOTD from ".$cf['servicesname']." --------oOo-------");
 	while(!feof($motd)){
-		$serv->Send("372 $nick->nick :".fgets($motd));
+		$fg = fgets($motd);
+		if (empty($fg))
+			$serv->Send("372 $nick->nick :- ");
+		else
+			$serv->Send("372 $nick->nick :- $fg");
 	}
 	$serv->Send("376 $nick->nick :--------oOo -------        End of MOTD         --------oOo-------");
 	return;
@@ -790,7 +784,8 @@ hook::func("raw", function($u)
 	{ 
 		return;
 	}
-
+	if (count($parv) < 4)
+		return;
 	$sid = mb_substr($parv[0],1);
 	$nick = $parv[2];
 	$ts = $parv[4];
