@@ -29,7 +29,7 @@ function is_invite($one, $two) : bool
 	/* quickly clear up any expired invitations (12hrs) */
 
 	$exptime = $servertime - 43200;
-	$conn->query("DELETE FROM dalek_invite WHERE realtime< $exptime");
+	$conn->query("DELETE FROM dalek_invite WHERE realtime < $exptime");
 
 	/* check their credentials */ 
 	$prep = $conn->prepare("SELECT * FROM dalek_invite WHERE timestamp = ?");
