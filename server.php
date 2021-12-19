@@ -24,6 +24,7 @@
 */
 global $cf,$sql,$sqlip,$sqluser,$sqlpass,$sqldb,$server,$port,$serv,$servertime,$svs,$ns,$cs;
 
+
 include "hook.php";
 include "dalek.conf";
 include "language.php";
@@ -31,9 +32,8 @@ include "protocol/".$cf['proto'].".php";
 include "sql.php";
 include "client.php";
 include "user.php";
-include "timer.php";
 include "squit.php";
-
+include "timer.php";
 include "NickServ/nickserv.php";
 include "BotServ/botserv.php";
 include "ChanServ/chanserv.php";
@@ -41,6 +41,7 @@ include "OperServ/operserv.php";
 include "Global/global.php";
 include "HostServ/hostserv.php";
 include "MemoServ/memoserv.php";
+include "wordpress/wordpress.php";
 //include "plugins/PATHWEB/uplink.php";
 // Server config
 $server = $cf['uplink'];
@@ -55,41 +56,35 @@ $sqluser = $cf['sqluser'];
 $sqlpass = $cf['sqlpass'];
 $sqldb = $cf['sqldb'];
 
-timer_add(30,"ping");
+start:
 
-function ourtime()
-{
-	$timeget = microtime(true);	
-	$timetok = explode(".",$timeget);
-	return $timetok[0];
-}
-init_ping();
 for (;;)
 {
-	start:
+	
 	if (!isset($sql))
 	{ 
 		$sql = new SQL($sqlip,$sqluser,$sqlpass,$sqldb); hook::run("preconnect", array());
 	}
 	
-	if (!isset($serv)){ $serv = new Server($server,$port,$mypass); }
-	for ($servertime = ourtime(); track_time(ourtime()); $servertime = ourtime())
+	if (!isset($serv)){ $serv = new Server($server,$port,$mypass);
+	}
+	while ($input = fgets($socket, 1000))
 	{
-		flush();
-		stream_set_blocking($socket,0);
-		if(!($input = fgets($socket, 2048)))
-			continue;
+		$timeget = microtime(true);	
+		$timetok = explode(".",$timeget);
+		if ($servertime != $timetok)
+			$servertime = $timetok[0];
+		
 		if (!$socket)
 			die();
 	
 		if ($cf['debugmode'] == "on")
 			echo $input."\n";
+	
+		flush();
 		
-		$strippem = ircstrip(str_replace('\n','\\n',str_replace('\r','\\r',$input)));
+		$strippem = ircstrip(str_replace('\n','',str_replace('\r','',$input)));
 		$splittem = explode(' ',$strippem);
-
-		if (!isset($splittem[0]))
-			return;
 		
 		// If the server pings us
 		if ($splittem[0] == 'PING')
@@ -97,30 +92,28 @@ for (;;)
 		
 		elseif ($splittem[0] == 'ERROR')
 		{
-			$serv = NULL;
-			$sql = NULL;
+			
 			if (strpos($input,'Throttled') !== false)
 			{
-				printf("Uh-oh, we've been throttled! Waiting 5 seconds and starting again.");
-				sleep(5);
-				printf("Reconnecting...");
+				$serv->hear("Uh-oh, we've been throttled! Waiting 40 seconds and starting again.");
+				sleep(40);
+				$serv->shout("Reconnecting...");
 				goto start;
 			}
 			elseif (strpos($input,'Timeout') !== false)
 			{
-				printf("Hmmmm. It seems there was a problem. Please check dalek.conf");
+				$serv->hear("Hmmmm. It seems there was a problem. Please check dalek.conf");
 				die();
 			}
 			elseif (strpos($input,'brb lmoa') !== false)
 			{
-				printf("Looks like we've been asked to restart! Lets go! Pewpewpew!");
+				$serv->hear("Looks like we've been asked to restart! Lets go! Pewpewpew!");
 				goto start;
 			}
 			else
 			{
-				printf("Uh-oh, we've been throttled! Waiting 5 seconds and starting again.");
-				sleep(5);
-				printf("Reconnecting...");
+				$serv->hear("Unknown exit issue! Waiting 40 seconds and restarting");
+				sleep(40);
 				goto start;
 			}
 		}
@@ -128,8 +121,6 @@ for (;;)
 		{
 			
 			$tagmsg = NULL;
-			if (isset($splittem[0]) == false)
-				continue;
 			if ($splittem[0][0] == '@')
 			{
 				$tagmsg = $splittem[0];
@@ -176,7 +167,7 @@ for (;;)
 				);
 			}
 			else
-				hook::run("raw", array('string' => $strippem, 'tagmsg' => $tagmsg));
+				hook::run("raw", array('string' => $strippem));
 			
 			
 		}
@@ -203,16 +194,3 @@ function ircstrip($string)
 	return $_ircstrip;
 }
 
-
-
-function init_ping()
-{
-	global $response,$ns;
-	rtimer_add(120,"init_ping()");
-	timer_add(120,"PING :international.shitposting.network");
-}
-
-function colour($c,$string)
-{
-	return  chr(3).$c.$string.chr(3);
-}

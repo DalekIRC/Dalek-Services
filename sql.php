@@ -231,10 +231,11 @@ class SQL {
 }
 
 
+
 function sqlnew()
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	global $cf;
+	$conn = mysqli_connect($cf['sqlip'],$cf['sqluser'],$cf['sqlpass'],$cf['sqldb']);
 	return $conn;
 }			
 
