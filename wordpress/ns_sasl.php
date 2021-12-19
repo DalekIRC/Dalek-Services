@@ -74,7 +74,7 @@ hook::func("start", function($u)
 hook::func("UID", function($u)
 {
 	global $ns,$nickserv;
-	if ($nickserv['login_method'] !== "default"){
+	if ($nickserv['login_method'] !== "wordpress"){
 		return;
 	}
 	if (!$ns)
@@ -88,6 +88,9 @@ hook::func("UID", function($u)
 		$ns->notice($nick->uid,"This account is registered. If this is your account,");
 		$ns->notice($nick->uid,"please identify for it using:");
 		$ns->notice($nick->uid,"/msg $ns->nick identify password");
+	}
+	else {
+		$ns->svs2mode($nick->nick,"+r");
 	}
 });
 		
@@ -131,11 +134,18 @@ nickserv::func("sasl", function($u){
 			break;
 		
 		case "C":
-		
+			
+			/* should not be here if they don't have this */
+			if (!isset($sasl[$uid]))
+				break;
+			
+			if ($param1 == "PLAIN")
+				break;
 			$sasl[$uid]["pass"] = $param1;
 			
 			$tok = explode(chr(0),base64_decode($sasl[$uid]["pass"]));
-			
+			if (count($tok) < 2)
+				break;
 			if (count($tok) == 2){
 				$account = $tok[0];
 				$pass = $tok[1];
@@ -144,21 +154,31 @@ nickserv::func("sasl", function($u){
 				$account = $tok[1];
 				$pass = $tok[2];
 			}
+			if (!isset($account) || strlen($account) == 0)
+				return;
 			
-			if (wp_verify_userpass($account,$pass)){
+			if (wp_verify_userpass($account,$pass) || $var = is_invite($account,$pass)){
+				if ($var)
+					$account = "GUEST";
 				nickserv::run("saslconf", array(
 					'uid' => $uid,
 					'account' => $account)
 				);
-				$ns->log("[".$sasl[$uid]["host"]."|".$sasl[$uid]["ip"]."] $uid identified for account $account"); 
+				if ($var)
+					$ns->log("[".$sasl[$uid]["host"]."|".$sasl[$uid]["ip"]."] $uid provided an invitation code");
+				else
+					$ns->log("[".$sasl[$uid]["host"]."|".$sasl[$uid]["ip"]."] $uid identified for account $account"); 
 				$ns->svslogin($uid,$account);
 				$ns->sendraw(":$ns->nick SASL $origin $uid L $account");
 				$ns->sendraw(":$ns->nick SASL $origin $uid D S");
 				$sasl[$uid] = NULL;
+				break;
 			}
 			else {
 				$ns->log("[".$sasl[$uid]["host"]."|".$sasl[$uid]["ip"]."] $uid failed to identify for account $account"); 
 				$ns->sendraw(":$ns->nick SASL $origin $uid D F");
+			
+				unset($sasl[$uid]);
 			}
 			break;
 	}

@@ -39,8 +39,8 @@ hook::func("raw", function($u)
 hook::func("start", function($u)
 {
 	
-	global $sql,$ns,$cf;
-	if ($cf['login_method'] !== "default"){
+	global $sql,$ns,$cf,$nickserv;
+	if ($nickserv['login_method'] !== "default"){
 		return;
 	}
 	$query = "SELECT * FROM dalek_user";
@@ -73,10 +73,13 @@ hook::func("start", function($u)
 });
 hook::func("UID", function($u)
 {
-	global $ns;
-	
-	if (!$ns)
+	global $sql,$ns,$cf,$nickserv;
+	if ($nickserv['login_method'] !== "default"){
 		return;
+	}
+	if (!$ns){
+		return;
+	} // not loaded yet
 	
 	if (!isset($u['account'])){
 		if (!df_IsRegUser($u['uid'])){
@@ -127,11 +130,11 @@ nickserv::func("sasl", function($u){
 			break;
 		
 		case "C":
-		
 			$sasl[$uid]["pass"] = $param1;
 			
 			$tok = explode(chr(0),base64_decode($sasl[$uid]["pass"]));
-		
+			if (count($tok) < 2)
+				break;
 			if (count($tok) == 2){
 				$account = $tok[0];
 				$pass = $tok[1];
@@ -141,7 +144,8 @@ nickserv::func("sasl", function($u){
 				$pass = $tok[2];
 			}
 			
-			if (df_verify_userpass($account,$pass)){
+			if (df_verify_userpass($account,$pass) || is_invite($account,$pass)){
+				
 				nickserv::run("saslconf", array(
 					'uid' => $uid,
 					'account' => $account)
@@ -149,8 +153,9 @@ nickserv::func("sasl", function($u){
 				$ns->log("[".$sasl[$uid]["host"]."|".$sasl[$uid]["ip"]."] $uid identified for account $account"); 
 				$ns->svslogin($uid,$account);
 				$ns->sendraw(":$ns->nick SASL $origin $uid L $account");
-				$ns->sendraw(":$ns->nick SASL $origin $uid D S");
+				$ns->sendraw("SASL $origin $uid D S");
 				$sasl[$uid] = NULL;
+				break;
 			}
 			else {
 				$ns->log("[".$sasl[$uid]["host"]."|".$sasl[$uid]["ip"]."] $uid failed to identify for account $account"); 

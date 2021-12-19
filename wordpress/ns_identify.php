@@ -50,8 +50,8 @@ nickserv::func("privmsg",	 function($u){
 		$account = $nick->nick;
 		$pass = $parv[1];
 	}
-	
-	if (!wp_verify_userpass($account,$pass)){ $ns->notice($nick->uid,IRC("MSG_IDENTIFAIL")); return; } 
+	$user = new WPUser($nick->account);
+	if (!$user->ConfirmPassword($pass)){ $ns->notice($nick->uid,IRC("MSG_IDENTIFAIL")); return; } 
 	
 	if (!df_login($nick->uid,$account)){
 		
@@ -69,25 +69,3 @@ nickserv::func("privmsg",	 function($u){
 	
 });
 
-
-function wp_verify_userpass($account,$pass)
-{
-	global $wpconfig;
-
-	$conn = sqlnew();
-	$prep = $conn->prepare("SELECT user_pass FROM ".$wpconfig['dbprefix']."users WHERE user_nicename = lower(?)");
-	$prep->bind_param("s",$account);
-	$prep->execute();
-	if (!($result = $prep->get_result()))
-		return false;
-	$row = $result->fetch_assoc();
-	$p = $pass;
-	$h = $row['user_pass'];
-	  $wp_hasher = new PasswordHash( 8, true );
-	if ($wp_hasher->CheckPassword($p,$h))
-		$return = true;
-	else
-		$return = false;
-	$conn->close();
-	return $return;
-}
