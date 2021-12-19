@@ -26,16 +26,6 @@
 */
 
 
-hook::func("raw", function($u)
-{ 
-	$tok = explode(" ",$u['string']);
-	if ($tok[1] !== "SASL")
-	{
-		return;
-	}
-	nickserv::run("sasl", array('sasl' => $u['string']));
-}); 
-
 hook::func("start", function($u)
 {
 	
@@ -93,14 +83,26 @@ hook::func("UID", function($u)
 		$ns->svs2mode($nick->nick,"+r");
 	}
 });
-		
+
+hook::func("raw", function($u)
+{
+	global $nickserv;
+	if ($nickserv['login_method'] !== "wordpress"){
+		return;
+	}
+	$tok = explode(" ",$u['string']);
+	if ($tok[1] !== "SASL")
+	{
+		return;
+	}
+	nickserv::run("sasl", array('sasl' => $u['string']));
+}); 	
 nickserv::func("sasl", function($u){
 	
 	global $ns,$nickserv,$sasl;
-	
 	if ($nickserv['login_method'] !== "wordpress")
 		return;
-	
+
 	$parv = explode(" ",$u['sasl']);
 	
 	$origin = mb_substr($parv[0],1);
@@ -112,77 +114,123 @@ nickserv::func("sasl", function($u){
 	$param1 = $parv[5] ?? NULL;
 	
 	$param2 = $parv[6] ?? NULL;
-	
-	switch($cmd){
+
+	$sasl = new IRC_SASL($origin,$uid,$cmd,$param1,$param2);
+});
+
+function SendSasl($string)
+{
+	S2S("SASL $string");
+}
+class IRC_SASL {
+	function __construct($source,$uid,$cmd,$param1 = "", $param2 = "")
+	{
+		global $_SASL;
 		
-		case "H":
-		
-			$sasl[$uid]["host"] = $param1;
-			$sasl[$uid]["ip"] = $param2;
-			break;
-			
-		case "S":
-		
-			$sasl[$uid]["mech"] = $param1;
-			$sasl[$uid]["fingerprint"] = $param2;
-			if ($param1 !== "PLAIN"){
-				
-				$ns->sendraw(":$ns->nick SASL $origin $uid D F");
-				break; 
-			}
-			$ns->sendraw(":$ns->nick SASL $origin $uid C +");
-			break;
-		
-		case "C":
-			
-			/* should not be here if they don't have this */
-			if (!isset($sasl[$uid]))
-				break;
-			
-			if ($param1 == "PLAIN")
-				break;
-			$sasl[$uid]["pass"] = $param1;
-			
-			$tok = explode(chr(0),base64_decode($sasl[$uid]["pass"]));
-			if (count($tok) < 2)
-				break;
-			if (count($tok) == 2){
-				$account = $tok[0];
-				$pass = $tok[1];
-			}
-			elseif (count($tok) == 3){
-				$account = $tok[1];
-				$pass = $tok[2];
-			}
-			if (!isset($account) || strlen($account) == 0)
+		$this->uid = $uid;
+		$this->source = $source;
+		if (!isset($_SASL[$uid]) && $cmd == "H")
+		{
+			$_SASL[$uid]["host"] = $param1;
+			$_SASL[$uid]["ip"] = $param2;
+		}
+		elseif (isset($_SASL[$uid]) && ($cmd == "S" || $cmd == "C") && $param1 == "PLAIN")
+		{
+			$_SASL[$uid]["mech"] = $param1;
+			$_SASL[$uid]["key"] = $param2;
+			$this->check = $this->check_pass($_SASL[$uid]["key"]);
+			if ($this->check == 0)
+				SendSasl("$source $uid C +");
+
+			elseif ($this->check > 0)
+				$this->success($this->check);
+		}
+		elseif (isset($_SASL[$uid]) && $cmd == "C")
+		{
+			if ($param1 == "+")
+			{
+				SendSasl("$source $uid C +");
 				return;
-			
-			if (wp_verify_userpass($account,$pass) || $var = is_invite($account,$pass)){
-				if ($var)
-					$account = "GUEST";
-				nickserv::run("saslconf", array(
-					'uid' => $uid,
-					'account' => $account)
-				);
-				if ($var)
-					$ns->log("[".$sasl[$uid]["host"]."|".$sasl[$uid]["ip"]."] $uid provided an invitation code");
-				else
-					$ns->log("[".$sasl[$uid]["host"]."|".$sasl[$uid]["ip"]."] $uid identified for account $account"); 
-				$ns->svslogin($uid,$account);
-				$ns->sendraw(":$ns->nick SASL $origin $uid L $account");
-				$ns->sendraw(":$ns->nick SASL $origin $uid D S");
-				$sasl[$uid] = NULL;
-				break;
 			}
 			else {
-				$ns->log("[".$sasl[$uid]["host"]."|".$sasl[$uid]["ip"]."] $uid failed to identify for account $account"); 
-				$ns->sendraw(":$ns->nick SASL $origin $uid D F");
-			
-				unset($sasl[$uid]);
+				$_SASL[$uid]["pass"] = $param1;
+				$this->check = $this->check_pass($param1);
+				var_dump($this->check);
+				if ($this->check == 0)
+					$this->fail();
+				elseif ($this->check > 0)
+					$this->success($this->check);
 			}
-			break;
+		}
+		elseif (isset($_SASL[$uid]) && $cmd == "D")
+			if ($param1 == "A")
+				unset($_SASL[$uid]);
+			
 	}
-});
-			
-			
-			
+	private function success(int $i)
+	{
+		global $ns,$_SASL;
+
+		if ($i == 2)
+		{
+			$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid provided an invitation code");
+			S2S(":$ns->nick SVSLOGIN * $this->uid INVITED");
+		}
+		elseif ($i == 1)
+		{
+			$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid identified using SASL for account: $this->account");
+			S2S(":$ns->nick SVSLOGIN * $this->uid $this->account");
+		}
+
+		SendSasl("$this->source $this->uid D S");
+
+		unset($_SASL[$this->uid]);
+	}
+	private function fail()
+	{
+		global $ns,$_SASL;		
+		$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid failed to identify.");
+		unset($_SASL[$this->uid]);
+	}
+		
+	 function check_pass($passwd)
+	{
+		global $_SASL;
+
+		$tok = explode(chr(0),base64_decode($passwd));
+		if (!$tok)
+			return false;
+
+		if (count($tok) < 2)
+			return false;
+
+		if (count($tok) == 2)
+		{
+			$account = $tok[0];
+			$pass = $tok[1];
+		}
+		elseif (count($tok) == 3)
+		{
+			$account = $tok[1];
+			$pass = $tok[2];
+		}
+		$this->account = $account;
+		if (!isset($account) || strlen($account) == 0)
+			return 3;
+		$wp_user = new WPUser($account);
+		if ($wp_user->ConfirmPassword($pass) || $var = is_invite($account,$pass))
+		{
+			if (isset($var))
+			{
+				if ($var == true)
+					return 2;
+				else return 1;
+			}	
+			else return 1;
+		}
+		else
+			return 0;
+	}
+		
+}
+		
