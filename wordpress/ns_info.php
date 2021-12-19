@@ -5,13 +5,13 @@
 //			pathweb.org
 \\				
 //	GNU GENERAL PUBLIC LICENSE
-\\							v3
+\\				v3
 //				
 \\
 //
-\\	Title:		Info
+\\	Title:		Info (wordpress)
 //				
-\\	Desc:		Provides lookups on a username
+\\	Desc:		Provides lookups on a username, in services db and WordPress db.
 //
 \\				
 //				
