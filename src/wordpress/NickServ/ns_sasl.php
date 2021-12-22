@@ -71,6 +71,8 @@ hook::func("UID", function($u)
 		return;
 	
 	$nick = new User($u['uid']);
+	if (!$nick->IsUser)
+		return;
 	if (!isset($u['account'])){
 		if (!wp_IsRegUser($nick->nick)){
 			return;
