@@ -1,6 +1,6 @@
 <?php
 /*
- *	(C) 2021 Pride IRC Services
+ *	(C) 2021 Dalek IRC Services
  *
  *	GNU GENERAL PUBLIC LICENSE v3
  *
