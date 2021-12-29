@@ -83,7 +83,7 @@ class Channel
 	
 	function SetMode($mode)
 	{
-        global $cf;
+		global $cf;
 		SendRaw("MODE $this->chan $mode",$cf['servicesname']);
 		$tok = explode(" ",$mode);
 		if (isset($tok[1]))
@@ -111,17 +111,17 @@ class Channel
 		if ($type == 1 || $type == 5)
 		{
 			if ($chr == "q" || $chr == "a" || $chr == "o" || $chr == "h" || $chr == "v")
-            {
+			{
 				if ($switch == "+")
 				{
 					$sql->add_userchmode($this->chan,$param,$chr);
 				}
 				elseif ($switch == "-")
 				{
-                    $sql->del_userchmode($this->chan,$param,$chr);
-                }
-                unset($source);
-            }
+					    $sql->del_userchmode($this->chan,$param,$chr);
+				}
+				unset($source);
+	           		 }
 			elseif ($chr == "b" || $chr == "I" || $chr = "e")
 			{
 				if ($switch == "+")
