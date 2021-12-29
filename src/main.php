@@ -36,7 +36,6 @@ include "squit.php";
 include "timer.php";
 include "protoctl.php";
 include "channel.php";
-include "module.php";
 include "NickServ/nickserv.php";
 include "BotServ/botserv.php";
 include "ChanServ/chanserv.php";
@@ -45,7 +44,6 @@ include "Global/global.php";
 include "HostServ/hostserv.php";
 include "MemoServ/memoserv.php";
 include "wordpress/wordpress.php";
-//include "plugins/PATHWEB/uplink.php";
 // Server config
 $server = $cf['uplink'];
 $port = $cf['port'];
@@ -199,4 +197,10 @@ function ircstrip($string)
 function S2S($string) {
 	global $serv;
 	$serv->send($string);
+}
+
+
+function colour($c,$string)
+{
+	return  chr(3).$c.$string.chr(3);
 }

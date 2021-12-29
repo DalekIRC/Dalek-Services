@@ -1,6 +1,6 @@
 <?php
 /*
- *	(C) 2021 Pride IRC Services
+ *	(C) 2021 Dalek IRC Services
  *
  *	GNU GENERAL PUBLIC LICENSE v3
  *
@@ -63,10 +63,7 @@ class Channel
 			return false;
 		for ($i = 0; isset($chanlist['list'][$i]); $i++)
 			if (strpos($chanlist['mode'][$i],$mode) !== false && $chanlist['list'][$i] == $this->chan)
-			{
-                echo "Wowow: ".$chanlist['mode'][$i]."\n\n";
 				return true;
-            }
 		return false;
 	}
 	
@@ -249,7 +246,7 @@ function cmode_type($chr)
 		}
 	}
 	if (!$type)
-		if ($chr == "o" || $chr == "h" || $chr == "v")
+		if ($chr == "o" || $chr == "h" || $chr == "v" || $chr == "a" || $chr == "q")
 			$type = 5;
 		
 	$result->close();
@@ -259,44 +256,3 @@ function cmode_type($chr)
 	
 	return $type;
 }
-
-/*
-$x = Bot X
-$eu = Bot EUworld
-$cf = config file dalek.conf
-
-*/
-hook::func("start", function()
-{
-	global $x,$eu,$cf;
-	
-	$chan = new Channel($cf['logchan']);
-	
-	if (!$chan->HasUser($x->nick))
-		$x->join($chan->chan);
-	
-	if (!$chan->HasUser($eu->nick))
-		$eu->join($chan->chan);
-});
-
-
-
-
-
-
-hook::func("start", function()
-{
-	global $x;
-	$conn = conn();
-	if (!$conn)
-		return;
-	
-	$table = "dalek_chaninfo";
-	$result = $conn->query("SELECT * FROM $table");
-	while ($row = $result->fetch_assoc())
-	{
-		$chan = new Channel($row['channel']);
-			$x->join($row['channel']);
-	}	
-	$result->close();
-});
