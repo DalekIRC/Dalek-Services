@@ -200,7 +200,8 @@ hook::func("raw", function($u)
 			return;
 		}
 		$hostmask = (strpos($whois->usermode,"x")) ? $whois->cloak : $whois->realhost;
-		$serv->Send("311 $nick->nick $whois->nick $whois->ident $hostmask * :$whois->gecos");
+		$showhost = (strpos($whois->usermode,"t")) ? $whois->cloak : $hostmask;
+		$serv->Send("311 $nick->nick $whois->nick $whois->ident $showhost * :$whois->gecos");
 		
 		if (strpos($nick->usermode,"o") !== false || $nick->uid == $whois->uid)
 		{
@@ -213,16 +214,16 @@ hook::func("raw", function($u)
 			
 			$serv->Send("307 $nick->nick $whois->nick :is identified for this nick (+r)");
 		}
-		$chanlist = get_ison($whois->uid);
+		$chanlist = $whois->channels;
 		$full_list = NULL;
 		for ($p = 0; isset($chanlist['list'][$p]); $p++)
 		{
 			
 			$secret = NULL;
 			$chanmode = NULL;
-			$chan = find_channel($chanlist['list'][$p]);
+			$chan = new Channel($chanlist['list'][$p]);
 			
-			if (strpos($chan['modes'],"s") || strpos($chan['modes'],"p"))
+			if (strpos($chan->modes,"s")  !== false || strpos($chan->modes,"p") !== false)
 			{
 				$secret = true;
 			}
@@ -232,26 +233,25 @@ hook::func("raw", function($u)
 			}
 			if ($chanlist['mode'])
 			{
-				
 				$char = $chanlist['mode'][$p];
 				
-				if ($char == "q")
+				if (strpos($char,"q") !== false)
 				{
 					$chanmode .= "~";
 				}
-				elseif ($char == "a")
+				if (strpos($char,"a") !== false)
 				{
 					$chanmode .= "&";
 				}
-				elseif ($char == "o")
+				if (strpos($char,"o") !== false)
 				{
 					$chanmode .= "@";
 				}
-				elseif ($char == "h")
+				if (strpos($char,"h") !== false)
 				{
 					$chanmode .= "%";
 				}
-				elseif ($char == "v")
+				if (strpos($char,"v") !== false)
 				{
 					$chanmode .= "+";
 				}
@@ -260,14 +260,17 @@ hook::func("raw", function($u)
 			$sec = ($secret) ? "!" : "";
 			if ($secret && (strpos($nick->usermode,"o") || $whois->uid == $nick->uid))
 			{
-				$full_list .= $sec.$chanmode.$chanlist['list'][$p]." ";
+				$full_list .= $chanmode.$sec.$chanlist['list'][$p]." ";
 			}
 			if (!$secret)
 			{
 				$full_list .= $chanmode.$chanlist['list'][$p]." ";
 			}
 		}
-		$serv->Send("319 $nick->nick $whois->nick :$full_list");
+		$chan_list = whois_chan_buffer($full_list);
+		if (!empty($chan_list))
+			foreach($chan_list as $chans)
+				$serv->Send("319 $nick->nick $whois->nick :$chans");
 		
 		$sv = find_serv($whois->sid);
 		$serv->Send("312 $nick->nick $whois->nick ".$sv['servername']." :".$sv['version']);
@@ -304,6 +307,41 @@ hook::func("raw", function($u)
 			$serv->Send("NOTICE $whois->nick :$nick->nick did a /WHOIS on you.");
 	}
 });
+
+function whois_chan_buffer($chans)
+{
+	if (!strlen($chans))
+		return NULL;
+
+	$buffer = array();
+	if (strlen($chans) <= 230)
+	{
+		$buffer[] = $chans;
+		return $buffer;
+	}
+
+	$a = "";
+
+	$chan = explode(" ",$chans);
+	for ($i = 0; isset($chan[$i]); $i++)
+	{
+		if (strlen($a." ".$chan[$i]) <= 230)
+		{
+			$a .= " ".$chan[$i];
+		}
+		else
+		{
+			$buffer[] = trim($a);
+			$a = "";
+			$i--;
+		}
+	}
+	if (strlen($a))
+		$buffer[] = $a;
+
+	return $buffer;
+}
+
 
 function version_response(User $user)
 {
@@ -845,7 +883,6 @@ hook::func("raw", function($u)
 	
 });
 
-/* SJOIN */
 hook::func("SJOIN", function($u)
 {	
 	global $sql;
@@ -854,11 +891,12 @@ hook::func("SJOIN", function($u)
 	$chan = $tokens[3];
 	$list = explode(":",$u['full']);
 	$parv = explode(" ",$list[count($list) - 1]);
+	
 	if (!$parv)
 	{
 		return;
 	}
-	for ($p = 0; $parv[$p]; $p++)
+	for ($p = 0; isset($parv[$p]); $p++)
 	{
 		$mode = "";
 		$item = $parv[$p];
@@ -897,24 +935,21 @@ hook::func("SJOIN", function($u)
 			$item = mb_substr($item,1);
 			goto loopback;
 		}
-		
 		if ($item[0] == "<")
 			bie($chan,$item);
-			
-		$user = new User($item);
-		if ($user->IsUser)
+		
+		if (isset($mode))
 		{
-			if (isset($mode))
-			{
-				$sql::insert_ison($chan,$user->uid,$mode);
-				hook::run("join", array('chan' => $chan, 'nick' => $user));
-			}
+			$sql::insert_ison($chan,$item,$mode);
+			hook::run("join", array('chan' => $chan, 'nick' => $item));
 		}
 	}
 });
-
-
-
+function SendRaw($string)
+{
+	global $serv;
+	$serv->Send($string);
+}
 
 function IsServiceBot(User $user)
 {

@@ -210,7 +210,8 @@ class SQL {
 	
 	function get_userchmode($chan,$user)
 	{
-		$conn = sqlnew();
+		global $sqlip,$sqluser,$sqlpass,$sqldb;
+		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 		if (!$conn) { return false; }
 		else {
 			if (!($u = new User($user))->IsUser)
@@ -233,7 +234,8 @@ class SQL {
 			$mode = $this->get_userchmode($chan,$user).$mode;
 			if (!($u = new User($user))->IsUser)
 				return false;
-			
+				
+
 			$prep = $conn->prepare("UPDATE dalek_ison SET mode = ? WHERE nick = ? AND chan = ?");
 			
 			$prep->bind_param("sss",$mode,$u->uid,$chan);
@@ -242,7 +244,8 @@ class SQL {
 		}
 	}
 	function del_userchmode($chan,$user,$mode){
-		$conn = sqlnew();
+		global $sqlip,$sqluser,$sqlpass,$sqldb;
+		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 		if (!$conn) { return false; }
 		else {
 			$mode = str_replace($mode,"",$this->get_userchmode($chan,$user));
@@ -258,7 +261,8 @@ class SQL {
 
 	function update_chmode($chan,$switch,$chr)
 	{
-		$conn = sqlnew();
+		global $sqlip,$sqluser,$sqlpass,$sqldb;
+		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 		if (!$conn) { return false; }
 		else {
 			$prep = $conn->prepare("UPDATE dalek_channels SET modes = ? WHERE channel = ?");
@@ -278,7 +282,7 @@ class SQL {
 			$prep->close();
 		}
 	}
-	function insert_ison($chan,$uid,$mode){
+	function insert_ison($chan,$uid,$mode = ""){
 		global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
 		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 		if (!$conn) { return false; }
@@ -299,9 +303,39 @@ class SQL {
 			$prep->close();
 		}
 	}
+	function delete_ison($chan,$uid)
+	{
+		$conn = sqlnew();
+		$prep = $conn->prepare("DELETE FROM dalek_ison WHERE nick = ? AND lower(chan) = ?");
+		$prep->bind_param("ss",$nick->uid,$chan);
+		$prep->execute();
+
+		/* cleanup any non-permanent empty channel */
+
+		$prep = $conn->prepare("SELECT * FROM dalek_ison WHERE lower(chan) = ?");
+		$prep->bind_param("s",$chan);
+		$prep->execute();
+		$result = $prep->get_result();
+
+		if ($result->num_rows == 0)
+		{
+			$lookup = find_channel($chan);
+			if (strpos($lookup['modes'],"P") == false)
+			{
+				$prep = $conn->prepare("DELETE FROM dalek_channels WHERE channel = ?");
+				$prep->bind_param("s",$lookup['channel']);
+				$prep->execute();
+			}
+		}
+		$prep->close();
+	}
 }
 
-
+function get_chmode($channel)
+{
+	$channel = new Channel($channel);
+	return $channel->modes;
+}
 
 function sqlnew()
 {
@@ -314,8 +348,7 @@ hook::func("preconnect", function($u){
 	
 	$conn = sqlnew();
 	
-	$result = $conn->multi_query(
-	"CREATE TABLE IF NOT EXISTS dalek_user (
+	$result = $conn->multi_query("CREATE TABLE IF NOT EXISTS dalek_user (
 		id int NOT NULL AUTO_INCREMENT,
 		nick varchar(255) NOT NULL,
 		timestamp int NOT NULL,
@@ -377,32 +410,6 @@ hook::func("preconnect", function($u){
 		UID varchar(10),
 		meta_key varchar(255),
 		meta_data varchar(255),
-		PRIMARY KEY(id)
-	);
-	CREATE TABLE IF NOT EXISTS dalek_channel_meta (
-		id int AUTO_INCREMENT NOT NULL,
-		chan varchar(255),
-		meta_key varchar(255),
-		meta_value varchar(255),
-		meta_setby varchar(255),
-		meta_timestamp varchar(255),
-		PRIMARY KEY(id)
-	);
-	CREATE TABLE IF NOT EXISTS dalek_chaninfo (
-		id int AUTO_INCREMENT NOT NULL,
-		channel varchar(255) NOT NULL,
-		owner varchar(255) NOT NULL,
-		regdate varchar(15) NOT NULL,
-		url varchar(255),
-		email varchar(255),
-		chatlink varchar(255),
-		PRIMARY KEY(id)
-	);
-	CREATE TABLE IF NOT EXISTS dalek_chanaccess (
-		id int AUTO_INCREMENT NOT NULL,
-		channel varchar(255) NOT NULL,
-		nick varchar(255) NOT NULL,
-		access varchar(20) NOT NULL,
 		PRIMARY KEY(id)
 	);
 	TRUNCATE TABLE dalek_user;

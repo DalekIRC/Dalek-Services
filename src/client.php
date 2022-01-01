@@ -72,12 +72,26 @@ class Client {
 		
 	function join($dest)
 	{
-		global $servertime;
+		global $sql,$servertime;
 		
-		$chan = find_channel($dest);
+		$chan = new Channel($dest);
+
+		if ($chan->HasUser($this->uid))
+			return;
+		$timestamp = (isset($chan->timestamp)) ? $chan->timestamp : $servertime;
+		$this->sendraw("SJOIN $timestamp $dest :~".$this->uid);
+		$sql->insert_ison($dest,$this->uid);
+	}
+	function part($dest)
+	{
+		global $sql;
+		
+		$chan = new Channel($dest);
 		if (!$chan){ return; }
-		
-		$this->sendraw("SJOIN ".$chan['timestamp']." $dest :~".$this->uid);
+		if (!$chan->HasUser($this->uid))
+			return;
+		$this->sendraw("SJOIN $chan->timestamp $dest :~".$this->uid);
+		$sql->delete_ison($dest,$this->uid);
 	}
 	function notice($dest,$string)
 	{
@@ -91,29 +105,57 @@ class Client {
 	}
 	function mode($dest,$string)
 	{
-		
+		if ($dest[0] == "#")
+		{
+			$chan = new Channel($dest);
+			$tok = explode(" ",$string);
+			if (isset($tok[1]))
+			{
+				$params = rparv($string);
+				MeatballFactory($chan,$tok[0],$params,$this->nick);
+			}
+			else
+			{
+				$params = "";
+				MeatballFactory($chan,$string,$params,$this->nick);
+			}
+		}
+			
 		$this->sendraw(":$this->uid MODE $dest $string");
 	}
 	function svs2mode($nick,$string){
+		var_dump($nick);
+		$nick = new User($nick);
+		if (!$nick->IsUser){ return; }
 		
-		if (!($nick = find_person($nick))){ return; }
-		
-		$uid = $nick['UID'];
-		
+		$uid = $nick->uid;
+		$nick->SetMode("$string");
 		$this->sendraw(":$this->uid SVS2MODE $uid $string");
 	}
 	function svslogin($uid,$account)
 	{
-		global $sasl;
-		
-		if (isset($sasl[$uid])){ goto svsloginexists; }
-		elseif (!($nick = find_person($uid))){ return; }
-		
-		
-		$uid = $nick['UID'];
-		
-		svsloginexists:
 		$this->sendraw(":$this->uid SVSLOGIN * $uid $account");
+	}
+	function up(Channel $chan, User $user)
+	{
+		$access = ChanAccessAsInt($chan,$user);
+		if (!$access)
+			return;
+
+		if ($access == 1)
+			$this->mode($chan->chan,"+v $user->nick");
+
+		elseif ($access == 2)
+			$this->mode($chan->chan,"+h $user->nick");
+
+		elseif ($access == 3)
+			$this->mode($chan->chan,"+o $user->nick");
+
+		elseif ($access == 4)
+			$this->mode($chan->chan,"+ao $user->nick $user->nick");
+
+		elseif ($access == 5)
+			$this->mode($chan->chan,"+qo $user->nick $user->nick");
 	}
 }
 
@@ -121,7 +163,6 @@ hook::func("start", function(){
 	global $ns,$cs,$bs,$os,$gb,$hs,$ms;
 	$ns->join("#services");
 	$cs->join("#services");
-	$cs->join("#Valeyard");
 	$cs->join("#PossumsOnly");
 	$bs->join("#services");
 	$os->join("#services");

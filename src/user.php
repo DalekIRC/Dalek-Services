@@ -51,6 +51,7 @@ class User {
 		$this->sid = $u['SID'];
 		$this->tls = (strpos($u['usermodes'],"z")) ? true : false;
 		$this->last = $u['last'];
+		$this->channels = get_ison($this->uid);
 	}
 	function NewNick($nick)
 	{
@@ -93,7 +94,6 @@ class User {
 			
 			elseif ($tok == "-")
 			{
-				echo "Changed switch to del\n";
 				$switch = "del";
 				$i++;
 			}
@@ -144,7 +144,7 @@ function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 	$DelModeString = NULL;
 
 	$NewModes = $modesThatWeHave;
-	
+	$SetTheMode = "";
 	for ($i = 0; $i < strlen($modesToAdd); $i++)
 	{
 
@@ -154,12 +154,12 @@ function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 		}
 	}
 	
-	if (isset($SetTheMode))
+	if (strlen($SetTheMode) > 0)
 	{	
 		$AddModeString = "+".$SetTheMode ?? NULL;
 		$NewModes = $modesThatWeHave.$SetTheMode;
 	}
-	
+	$UnsetTheMode = "";
 	for ($i = 0; $i < strlen($modesToDel); $i++)
 	{
 		
@@ -169,7 +169,7 @@ function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 		}
 	}
 	
-	if (isset($UnsetTheMode))
+	if (strlen($UnsetTheMode) > 0)
 	{
 		$DelModeString = "-".$UnsetTheMode ?? NULL;
 		
@@ -182,7 +182,7 @@ function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 		}
 	}
 	$TheEntireStringOfModesThatWeAreGoingToSetOnTheUser = $AddModeString.$DelModeString;
-	if (!$TheEntireStringOfModesThatWeAreGoingToSetOnTheUser)
+	if (!strlen($TheEntireStringOfModesThatWeAreGoingToSetOnTheUser))
 	{
 		return false;
 	}

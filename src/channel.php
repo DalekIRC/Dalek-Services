@@ -64,6 +64,7 @@ class Channel
 		for ($i = 0; isset($chanlist['list'][$i]); $i++)
 			if (strpos($chanlist['mode'][$i],$mode) !== false && $chanlist['list'][$i] == $this->chan)
 				return true;
+
 		return false;
 	}
 	
@@ -83,7 +84,7 @@ class Channel
 	
 	function SetMode($mode)
 	{
-		global $cf;
+        global $cf;
 		SendRaw("MODE $this->chan $mode",$cf['servicesname']);
 		$tok = explode(" ",$mode);
 		if (isset($tok[1]))
@@ -111,17 +112,17 @@ class Channel
 		if ($type == 1 || $type == 5)
 		{
 			if ($chr == "q" || $chr == "a" || $chr == "o" || $chr == "h" || $chr == "v")
-			{
+            {
 				if ($switch == "+")
 				{
 					$sql->add_userchmode($this->chan,$param,$chr);
 				}
 				elseif ($switch == "-")
 				{
-					    $sql->del_userchmode($this->chan,$param,$chr);
-				}
-				unset($source);
-	           		 }
+                    $sql->del_userchmode($this->chan,$param,$chr);
+                }
+                unset($source);
+            }
 			elseif ($chr == "b" || $chr == "I" || $chr = "e")
 			{
 				if ($switch == "+")
@@ -158,7 +159,7 @@ class Channel
 							$type = "except";
 							break;
 					}
-					$conn = conn();
+					$conn = sqlnew();
 					$prep = $conn->prepare("DELETE FROM dalek_channel_meta WHERE chan = ? AND meta_key = ? AND meta_value = ?");
 					$prep->bind_param("sss",$this->chan,$type,$param);
 					$prep->execute();
@@ -209,7 +210,7 @@ class Channel
 	}
 	function IsEmpty()
 	{
-		if (!($conn = conn()))
+		if (!($conn = sqlnew()))
 			return;
 		$prep = $conn->prepare("SELECT * FROM dalek_ison WHERE chan = ?");
 		$prep->bind_param("s",$this->chan);
