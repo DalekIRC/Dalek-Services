@@ -52,8 +52,8 @@ class Server
 		// create ssl context
 		$context = stream_context_create(['ssl' => [
 			'verify_peer'  => false,
-            'verify_peer_name'  => false,
-            'allow_self_signed' => true,
+			'verify_peer_name'  => false,
+			'allow_self_signed' => true,
 			'ciphers' => 'ECDHE-ECDSA-AES256-GCM-SHA384'
 		]]);
 
