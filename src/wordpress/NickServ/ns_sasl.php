@@ -185,7 +185,6 @@ class IRC_SASL {
 		}
 
 		SendSasl("$this->source $this->uid D S");
-
 		unset($_SASL[$this->uid]);
 	}
 	private function fail()
@@ -193,6 +192,7 @@ class IRC_SASL {
 		global $ns,$_SASL;		
 		$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid failed to identify.");
 		unset($_SASL[$this->uid]);
+		SendSasl("$this->source $this->uid D F");
 	}
 		
 	 function check_pass($passwd)
