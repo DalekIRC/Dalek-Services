@@ -201,7 +201,6 @@ class IRC_SASL {
 		}
 
 		SendSasl("$this->source $this->uid D S");
-
 		unset($_SASL[$this->uid]);
 	}
 	private function fail()
