@@ -32,7 +32,9 @@ class Client {
 		
 		$this->nick = $nick;
 		$this->uid = $uid;
-		
+
+		$this->elmer = false;
+
 		$this->sendraw("UID $nick 0 $servertime $ident $hostmask $uid $nick +oiqS * * * :$gecos");
 		
 		hook::run("UID", array(
@@ -61,7 +63,8 @@ class Client {
 	}
 	function msg($dest,$string)
 	{
-		
+		if ($this->elmer)
+			$string = preg_match('[rl]','w',$string);
 		$this->sendraw(":$this->uid PRIVMSG $dest :$string");
 	}
 	function log($string){
@@ -95,6 +98,10 @@ class Client {
 	}
 	function notice($dest,$string)
 	{
+		
+		if ($this->elmer)
+			$string = preg_match("[rl]","w",$string);
+
 		$uid = $this->uid;
 		$tok = explode("<lf>",$string) ?? $string;
 		if ($string == "Array"){ $tok = $string; }
@@ -124,7 +131,6 @@ class Client {
 		$this->sendraw(":$this->uid MODE $dest $string");
 	}
 	function svs2mode($nick,$string){
-		var_dump($nick);
 		$nick = new User($nick);
 		if (!$nick->IsUser){ return; }
 		
@@ -169,5 +175,13 @@ hook::func("start", function(){
 	$gb->join("#services");
 	$hs->join("#services");
 	$ms->join("#services");
-	//$gb->notice("$*","Services is back online. Have a great day!");
+	//global_notice("Services is back online. Have a great day!");
 });
+
+
+function global_notice($msg) : bool
+{
+	global $gb;
+	$gb->notice("$*",$msg);
+	return true;
+}

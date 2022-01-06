@@ -51,7 +51,12 @@ class User {
 		$this->sid = $u['SID'];
 		$this->tls = (strpos($u['usermodes'],"z")) ? true : false;
 		$this->last = $u['last'];
-		$this->channels = get_ison($this->uid);
+		$s = find_serv($u['SID']);
+		if ($s)
+			$this->server = $s['servername'];
+		$this->tls = (strpos($u['usermodes'],"z")) ? true : false;
+		$this->last = $u['last'];
+		$this->meta = new UserMeta($this);
 	}
 	function NewNick($nick)
 	{
@@ -94,6 +99,7 @@ class User {
 			
 			elseif ($tok == "-")
 			{
+				echo "Changed switch to del\n";
 				$switch = "del";
 				$i++;
 			}
@@ -121,6 +127,26 @@ class User {
 		update_usermode($this->uid,$validate['NewModes']);
 		return true;
 	}
+	function get_user_meta()
+	{
+		$meta = array();
+
+		$conn = sqlnew();
+		$prep = $conn->prepare("SELECT * FROM dalek_user_meta WHERE UID = ?");
+		$prep->bind_param("s",$this->uid);
+		$prep->execute();
+		$result = $prep->get_result();
+		if (!$result)
+		{
+			$prep->close();
+			return NULL;
+		}
+		while($row = $result->fetch_assoc())
+			$this->$meta->$row['meta_key'] = $row['meta_data'];
+
+		$prep->close();
+		return $meta;
+	}
 	function exit()
 	{
 		global $sql;
@@ -130,6 +156,27 @@ class User {
 }
 
 
+class UserMeta {
+
+	function __construct(User $nick)
+	{
+
+		$conn = sqlnew();
+		$prep = $conn->prepare("SELECT * FROM dalek_user_meta WHERE UID = ?");
+		$prep->bind_param("s",$nick->uid);
+		$prep->execute();
+		$result = $prep->get_result();
+		if (!$result)
+		{
+			$prep->close();
+			return NULL;
+		}
+		while($row = $result->fetch_assoc())
+			$this->{$row['meta_key']} = $row['meta_data'];
+
+		$prep->close();
+	}
+}
 function sendumode($uid,$mode)
 {
 	global $serv;
@@ -144,7 +191,7 @@ function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 	$DelModeString = NULL;
 
 	$NewModes = $modesThatWeHave;
-	$SetTheMode = "";
+	
 	for ($i = 0; $i < strlen($modesToAdd); $i++)
 	{
 
@@ -154,12 +201,12 @@ function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 		}
 	}
 	
-	if (strlen($SetTheMode) > 0)
+	if (isset($SetTheMode))
 	{	
 		$AddModeString = "+".$SetTheMode ?? NULL;
 		$NewModes = $modesThatWeHave.$SetTheMode;
 	}
-	$UnsetTheMode = "";
+	
 	for ($i = 0; $i < strlen($modesToDel); $i++)
 	{
 		
@@ -169,7 +216,7 @@ function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 		}
 	}
 	
-	if (strlen($UnsetTheMode) > 0)
+	if (isset($UnsetTheMode))
 	{
 		$DelModeString = "-".$UnsetTheMode ?? NULL;
 		
@@ -182,7 +229,7 @@ function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 		}
 	}
 	$TheEntireStringOfModesThatWeAreGoingToSetOnTheUser = $AddModeString.$DelModeString;
-	if (!strlen($TheEntireStringOfModesThatWeAreGoingToSetOnTheUser))
+	if (!$TheEntireStringOfModesThatWeAreGoingToSetOnTheUser)
 	{
 		return false;
 	}

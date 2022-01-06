@@ -35,7 +35,7 @@ include "user.php";
 include "squit.php";
 include "timer.php";
 include "protoctl.php";
-include "channel.php";
+include "module.php";
 include "NickServ/nickserv.php";
 include "BotServ/botserv.php";
 include "ChanServ/chanserv.php";
@@ -44,6 +44,8 @@ include "Global/global.php";
 include "HostServ/hostserv.php";
 include "MemoServ/memoserv.php";
 include "wordpress/wordpress.php";
+include "channel.php";
+//include "plugins/PATHWEB/uplink.php";
 // Server config
 $server = $cf['uplink'];
 $port = $cf['port'];
@@ -69,6 +71,8 @@ for (;;)
 	
 	if (!isset($serv)){ $serv = new Server($server,$port,$mypass);
 	}
+	if (!$socket)
+		die();
 	while ($input = fgets($socket, 1000))
 	{
 		$timeget = microtime(true);	
@@ -199,8 +203,7 @@ function S2S($string) {
 	$serv->send($string);
 }
 
-
-function colour($c,$string)
+function color($c,$string)
 {
 	return  chr(3).$c.$string.chr(3);
 }

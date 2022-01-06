@@ -19,13 +19,19 @@ if (!isset($wpconfig['siteurl']) || empty($wpconfig['siteurl']))
 }
 
 
-include "ns_identify.php";
-include "ns_register.php";
-include "ns_sasl.php";
-include "ns_set_pass.php";
-include "ns_set_email.php";
-include "ns_info.php";
+include "NickServ/ns_identify.php";
+include "NickServ/ns_register.php";
+include "NickServ/ns_sasl.php";
+include "NickServ/ns_set_pass.php";
+include "NickServ/ns_set_email.php";
+include "NickServ/ns_info.php";
+include "NickServ/ns_autoprivate.php";
+include "NickServ/ns_certfp.php";
+include "ChanServ/cs_register.php";
+include "ChanServ/cs_autoop.php";
 
+/* WordPress plugin "Disable User Account" compatibility" */
+include "_is_disabled.php";
 
 class WPUser {
 
@@ -163,5 +169,125 @@ class WPUserMeta {
 		}
 		else
 			return "0";
+	}
+}
+
+
+
+
+function wp_get_privs($role)
+{
+	global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	if (!$conn) { return false; }
+	
+	$table = $cf['wp_prefix']."_options";
+	$option = $cf['wp_prefix']."_user_roles";
+	$prep = $conn->prepare("SELECT * FROM $table WHERE option_name = ?");
+	$prep->bind_param("s",$option);
+	$prep->execute();
+	$result = $prep->get_result();
+	
+	if (!$result){ return false; }
+	if ($result->num_rows == 0)
+	{
+		return false;
+	}
+	
+	$privs = array();
+	$priv = array();
+	$row = $result->fetch_assoc();
+	$privs = unserialize($row['option_value']);
+	
+	if (!is_array($privs))
+		return false;
+	
+	
+	
+	foreach ($privs[$role]['capabilities'] as $key => $val)
+	{
+		$priv[] = $key;
+	}
+	
+	return $priv;
+}
+
+
+function wp_get_caps($nicename)
+{
+	global $sqlip,$sqluser,$sqlpass,$sqldb,$wpconfig;
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	if (!$conn) { return false; }
+	
+	$user = new WPUser($nicename);
+	$table = $wpconfig['dbprefix']."usermeta";
+	$option = $wpconfig['dbprefix']."capabilities";
+	
+	$prep = $conn->prepare("SELECT * FROM $table WHERE meta_key = ? AND user_id = ?");
+	$prep->bind_param("si",$option,$user->id);
+	$prep->execute();
+	$result = $prep->get_result();
+	
+	if (!$result){ return false; }
+	if ($result->num_rows == 0)
+	{
+		return false;
+	}
+	
+	$row = $result->fetch_assoc();
+	
+	$perms = array();
+	$perms = unserialize($row['meta_value']);
+	
+	$perm = array();
+	foreach ($perms as $p => $val)
+		$perm[] = $p ;
+		
+	return $perm;
+}
+
+function IsAdmin($caps)
+{
+	if (!$caps)
+		return;
+	if (is_array($caps)) {
+			if (in_array("services-admin",$caps) || 
+			in_array("administrator",$caps) ||
+			in_array("services-operator",$caps))
+				return true;
+	}
+}
+
+function ChanAccess(Channel $channel,$nick)
+{
+	foreach ($channel->access as $key => $val)
+	{
+		if (strtolower($key) == strtolower($nick))
+			return $val;			
+	}
+	return false;
+}
+
+function ChanAccessAsInt(Channel $chan, User $nick)
+{
+	if (!($ch = ChanAccess($chan,$nick->nick)))
+		return false;
+	
+	switch ($ch)
+	{
+		case "owner":
+		return 5;
+	
+		case "admin":
+		return 4;
+		
+		case "operator":
+		return 3;
+
+		case "halfop":
+		return 2;
+		
+		case "voice":
+		return 1;
 	}
 }

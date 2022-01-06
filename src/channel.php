@@ -175,8 +175,7 @@ class Channel
 	
 	function CheckReg()
 	{
-		global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
-		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+		$conn = sqlnew();
 		if (!$conn) { return false; }
 		
 		$prep = $conn->prepare("SELECT * FROM dalek_chaninfo WHERE channel = ?");

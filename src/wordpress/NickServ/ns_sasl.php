@@ -13,19 +13,33 @@
 //				
 \\	Title: SASL
 //	
-\\	Desc: Provides default SASL (plain)
+\\	Desc: Provides default SASL (plain & external)
 //	
 \\	
 //	
 \\	
 //	
-\\	Version: 1
+\\	Version: 1.1
 //				
 \\	Author:	Valware
 //				
 */
 
+hook::func("preconnect", function($u)
+{
+	$conn = sqlnew();
 
+	$table = "dalek_fingerprints_external";	
+	
+	$conn->query("CREATE TABLE IF NOT EXISTS $table (
+		id int NOT NULL AUTO_INCREMENT,
+		account varchar(255),
+		ip varchar(255),
+		fingerprint varchar(255),
+		PRIMARY KEY (id)
+	)");
+
+});
 hook::func("start", function($u)
 {
 	
@@ -73,7 +87,7 @@ hook::func("UID", function($u)
 	$nick = new User($u['uid']);
 	if (!$nick->IsUser)
 		return;
-	if (!isset($u['account'])){
+	if (!isset($u['account']) && $u['account'] !== 0 && $u['account'] !== "*"){
 		if (!wp_IsRegUser($nick->nick)){
 			return;
 		}
@@ -81,7 +95,7 @@ hook::func("UID", function($u)
 		$ns->notice($nick->uid,"please identify for it using:");
 		$ns->notice($nick->uid,"/msg $ns->nick identify password");
 	}
-	else {
+	elseif ($nick->nick == $u['account']) {
 		$ns->svs2mode($u['nick'],"+r");
 	}
 });
@@ -124,6 +138,7 @@ function SendSasl($string)
 {
 	S2S("SASL $string");
 }
+
 class IRC_SASL {
 	function __construct($source,$uid,$cmd,$param1 = "", $param2 = "")
 	{
@@ -131,12 +146,14 @@ class IRC_SASL {
 		
 		$this->uid = $uid;
 		$this->source = $source;
+		$this->banned = "";
+		$this->reason = "";
 		if (!isset($_SASL[$uid]) && $cmd == "H")
 		{
 			$_SASL[$uid]["host"] = $param1;
 			$_SASL[$uid]["ip"] = $param2;
 		}
-		elseif (isset($_SASL[$uid]) && ($cmd == "S" || $cmd == "C") && $param1 == "PLAIN")
+		elseif (isset($_SASL[$uid]) && $cmd == "S")
 		{
 			$_SASL[$uid]["mech"] = $param1;
 			$_SASL[$uid]["key"] = $param2;
@@ -157,7 +174,6 @@ class IRC_SASL {
 			else {
 				$_SASL[$uid]["pass"] = $param1;
 				$this->check = $this->check_pass($param1);
-				var_dump($this->check);
 				if ($this->check == 0)
 					$this->fail();
 				elseif ($this->check > 0)
@@ -175,12 +191,12 @@ class IRC_SASL {
 
 		if ($i == 2)
 		{
-			$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid provided an invitation code");
-			S2S(":$ns->nick SVSLOGIN * $this->uid INVITED");
+			$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid provided an invitation code ($this->account)");
+			S2S(":$ns->nick SVSLOGIN * $this->uid $this->account");
 		}
 		elseif ($i == 1)
 		{
-			$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid identified using SASL for account: $this->account");
+			$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid identified using SASL for account: $this->account $this->reason");
 			S2S(":$ns->nick SVSLOGIN * $this->uid $this->account");
 		}
 
@@ -190,15 +206,23 @@ class IRC_SASL {
 	}
 	private function fail()
 	{
-		global $ns,$_SASL;		
-		$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid failed to identify.");
+		global $ns,$_SASL;
+		if (!isset($this->account) || !strlen($this->account))
+			$this->account = "No account provided";
+		$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid failed to identify ($this->account) $this->$reason $this->banned");
 		unset($_SASL[$this->uid]);
+		SendSasl("$this->source $this->uid D F");
 	}
 		
 	 function check_pass($passwd)
 	{
 		global $_SASL;
 
+		if (ctype_xdigit($passwd))
+		{
+			if ($this->check_fingerprint($passwd))
+				return 1;
+		}
 		$tok = explode(chr(0),base64_decode($passwd));
 		if (!$tok)
 			return false;
@@ -220,18 +244,47 @@ class IRC_SASL {
 		if (!isset($account) || strlen($account) == 0)
 			return 3;
 		$wp_user = new WPUser($account);
+		if (function_exists('_is_disabled'))
+			if (_is_disabled($wp_user))
+			{
+				$this->banned = "(User is disabled on the website)";
+				return 0;
+			}
+
 		if ($wp_user->ConfirmPassword($pass) || $var = is_invite($account,$pass))
 		{
 			if (isset($var))
-			{
 				if ($var == true)
 					return 2;
 				else return 1;
-			}	
 			else return 1;
 		}
 		else
 			return 0;
+	}
+	function check_fingerprint($fp)
+	{
+		global $_SASL;
+		
+		$table = "dalek_fingerprints_external";	
+		$conn = sqlnew();
+		$prep = $conn->prepare("SELECT account FROM $table WHERE ip = ? and fingerprint = ? LIMIT 1");
+		$prep->bind_param("ss", $_SASL[$this->uid]['ip'], $_SASL[$this->uid]["key"]);
+		$prep->execute();
+
+		if (!($result = $prep->get_result()))
+			return; // we return silently so the user may continue another sasl method
+			
+		if ($result->num_rows == 0)
+			return; // we return silently so the user may continue another sasl method
+		
+		$row = $result->fetch_assoc();
+		if (!$row['account'])
+			return; // we return silently so the user may continue another sasl method
+		
+		$this->reason = "(CertFP)";
+		$this->account = $row['account'];
+		return 1;
 	}
 		
 }

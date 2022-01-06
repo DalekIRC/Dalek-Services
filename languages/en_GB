@@ -54,7 +54,9 @@
 	'REGAIN_QUITMSG' => "Recovery in progress",
 	
 	'ERR_NICKNOTONLINE' => "Nick not online.",
-	
+
+	'HELPCMD_AJOIN' => "Automatically join you to channels when you identify.",
+	'HELPCMD_INFO' => "Views information about a given nick/account",
 
 	
 ];

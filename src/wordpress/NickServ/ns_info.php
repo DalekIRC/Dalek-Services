@@ -46,25 +46,37 @@ nickserv::func("privmsg",	 function($u){
 	}
 
 	$target = new User($parv[1]);
-	$wp_target = new WPUser($parv[1]);
 
+	$lookup = (isset($target->account)) ? $target->account : $parv[1];
+	$wp_target = new WPUser($lookup);
+	echo "Got past the first bit lol\n";
 	if ($target->IsUser)
 	{
 		$ns->notice($nick->uid,"IRC information about $target->nick");
 		$ns->notice($nick->uid," ");
+		$ns->notice($nick->uid,"$target->nick is logged in as $target->account");
 		$ns->notice($nick->uid,"$target->nick is $target->gecos");
 		$ns->notice($nick->uid,"$target->nick is currently online.");
+
 		if ($wp_user->IsUser)
 			if ($wp_user->IsAdmin || $wp_target->user_id == $wp_user->user_id)
 				$ns->notice($nick->uid,"Online from: $target->ident@$target->realhost");
-		else
-			$ns->notice($nick->uid,"Online from: $target->ident@$target->cloak");
+			else
+				$ns->notice($nick->uid,"Online from: $target->ident@$target->cloak");
 
+		if (function_exists("_is_disabled") && $wp_user->IsAdmin)
+			if (_is_disabled($wp_target))
+			{
+				$ns->notice($nick->uid," ");
+				$ns->notice($nick->uid,"\x02This account has been disabled by an administrator.");
+			}
 		$ns->notice($nick->uid," ");
 	}
+	echo "Got to the final part\n";
 	if (!$wp_target->IsUser)
 		return;
 	
+	echo "Got PAST the final part... hmmm\n";
 	$ns->notice($nick->uid,"Website information about $wp_target->user_login");
 	$ns->notice($nick->uid," ");
 	if ($wp_user->IsUser)
@@ -104,6 +116,7 @@ nickserv::func("help", function($u){
 	$nick = $u['nick'];
 	
 	$ns->notice($nick,"Command: INFO");
+	$ns->notice($nick,"Automatically turns your private messaging off when you identify");
 	$ns->notice($nick,"Syntax: /msg $ns->nick info <account>");
 	$ns->notice($nick,"Example: /msg $ns->nick info Lamer23");
 });
