@@ -27,6 +27,7 @@
 include "class.php";
 include "chanserv.conf";
 include "modules.conf";
+include "cs_help.php";
 
 
 // Spawn chanserv on server connect
@@ -41,15 +42,14 @@ hook::func("connect", function($u){
 
 hook::func("privmsg", function($u){
 	
-	global $cs;
+	global $cs,$chanserv;
+	$dest = $u['dest'];
 	if (strpos($u['dest'],"@") !== false){
 		$n = explode("@",$u['dest']);
 		$dest = $n[0];
 	}
-	else { $dest = $u['dest']; }
 	
-	
-	if (strtolower($dest) == strtolower($cs->nick)){ 
+	if (strtolower($dest) == strtolower($cs->nick) || $dest == $chanserv['uid']){
 		chanserv::run("privmsg", array(
 			"msg" => $u['parv'],
 			"nick" => $u['nick'])

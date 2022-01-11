@@ -36,3 +36,41 @@ function _is_disabled(WPUser $user) : int
 		return 0;
 	return $user->user_meta->_is_disabled;
 }
+
+hook::func("ping", function($u)
+{
+	global $cf,$wpconfig;
+	$conn = sqlnew();
+	$result  = $conn->query("SELECT * FROM dalek_user WHERE account IS NOT NULL");
+	while ($row = $result->fetch_assoc())
+	{
+		$nick = new User($row['account']);
+		$user = new WPUser($row['account']);
+		if (_is_disabled($user))
+		{
+			S2S("KILL $nick->nick :Account disabled on website");
+			$nick->exit();
+		}
+		
+	}
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

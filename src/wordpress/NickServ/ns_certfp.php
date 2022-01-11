@@ -34,7 +34,7 @@ nickserv::func("privmsg", function($u)
 		$ns->notice($nick->uid, add_certfp($nick->ip,$nick->account,$nick->meta->certfp));
 	}
 
-	if (strtolower($parv[1]) == "del")
+	elseif (strtolower($parv[1]) == "del")
 	{
 		if (!isset($parv[2]))
 		{
@@ -43,6 +43,25 @@ nickserv::func("privmsg", function($u)
 		}
 		$ns->notice($nick->uid, del_certfp($nick->ip,$nick->account,$nick->meta->certfp));
 	}
+	elseif (strtolower($parv[1]) == "list")
+	{
+		$table = 'dalek_fingerprints_external';
+		$conn = sqlnew();
+		$prep = $conn->prepare("SELECT * FROM $table WHERE account = ?");
+		$prep->bind_param("s",$nick->account);
+		$prep->execute();
+		$result = $prep->get_result();
+		if (!$result || $result->num_rows == 0)
+		{
+			$ns->notice($nick->uid,"You do not have any Certificate Fingerprints saved.");
+			return;
+		}
+		$ns->notice($nick->uid,"Listing your saved Certificate Fingerprints:");
+		while ($row = $result->fetch_assoc())
+			$ns->notice($nick->uid,$row['fingerprint']);
+	}
+			
+
 });
 
 function is_certfp_already($ip, $account, $fp) : bool

@@ -49,7 +49,7 @@ nickserv::func("privmsg",	 function($u){
 
 	$lookup = (isset($target->account)) ? $target->account : $parv[1];
 	$wp_target = new WPUser($lookup);
-	echo "Got past the first bit lol\n";
+
 	if ($target->IsUser)
 	{
 		$ns->notice($nick->uid,"IRC information about $target->nick");
@@ -72,11 +72,9 @@ nickserv::func("privmsg",	 function($u){
 			}
 		$ns->notice($nick->uid," ");
 	}
-	echo "Got to the final part\n";
 	if (!$wp_target->IsUser)
 		return;
 	
-	echo "Got PAST the final part... hmmm\n";
 	$ns->notice($nick->uid,"Website information about $wp_target->user_login");
 	$ns->notice($nick->uid," ");
 	if ($wp_user->IsUser)

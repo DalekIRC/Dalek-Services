@@ -27,9 +27,16 @@ include "NickServ/ns_set_email.php";
 include "NickServ/ns_info.php";
 include "NickServ/ns_autoprivate.php";
 include "NickServ/ns_certfp.php";
+
 include "ChanServ/cs_register.php";
 include "ChanServ/cs_autoop.php";
-
+//include "ChanServ/cs_fantasy.php";
+include "ChanServ/cs_voice.php";
+include "ChanServ/cs_devoice.php";
+include "ChanServ/cs_invite.php";
+include "ChanServ/cs_op.php";
+include "ChanServ/cs_deop.php";
+include "ChanServ/cs_kick.php";
 /* WordPress plugin "Disable User Account" compatibility" */
 include "_is_disabled.php";
 

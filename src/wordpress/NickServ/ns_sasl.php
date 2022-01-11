@@ -201,14 +201,17 @@ class IRC_SASL {
 		}
 
 		SendSasl("$this->source $this->uid D S");
+
 		unset($_SASL[$this->uid]);
 	}
 	private function fail()
 	{
 		global $ns,$_SASL;
+		$b = ($this->banned) ? " ".$this->banned : "";
+		$r = ($this->reason) ? " ".$this->reason : "";
 		if (!isset($this->account) || !strlen($this->account))
 			$this->account = "No account provided";
-		$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid failed to identify ($this->account) $this->$reason $this->banned");
+		$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid failed to identify ($this->account)$r$b");
 		unset($_SASL[$this->uid]);
 		SendSasl("$this->source $this->uid D F");
 	}
@@ -280,7 +283,9 @@ class IRC_SASL {
 		$row = $result->fetch_assoc();
 		if (!$row['account'])
 			return; // we return silently so the user may continue another sasl method
-		
+		$user = new WPUser($row['account']);
+		if (_is_disabled($user))
+			return 0;
 		$this->reason = "(CertFP)";
 		$this->account = $row['account'];
 		return 1;
