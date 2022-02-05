@@ -39,11 +39,8 @@ nickserv::func("privmsg",	 function($u){
 		return;
 	if ($nickserv['login_method'] !== "wordpress"){ return; }	// default config option
 	
-	if (count($parv) < 2)
-	{
-		$ns->notice($nick->uid,"Syntax: INFO <username>");
-		return;
-	}
+	if (count($parv) == 1)
+		$parv[1] = $u['nick'];
 
 	$target = new User($parv[1]);
 
