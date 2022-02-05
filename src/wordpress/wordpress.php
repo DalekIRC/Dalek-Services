@@ -30,6 +30,8 @@ include "NickServ/ns_certfp.php";
 
 include "ChanServ/cs_register.php";
 include "ChanServ/cs_autoop.php";
+include "ChanServ/cs_bans.php";
+include "ChanServ/cs_set.php";
 //include "ChanServ/cs_fantasy.php";
 include "ChanServ/cs_voice.php";
 include "ChanServ/cs_devoice.php";
@@ -37,8 +39,10 @@ include "ChanServ/cs_invite.php";
 include "ChanServ/cs_op.php";
 include "ChanServ/cs_deop.php";
 include "ChanServ/cs_kick.php";
+include "ChanServ/cs_info.php";
 /* WordPress plugin "Disable User Account" compatibility" */
 include "_is_disabled.php";
+include "fail2ban.php";
 
 class WPUser {
 
@@ -60,6 +64,7 @@ class WPUser {
 		$this->user_registered = $nick['user_registered'];
 		$this->user_status = $nick['user_status'];
 		$this->display_name = $nick['display_name'];
+		$this->confirmed = (!strlen($nick['user_activation_key'])) ? true : false;
 		$this->user_meta = new WPUserMeta($this);
 		$uns = unserialize($this->user_meta->wp_capabilities);
 		$this->role_array = array();

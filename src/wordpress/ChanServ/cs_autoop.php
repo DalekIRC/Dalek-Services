@@ -154,3 +154,28 @@ function autoop_toggle(WPUser $nick,$chan,$toggle)
 		$prep->execute();
 	}
 }
+
+
+chanserv::func("helplist", function($u){
+	
+	global $cs;
+	
+	$nick = $u['nick'];
+	
+	$cs->notice($nick,"AUTOOP              Modify your AUTOOP setting for a channel");
+	
+});
+
+
+chanserv::func("help", function($u){
+	
+	global $cs;
+	
+	if ($u['key'] !== "autoop"){ return; }
+	
+	$nick = $u['nick'];
+	
+	$cs->notice($nick,"Command: AUTOOP");
+	$cs->notice($nick,"Syntax: /msg $cs->nick autoop #channel <on|off>");
+	$cs->notice($nick,"Example: /msg $cs->nick autoop #channel on");
+});

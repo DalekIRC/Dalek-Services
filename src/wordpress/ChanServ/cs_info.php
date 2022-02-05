@@ -1,6 +1,6 @@
 <?php
 /*
- *	(C) 2021 Pride IRC Services
+ *	(C) 2022 Dalek IRC Services
  *
  *	GNU GENERAL PUBLIC LICENSE v3
  *
@@ -13,22 +13,11 @@
  *	Version: 1
 */
 
-hook::func("preconnect", function(){
-	AddCommand(
-		$cmd = array(
-			'entity' => "X",
-			'cmd' => "INFO",
-			'help' => "Use this command to view specific information on a user or channel,<lf>you can also use this to confirm is someone is a staff member.<lf>For more information try HELP INFO",
-			'helpstr' => "Lookup information on a user or channel",
-			'syntax' => "/msg %me INFO <nick|channel>",
-		)
-	);
-});
 
 
 hook::func("privmsg", function($u)
 {
-	global $x;
+	global $cs;
 	
 	$tok = explode(" ",$u['parv']);
 	if ($tok[0] !== "!info")
@@ -37,24 +26,22 @@ hook::func("privmsg", function($u)
 		return;
 	
 	$params = rparv($u['parv']);
-
-	$command = str_replace("!","",$tok[0]);
-	$cmd = new Command($command);
+	
 	if (strlen($params) == 0)
 	{
-		$x->notice($u['nick'],$cmd->syntax);
+		$cs->notice($u['nick'],"Syntax: /msg $cs->nick INFO <#channel>");
 		return;
 	}
-	X::run("privmsg", array(
+	chanserv::run("privmsg", array(
 		'msg' => "$command $params",
 		'nick' => $u['nick'])
 	);
 
 });
 
-X::func("privmsg", function($u)
+chanserv::func("privmsg", function($u)
 {
-	global $x;
+	global $cs;
 	$caps = NULL;
 	$nick = new User($u['nick']);
 	$parv = explode(" ",$u['msg']);
@@ -64,84 +51,53 @@ X::func("privmsg", function($u)
 	
 	if (!isset($parv[1]))
 	{
-		$x->notice($nick->uid,"Syntax: /msg $x->nick INFO <username>");
+		$cs->notice($nick->uid,"Syntax: /msg $cs->nick INFO <#channel>");
 		return;
 	}
+
+	$chan = new Channel($parv[1]);
 	
-	$wpuser = new WPUser($parv[1]);
-	if (!$wpuser->IsUser)
+	$cs->notice($nick->uid,"Listing information about $chan->chan");
+	if (!$chan->RegDate)
 	{
-		goto x_info_botcheck;
-	}
-	
-	$x->notice($nick->uid,"Listing information for ".$parv[1]." ($wpuser->display):");
-	
-	if (($list = channel_owner_list($wpuser->display)) !== false)
-		$x->notice($nick->uid,clean_align("Owner of:").$list);
-	
-	$caps = wp_get_caps($nick->account);
-	
-	if ($wpuser->nicename == $nick->account || ($nick->account && in_array("administrator",$caps)))
-		$x->notice($nick->uid,clean_align("Email:").$wpuser->email);
-
-	$x->notice($nick->uid,clean_align("Registered on:").$wpuser->regdate);
-	$x->notice($nick->uid,clean_align("Last login:").$wpuser->lastlogin);
-
-
-	if (!($caps = wp_get_caps($wpuser->nicename)))
-	{
-		$x->notice($nick->uid,clean_align("Permissions:")." None");
+		$cs->notice($nick->uid,"$chan->chan is not registered.");
 		return;
 	}
-	foreach ($caps as $cap)
-		$fullcaps .= $cap.", ";
-		
-	if (IsStaff($nick))
-		$x->notice($nick->uid,clean_align("Permissions").substr($fullcaps,0 ,-2));
+	$cs->notice($nick->uid,"$chan->chan is registered to $chan->owner");
+	$cs->notice($nick->uid,"$chan->chan was registered on: ".gmdate("Y-m-d\TH:i:s\Z", $chan->RegDate));
+	$cs->notice($nick->uid,"Channel email: $chan->email");
+	$cs->notice($nick->uid,"Channel URL: $chan->url");
+
 	
-	$irc = new User($parv[1]);
-	if (IsIdentified($irc))
-		$loggedin = "Logged in";
-	else
-		$loggedin = "Not logged in";
+});
+
+chanserv::func("helplist", function($u){
 	
-	if (in_array("administrator",$caps))
-		$x->notice($nick->uid,"$wpuser->login is an official network administrator ($loggedin)");
-	elseif (in_array("services-admin",$caps))
-		$x->notice($nick->uid,"$wpuser->login is an official administrator ($loggedin)");
-	elseif (in_array("services-operator",$caps))
-		$x->notice($nick->uid,"$wpuser->login is an official operator ($loggedin)");
-	elseif (in_array("services-helper",$caps))
-		$x->notice($nick->uid,"$wpuser->login is an official helper ($loggedin)");
-		
-	x_info_botcheck:
-	$isbot = new User($parv[1]);
-	if (IsServiceBot($isbot))
-	{
-		$x->notice($nick->uid,"$isbot->nick is an official service bot of IRCNetwork");
-		return;
-	}
-	elseif (!$wpuser->IsUser)
-	{
-		$chan = new Channel($parv[1]);
-		
-		$x->notice($nick->uid,"Listing information about $chan->chan");
-		if (!$chan->RegDate)
-		{
-			$x->notice($nick->uid,"$chan->chan is not registered.");
-			return;
-		}
-		$x->notice($nick->uid,"$chan->chan is registered to $chan->owner");
-		$x->notice($nick->uid,"Channel email: $chan->email");
-		$x->notice($nick->uid,"Channel URL: $chan->url");
-	}
+	global $cs;
+	
+	$nick = $u['nick'];
+	
+	$cs->notice($nick,"INFO                List information about a given channel.");
 	
 });
 
 
+chanserv::func("help", function($u){
+	
+	global $cs;
+	
+	if ($u['key'] !== "autoop"){ return; }
+	
+	$nick = $u['nick'];
+	
+	$cs->notice($nick,"Command: AUTOOP");
+	$cs->notice($nick,"Syntax: /msg $cs->nick INFO <#channel>");
+	$cs->notice($nick,"Example: /msg $cs->nick INFO <#channel>");
+});
+
 function channel_owner_list($nick)
 {
-	global $db,$sqlip,$sqluser,$sqlpass,$sqldb,$x;
+	global $db,$sqlip,$sqluser,$sqlpass,$sqldb,$cs;
 		
 	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 	$table = "dalek_chaninfo";

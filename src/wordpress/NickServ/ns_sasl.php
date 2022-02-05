@@ -142,7 +142,7 @@ function SendSasl($string)
 class IRC_SASL {
 	function __construct($source,$uid,$cmd,$param1 = "", $param2 = "")
 	{
-		global $_SASL;
+		global $_SASL,$saslignore;
 		
 		$this->uid = $uid;
 		$this->source = $source;
@@ -153,10 +153,20 @@ class IRC_SASL {
 			$_SASL[$uid]["host"] = $param1;
 			$_SASL[$uid]["ip"] = $param2;
 		}
+
+		//if in our ignore list
+		//make sure we're not reading an empty array
+		if (!isset($saslignore))
+			$saslignore = array();
+		if (in_array($param2,$saslignore))
+		{
+			/* do nothing */
+		}
 		elseif (isset($_SASL[$uid]) && $cmd == "S")
 		{
 			$_SASL[$uid]["mech"] = $param1;
 			$_SASL[$uid]["key"] = $param2;
+
 			$this->check = $this->check_pass($_SASL[$uid]["key"]);
 			if ($this->check == 0)
 				SendSasl("$source $uid C +");
@@ -189,31 +199,28 @@ class IRC_SASL {
 	{
 		global $ns,$_SASL;
 
-		if ($i == 2)
-		{
-			$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid provided an invitation code ($this->account)");
-			S2S(":$ns->nick SVSLOGIN * $this->uid $this->account");
-		}
-		elseif ($i == 1)
+		if ($i)
 		{
 			$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid identified using SASL for account: $this->account $this->reason");
 			S2S(":$ns->nick SVSLOGIN * $this->uid $this->account");
 		}
 
 		SendSasl("$this->source $this->uid D S");
-
+		fail2ban($_SASL[$this->uid]['ip'], 0);
 		unset($_SASL[$this->uid]);
+		
 	}
 	private function fail()
 	{
 		global $ns,$_SASL;
-		$b = ($this->banned) ? " ".$this->banned : "";
 		$r = ($this->reason) ? " ".$this->reason : "";
 		if (!isset($this->account) || !strlen($this->account))
 			$this->account = "No account provided";
-		$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid failed to identify ($this->account)$r$b");
-		unset($_SASL[$this->uid]);
+		$ns->log("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid failed to identify ($this->account)$r");
+		
 		SendSasl("$this->source $this->uid D F");
+		fail2ban($_SASL[$this->uid]['ip'],1);
+		unset($_SASL[$this->uid]);
 	}
 		
 	 function check_pass($passwd)
@@ -243,26 +250,43 @@ class IRC_SASL {
 			$pass = $tok[2];
 		}
 		$this->account = $account;
-		if (!isset($account) || strlen($account) == 0)
-			return 3;
+		if (!isset($account) || strlen($account) == 0){
+			$this->reason = "(No account provided)";
+			SendSASL("$this->source $this->uid D F");
+			return 0;
+		}
 		$wp_user = new WPUser($account);
+		if (!$wp_user->IsUser)
+		{
+			$this->reason = "(Account doesn't exist)";
+			SendSASL("$this->source $this->uid D F");
+			return 0;
+		}
 		if (function_exists('_is_disabled'))
 			if (_is_disabled($wp_user))
 			{
-				$this->banned = "(User is disabled on the website)";
+				SendSASL("$this->source $this->uid D F");
+				$this->reason = "(User is disabled on the website)";
 				return 0;
 			}
 
+		if (!$wp_user->confirmed)
+		{
+			S2S("SVSLOGIN * $this->uid 0");
+			SendSASL("$this->source $this->uid D F");
+			$this->reason = "(User has not confirmed their email)";
+			return 0;
+		}
 		if ($wp_user->ConfirmPassword($pass) || $var = is_invite($account,$pass))
 		{
-			if (isset($var))
-				if ($var == true)
-					return 2;
-				else return 1;
-			else return 1;
+			if (isset($var) && $var == true)
+				$this->reason = "(Invitation code)";
+			else
+				$this->reason = "(PLAIN)";
+			return 1;
 		}
-		else
-			return 0;
+		$this->reason = "(Invalid password)";
+		return 0;
 	}
 	function check_fingerprint($fp)
 	{
@@ -284,7 +308,7 @@ class IRC_SASL {
 		if (!$row['account'])
 			return; // we return silently so the user may continue another sasl method
 		$user = new WPUser($row['account']);
-		if (_is_disabled($user))
+		if (_is_disabled($user) || !$user->confirmed)
 			return 0;
 		$this->reason = "(CertFP)";
 		$this->account = $row['account'];

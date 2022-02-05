@@ -12,20 +12,10 @@
  * 
  *	Version: 1
 */
-hook::func("preconnect", function(){
-	AddCommand(
-		$cmd = array(
-			'entity' => "X",
-			'cmd' => "AUTOVOICE",
-			'help' => "Configure AUTOVOICE for a channel you have voice access in.",
-			'helpstr' => "Configure AUTOVOICE for a channel you have voice access in.",
-			'syntax' => "/msg %me AUTOVOICE <#channel> on|off",
-		)
-	);
-});
+
 hook::func("join", function($u)
 {
-	global $x;
+	global $cs;
 	
 	$nick = $u['nick'];
 	$chan = $u['chan'];
@@ -37,25 +27,25 @@ hook::func("join", function($u)
 	$chan = new Channel($chan);
 	if (is_autovoice($wpuser,$chan->chan) && !$chan->IsVoice($nick->nick))
 	{
-		$x->mode($chan->chan,"+v $nick->nick");
+		$cs->mode($chan->chan,"+v $nick->nick");
 	}
 });
 
 hook::func("user_login", function($nick)
 {
-	global $x;
+	global $cs;
 	if (!($list = get_ison($nick->uid)))
 		return;
 	$user = new WPUser($nick->account);
 	foreach ($list['list'] as $chan)
 		$chan = new Channel($chan);
 		if (is_autovoice($user,$chan->chan) && !$chan->IsVoice($nick->nick))
-			$x->mode($chan->chan,"+v $nick->nick");
+			$cs->mode($chan->chan,"+v $nick->nick");
 });
 
-X::func("privmsg", function($u)
+chanserv::func("privmsg", function($u)
 {
-	global $x;
+	global $cs;
 	$parv = explode(" ",$u['msg']);
 	
 	if ($parv[0] !== "autovoice")
@@ -64,19 +54,19 @@ X::func("privmsg", function($u)
 	$nick = new User($u['nick']);
 	if (!isset($parv[2]))
 	{
-		$x->notice($nick->uid,"Syntax: /msg $x->nick AUTOVOICE <chan> on|off");
+		$cs->notice($nick->uid,"Syntax: /msg $cs->nick AUTOVOICE <chan> on|off");
 		return;
 	}
 	$toggle = $parv[2];
 	if ($toggle !== "on" && $toggle !== "off")
 	{
-		$x->notice($nick->uid,"Syntax: /msg $x->nick AUTOVOICE <chan> on|off");
+		$cs->notice($nick->uid,"Syntax: /msg $cs->nick AUTOVOICE <chan> on|off");
 		return;
 	}
 	
 	if ($nick->account !== $nick->nick)
 	{
-		$x->notice($nick->uid,"You need to login to use that command.");
+		$cs->notice($nick->uid,"You need to login to use that command.");
 		return;
 	}
 	
@@ -84,12 +74,12 @@ X::func("privmsg", function($u)
 
 	if (!$chan)
 	{
-		$x->notice($nick->uid,"Syntax: /msg $x->nick AUTOVOICE <chan> on|off");
+		$cs->notice($nick->uid,"Syntax: /msg $cs->nick AUTOVOICE <chan> on|off");
 		return;
 	}
 	if (!$chan->IsChan)
 	{
-		$x->notice($nick->uid,"That channel does not exist.");
+		$cs->notice($nick->uid,"That channel does not exist.");
 		return;
 	}
 	if (can_autovoice($nick->nick,$chan))
@@ -98,26 +88,26 @@ X::func("privmsg", function($u)
 		
 		if ($toggle == "on" && is_autovoice($user,$chan->chan))
 		{
-			$x->notice($nick->uid,"AUTOVOICE is already set to 'on' for $chan->chan");
+			$cs->notice($nick->uid,"AUTOVOICE is already set to 'on' for $chan->chan");
 			return;
 		}
 		
 		elseif ($toggle == "off" && !is_autovoice($user,$chan->chan))
 		{
-			$x->notice($nick->uid,"AUTOVOICE is already set to 'off' for $chan->chan");
+			$cs->notice($nick->uid,"AUTOVOICE is already set to 'off' for $chan->chan");
 			return;
 		}
 		
 		autovoice_toggle($user,$chan->chan,$toggle);
-		$x->notice($nick->uid,"AUTOVOICE has been set to '$toggle' for $chan->chan");
+		$cs->notice($nick->uid,"AUTOVOICE has been set to '$toggle' for $chan->chan");
 		return;
 	}
-	$x->notice($nick->uid,"Permission denied.");
+	$cs->notice($nick->uid,"Permission denied.");
 });
 
 function can_autovoice($nick,Channel $channel)
 {
-	global $x;
+	global $cs;
 		
 	$access = ChanAccess($channel,$nick);
 	if ($access == "owner" || $access == "operator" || $access == "admin" || $access == "voice")
@@ -127,7 +117,7 @@ function can_autovoice($nick,Channel $channel)
 
 function is_autovoice(WPUser $nick,$chan)
 {
-	$conn = conn();
+	$conn = sqlnew();
 	$prep = $conn->prepare("SELECT * FROM dalek_account_settings WHERE account = ?");
 	$prep->bind_param("s",$nick->login);
 	$prep->execute();
@@ -147,7 +137,7 @@ function is_autovoice(WPUser $nick,$chan)
 
 function autovoice_toggle(WPUser $nick,$chan,$toggle)
 {
-	$conn = conn();
+	$conn = sqlnew();
 	if (!$conn)
 		return;
 	
@@ -165,3 +155,28 @@ function autovoice_toggle(WPUser $nick,$chan,$toggle)
 		$prep->execute();
 	}
 }
+
+
+chanserv::func("helplist", function($u){
+	
+	global $cs;
+	
+	$nick = $u['nick'];
+	
+	$cs->notice($nick,"AUTOVOICE           Modify your AUTOVOICE setting for a channel.");
+	
+});
+
+
+chanserv::func("help", function($u){
+	
+	global $cs;
+	
+	if ($u['key'] !== "autovoice"){ return; }
+	
+	$nick = $u['nick'];
+	
+	$cs->notice($nick,"Command: AUTOVOICE");
+	$cs->notice($nick,"Syntax: /msg $cs->nick autovoice #channel <on|off>");
+	$cs->notice($nick,"Example: /msg $cs->nick autovoicevoice #channel on");
+});

@@ -24,10 +24,9 @@ nickserv::func("privmsg", function($u)
 
 	if (strtolower($parv[1]) == "add")
 	{
-		var_dump($nick);
 		if (!isset($nick->meta->certfp))
 		{
-			$ns->notice($nick->uid,"You do not have a certfp to store. $nick->meta->certfp");
+			$ns->notice($nick->uid,"You do not have a certfp to store.");
 			return;
 		}
 

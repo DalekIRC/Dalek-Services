@@ -29,38 +29,53 @@ class User {
 	
 	public function __construct($user)
 	{
-		
+		global $cf;
 		$u = find_person($user);
 		
 		if (!$u)
+			$this->IsUser = false;
+		else 
+			$this->IsUser = true;
+		if ($this->IsUser)
 		{
-			$this->IsUser = false; return;
+			$this->nick = $u['nick'];
+			$this->uid = $u['UID'];
+			$this->ts = $u['timestamp'];
+			$this->ident = $u['ident'];
+			$this->usermode = $u['usermodes'];
+			$this->realhost = $u['realhost'];
+			$this->gecos = $u['gecos'];
+			$this->cloak = $u['cloak'];
+			$this->ip = $u['ip'];
+			$this->channels = get_ison($this->uid);
+			$this->account = (isset($u['account'])) ? $u['account'] : false;
+			$this->fingerprint = (isset($u['fingerprint'])) ? $u['fingerprint'] : false;
+			$this->sid = $u['SID'];
+			$this->tls = (strpos($u['usermodes'],"z")) ? true : false;
+			$this->last = $u['last'];
+			$s = find_serv($u['SID']);
+			if ($s)
+				$this->server = $s['servername'];
+			$this->tls = (strpos($u['usermodes'],"z")) ? true : false;
+			$this->last = $u['last'];
+			$this->meta = new UserMeta($this);
 		}
-		else { $this->IsUser = true; }
-		$this->nick = $u['nick'];
-		$this->uid = $u['UID'];
-		$this->ts = $u['timestamp'];
-		$this->ident = $u['ident'];
-		$this->usermode = $u['usermodes'];
-		$this->realhost = $u['realhost'];
-		$this->gecos = $u['gecos'];
-		$this->cloak = $u['cloak'];
-		$this->ip = $u['ip'];
-		$this->account = (isset($u['account'])) ? $u['account'] : false;
-		$this->fingerprint = (isset($u['fingerprint'])) ? $u['fingerprint'] : false;
-		$this->sid = $u['SID'];
-		$this->tls = (strpos($u['usermodes'],"z")) ? true : false;
-		$this->last = $u['last'];
-		$s = find_serv($u['SID']);
-		if ($s)
-			$this->server = $s['servername'];
-		$this->tls = (strpos($u['usermodes'],"z")) ? true : false;
-		$this->last = $u['last'];
-		$this->meta = new UserMeta($this);
+		if (!$this->IsUser)
+			if (($s = find_serv($user)) !== false)
+			{
+				$this->IsServer = true;
+				$this->nick = $s['servername'];
+				$this->uid = $s['sid'];
+			}
+		else {
+			$this->IsServer = true;
+			$this->nick = $cf['servicesname'];
+			$this->uid = $cf['sid'];
+		}
 	}
 	function NewNick($nick)
 	{
-		global $serv,$servertime,$cf;
+		global $servertime,$cf;
 		
 		if (!$this->IsUser)
 		{ 
@@ -70,7 +85,7 @@ class User {
 		{
 			return false;
 		}
-		$serv->sendraw(":".$cf['sid']." SVSNICK ".$this->nick." $nick $servertime");
+		S2S(":".$cf['sid']." SVSNICK ".$this->nick." $nick $servertime");
 		update_nick($this->uid,$nick,$servertime);
 		$this->nick = $nick;
 	}
@@ -154,6 +169,7 @@ class User {
 	}
 		
 }
+
 
 
 class UserMeta {

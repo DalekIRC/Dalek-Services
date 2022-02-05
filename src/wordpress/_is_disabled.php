@@ -44,7 +44,7 @@ hook::func("ping", function($u)
 	$result  = $conn->query("SELECT * FROM dalek_user WHERE account IS NOT NULL");
 	while ($row = $result->fetch_assoc())
 	{
-		$nick = new User($row['account']);
+		$nick = new User($row['UID']);
 		$user = new WPUser($row['account']);
 		if (_is_disabled($user))
 		{

@@ -28,14 +28,17 @@ global $cf,$sql,$sqlip,$sqluser,$sqlpass,$sqldb,$server,$port,$serv,$servertime,
 include "hook.php";
 include "dalek.conf";
 include "language.php";
-include "protocol/".$cf['proto'].".php";
+
+include "serv.php";
 include "sql.php";
 include "client.php";
 include "user.php";
-include "squit.php";
 include "timer.php";
-include "protoctl.php";
+include "cmd.php";
 include "module.php";
+include "filter.php";
+include "misc.php";
+include "dalek.conf";
 include "NickServ/nickserv.php";
 include "BotServ/botserv.php";
 include "ChanServ/chanserv.php";
@@ -45,6 +48,33 @@ include "HostServ/hostserv.php";
 include "MemoServ/memoserv.php";
 include "wordpress/wordpress.php";
 include "channel.php";
+
+
+loadmodule("umode2");
+loadmodule("mode");
+loadmodule("protoctl");
+loadmodule("version");
+loadmodule("modules");
+loadmodule("away");
+loadmodule("whois");
+loadmodule("specialwhois");
+loadmodule("setname");
+loadmodule("sethost");
+loadmodule("setident");
+loadmodule("chgname");
+loadmodule("chghost");
+loadmodule("chgident");
+loadmodule("motd");
+loadmodule("nick");
+loadmodule("squit");
+loadmodule("quit");
+loadmodule("topic");
+loadmodule("sjoin");
+loadmodule("part");
+loadmodule("md");
+loadmodule("uid");
+loadmodule("third/elmer");
+
 //include "plugins/PATHWEB/uplink.php";
 // Server config
 $server = $cf['uplink'];
@@ -73,7 +103,7 @@ for (;;)
 	}
 	if (!$socket)
 		die();
-	while ($input = fgets($socket, 1000))
+	while ($input = stream_get_line($socket, 8678, "\n"))
 	{
 		$timeget = microtime(true);	
 		$timetok = explode(".",$timeget);
@@ -93,8 +123,11 @@ for (;;)
 		
 		// If the server pings us
 		if ($splittem[0] == 'PING')
+		{
+			/* hook into ping lol */
+			hook::run("ping", array());
 			$serv->sendraw("PONG ".$splittem[1]); 	// Ping it back
-		
+		}
 		elseif ($splittem[0] == 'ERROR')
 		{
 			
@@ -109,11 +142,6 @@ for (;;)
 			{
 				$serv->hear("Hmmmm. It seems there was a problem. Please check dalek.conf");
 				die();
-			}
-			elseif (strpos($input,'brb lmoa') !== false)
-			{
-				$serv->hear("Looks like we've been asked to restart! Lets go! Pewpewpew!");
-				goto start;
 			}
 			else
 			{
@@ -144,22 +172,6 @@ for (;;)
 			}
 			$action = $splittem[1];
 			
-			if ($action == "PRIVMSG")
-			{
-				
-				$nick = mb_substr($splittem[0],1);
-				$dest = $splittem[2];
-				$string = mb_substr(str_replace(":$nick PRIVMSG $dest ","",$strippem),1);
-				$token = explode(" ",$string);
-				$string = str_replace($token[0],strtolower($token[0]),$string);
-				hook::run("privmsg", array(
-					"nick" => $nick,
-					"dest" => $dest,
-					"parv" => $string,
-					"mtags" => $tagmsg)
-				);
-				update_last($nick);
-			}
 			if ($action == "TAGMSG")
 			{
 
@@ -170,6 +182,7 @@ for (;;)
 					"dest" => $dest,
 					"mtags" => $tagmsg)
 				);
+			
 			}
 			else
 				hook::run("raw", array('string' => $strippem));
@@ -178,6 +191,7 @@ for (;;)
 		}
 	}
 }
+
 
 function get_string_between($string,$start, $end)
 {
@@ -206,4 +220,26 @@ function S2S($string) {
 function color($c,$string)
 {
 	return  chr(3).$c.$string.chr(3);
+}
+
+
+function clean_align($str)
+{
+	$len = strlen($str);
+	$rem = 20 - $len;
+	$whitespace = whitespace($rem);
+	
+	return "$str"."$whitespace";
+}
+function whitespace(int $n)
+{
+	if ($n < 1)
+		return "";
+	
+	$return = "";
+	
+	for ($i = 1; $i <= $n; $i++)
+		$return .= " ";
+	
+	return $return;
 }

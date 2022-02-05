@@ -28,6 +28,7 @@ include "class.php";
 include "chanserv.conf";
 include "modules.conf";
 include "cs_help.php";
+include "_regjoin.php";
 
 
 // Spawn chanserv on server connect

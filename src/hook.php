@@ -64,5 +64,10 @@ class hook {
 	public static function func($hook, $function) {
 		self::$actions[$hook][] = $function;
 	}
+	public static function del($hook, $function) {
+		for ($i = 0; isset(self::$actions[$hook][$i]); $i++)
+		  if (self::$actions[$hook][$i] == $function)
+		  array_splice(self::$actions[$hook],$i);
+	}
 }
 

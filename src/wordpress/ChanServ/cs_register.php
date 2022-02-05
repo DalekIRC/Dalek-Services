@@ -143,3 +143,27 @@ hook::func("preconnect", function()
 	$sql::query($query);
 });
 
+
+chanserv::func("helplist", function($u){
+	
+	global $cs;
+	
+	$nick = $u['nick'];
+	
+	$cs->notice($nick,"REGISTER            Register a channel to your account");
+	
+});
+
+
+chanserv::func("help", function($u){
+	
+	global $cs;
+	
+	if ($u['key'] !== "register"){ return; }
+	
+	$nick = $u['nick'];
+	
+	$cs->notice($nick,"Command: REGISTER");
+	$cs->notice($nick,"Syntax: /msg $cs->nick register #channel");
+	$cs->notice($nick,"Example: /msg $cs->nick register #channel");
+});

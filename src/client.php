@@ -33,7 +33,6 @@ class Client {
 		$this->nick = $nick;
 		$this->uid = $uid;
 
-		$this->elmer = false;
 
 		$this->sendraw("UID $nick 0 $servertime $ident $hostmask $uid $nick +oiqS * * * :$gecos");
 		
@@ -63,7 +62,8 @@ class Client {
 	}
 	function msg($dest,$string)
 	{
-		if ($this->elmer)
+		$nick = new User($this->nick);
+		if (function_exists('IsElmer') && IsElmer($nick))
 			$string = preg_match('[rl]','w',$string);
 		$this->sendraw(":$this->uid PRIVMSG $dest :$string");
 	}
@@ -98,9 +98,9 @@ class Client {
 	}
 	function notice($dest,$string)
 	{
-		
-		if ($this->elmer)
-			$string = preg_match("[rl]","w",$string);
+		$nick = new User($this->nick);
+		if (function_exists('IsElmer') && IsElmer($nick))
+			$string = str_replace(array('r','R','l','L'),array('w','W','w','W'),$string);
 
 		$uid = $this->uid;
 		$tok = explode("<lf>",$string) ?? $string;
@@ -163,8 +163,13 @@ class Client {
 		elseif ($access == 5)
 			$this->mode($chan->chan,"+qo $user->nick $user->nick");
 	}
+	function kick($chan,$nick,$reason = '')
+	{
+		$this->sendraw(":$this->uid KICK $chan $nick :$reason");
+		do_part($chan,$nick);
+	}
 }
-
+/*
 hook::func("start", function(){
 	global $ns,$cs,$bs,$os,$gb,$hs,$ms;
 	$ns->join("#services");
@@ -177,7 +182,7 @@ hook::func("start", function(){
 	$ms->join("#services");
 	//global_notice("Services is back online. Have a great day!");
 });
-
+*/
 
 function global_notice($msg) : bool
 {

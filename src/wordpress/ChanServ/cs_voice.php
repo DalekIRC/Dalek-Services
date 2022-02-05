@@ -82,3 +82,29 @@ function can_voice($nick,Channel $channel)
 	}
 	return false;
 }
+
+	
+
+chanserv::func("helplist", function($u){
+	
+	global $cs;
+	
+	$nick = $u['nick'];
+	
+	$cs->notice($nick,"VOICE               Voices you in a channel.");
+	
+});
+
+
+chanserv::func("help", function($u){
+	
+	global $cs;
+	
+	if ($u['key'] !== "voice"){ return; }
+	
+	$nick = $u['nick'];
+	
+	$cs->notice($nick,"Command: VOICE");
+	$cs->notice($nick,"Syntax: /msg $cs->nick voice #channel [nick]");
+	$cs->notice($nick,"Example: /msg $cs->nick voice #channel Lamer32");
+});

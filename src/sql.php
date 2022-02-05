@@ -331,6 +331,54 @@ class SQL {
 	}
 }
 
+
+function do_part($chan,$nick)
+{
+	$conn = sqlnew();
+	$prep = $conn->prepare("DELETE FROM dalek_ison WHERE nick = ? AND lower(chan) = ?");
+	$prep->bind_param("ss",$nick->uid,$chan);
+	$prep->execute();
+
+	/* cleanup any non-permanent empty channel */
+	
+	$prep = $conn->prepare("SELECT * FROM dalek_ison WHERE lower(chan) = ?");
+	$prep->bind_param("s",$chan);
+	$prep->execute();
+	$result = $prep->get_result();
+	
+	if ($result->num_rows == 0)
+	{
+		$lookup = find_channel($chan);
+		if (strpos($lookup['modes'],"P") == false)
+		{
+			$prep = $conn->prepare("DELETE FROM dalek_channels WHERE channel = ?");
+			$prep->bind_param("s",$lookup['channel']);
+			$prep->execute();
+		}
+	}
+	$prep->close();
+}
+
+function find_channel($channel)
+{
+	
+	global $ns;
+	$conn = sqlnew();
+	if (!$conn) { return false; }
+	else {
+		$prep = $conn->prepare("SELECT * FROM dalek_channels WHERE channel = ?");
+		$prep->bind_param("s",$channel);
+		$prep->execute();
+		$result = $prep->get_result();
+		
+		if (!$result){ return false; }
+		if ($result->num_rows == 0){ return false; }
+		$row = $result->fetch_assoc();
+		$prep->close();
+	}
+	return $row;
+}
+
 function get_chmode($channel)
 {
 	$channel = new Channel($channel);
@@ -604,8 +652,8 @@ function find_person($person){
 	
 	if (!$person or $person == "")
 		return;
-	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	global $ns;
+	$conn = sqlnew();
 	if (!$conn) { return false; }
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_user WHERE nick = ?");
@@ -633,29 +681,10 @@ function find_person($person){
 	}
 }
 
-function find_channel($channel){
-	
-	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
-	if (!$conn) { return false; }
-	else {
-		$prep = $conn->prepare("SELECT * FROM dalek_channels WHERE channel = ?");
-		$prep->bind_param("s",$channel);
-		$prep->execute();
-		$result = $prep->get_result();
-		
-		if (!$result){ return false; }
-		if ($result->num_rows == 0){ return false; }
-		$row = $result->fetch_assoc();
-		$prep->close();
-	}
-	return $row;
-}
-
 function update_nick($uid,$nick,$ts){
 	
-	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	global $ns;
+	$conn = sqlnew();
 	if (!$conn) { return false; }
 	else {
 		
@@ -670,8 +699,8 @@ function update_nick($uid,$nick,$ts){
 }
 function update_usermode($uid,$new){
 	
-	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	global $ns;
+	$conn = sqlnew();
 	if (!$conn) { return false; }
 	else {
 		
@@ -686,8 +715,8 @@ function update_usermode($uid,$new){
 }
 function find_serv($serv){
 	
-	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	global $ns;
+	$conn = sqlnew();
 	if (!$conn) { return false; }
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_server WHERE servername = ?");
@@ -707,7 +736,7 @@ function find_serv($serv){
 		$prep->execute();
 		$result = $prep->get_result();
 		
-		if (!$result){ return; }
+		if (!$result){ return false; }
 		if ($result->num_rows == 0){ return false; }
 		$row = $result->fetch_assoc();
 		$prep->close();
@@ -716,8 +745,8 @@ function find_serv($serv){
 }
 function get_ison($uid){
 	
-	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	global $ns;
+	$conn = sqlnew();
 	if (!$conn) { return false; }
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_ison WHERE nick = ?");
@@ -741,5 +770,85 @@ function get_ison($uid){
 		$prep->close();
 		return $big;
 	}
+}
+
+function recurse_serv_attach($sid)
+{
+	$squit = array();
+	for ($squit[] = $sid, $i = 0; isset($squit[$i]); $i++)
+		foreach(serv_attach($squit[$i]) as $key => $value)
+			if (!in_array($value,$squit))
+				$squit[] = $value;
+
+	return $squit;
+}
+
+
+function del_sid($sid)
+{
+	global $sql;
+	$sql->delsid($sid);
+}
+
+function serv_num_users($sid)
+{
+	$conn = sqlnew();
+	$prep = $conn->prepare("SELECT * FROM dalek_user WHERE SID = ?");
+	$prep->bind_param("s",$sid);
+	$prep->execute();
+	$result = $prep->get_result();
+	$return = $result->num_rows;
+	return $return;
+}
+
+function serv_num_attach($sid)
+{
+	$conn = sqlnew();
+	$prep = $conn->prepare("SELECT * FROM dalek_server WHERE intro_by = ?");
+	$prep->bind_param("s",$sid);
+	$prep->execute();
+	$result = $prep->get_result();
+	if (!$result)
+		return 0;
+	if (($numr = $result->num_rows) == 0)
+		return 0;
+	else
+		return $numr;
+}
+
+function serv_attach($sid)
+{
+	$return = array();
+	$conn = sqlnew();
+	$prep = $conn->prepare("SELECT * FROM dalek_server WHERE intro_by = ?");
+	$prep->bind_param("s",$sid);
+	$prep->execute();
+	$result = $prep->get_result();
+	if (!$result)
+		return 0;
+	while ($row = $result->fetch_assoc())
+		if (!in_array($row['sid'],$return))
+			$return[] = $row['sid'];
+
+	return $return;
+}
+
+function recurse_serv_users($sid)
+{
+	$return = array();
+	$conn = sqlnew();
+	$prep = $conn->prepare("SELECT * FROM dalek_user WHERE SID = ?");
+	foreach (recurse_serv_attach($sid) as $s)
+	{
+		$prep->bind_param("s",$s);
+		$prep->execute();
+		$result = $prep->get_result();
+		if (!$result)
+			continue;
+		while ($row = $result->fetch_assoc())
+			if (!in_array($row['UID'],$return))
+				$return[] = $row['UID'];
+	}
+	return $return;
 }
 

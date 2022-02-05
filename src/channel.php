@@ -28,7 +28,7 @@ class Channel
 		else
 		{
 			$this->IsChan = true;
-			$this->modes = mb_substr($u['modes'],1);
+			$this->modes = mb_substr($u['modes'],1) ?? false;
 			$this->topic = $u['topic'];
 			$this->timestamp = $u['timestamp'];
 		}
@@ -44,6 +44,10 @@ class Channel
 	function HasUser($user)
 	{
 		$user = new User($user);
+		if (!$user->IsUser)
+		{
+			return;
+		}
 		$chanlist = get_ison($user->uid);
 		if (empty($chanlist))
 			return false;
@@ -62,16 +66,22 @@ class Channel
 		if (empty($chanlist))
 			return false;
 		for ($i = 0; isset($chanlist['list'][$i]); $i++)
-			if (strpos($chanlist['mode'][$i],$mode) !== false && $chanlist['list'][$i] == $this->chan)
+		{
+			if ($var = strpos($chanlist['mode'][$i],$mode) !== false && $chanlist['list'][$i] == $this->chan)
+			 {
 				return true;
-
+			}
+			continue;
+		}
 		return false;
 	}
 	
 	function IsOp($user)
 	{
-		if ($this->UserHasMode($user,"o"))
+		if ($var = $this->UserHasMode($user,"o"))
+		{
 			return true;
+		}
 		return false;
 	}
 	
@@ -84,8 +94,8 @@ class Channel
 	
 	function SetMode($mode)
 	{
-        global $cf;
-		SendRaw("MODE $this->chan $mode",$cf['servicesname']);
+		global $cf;
+		S2S("MODE $this->chan $mode",$cf['servicesname']);
 		$tok = explode(" ",$mode);
 		if (isset($tok[1]))
 		{
