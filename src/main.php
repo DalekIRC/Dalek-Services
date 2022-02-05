@@ -53,6 +53,7 @@ include "channel.php";
 loadmodule("umode2");
 loadmodule("mode");
 loadmodule("protoctl");
+loadmodule("tkl");
 loadmodule("version");
 loadmodule("modules");
 loadmodule("away");
