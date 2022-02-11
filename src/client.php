@@ -169,20 +169,19 @@ class Client {
 		do_part($chan,$nick);
 	}
 }
-/*
+
 hook::func("start", function(){
-	global $ns,$cs,$bs,$os,$gb,$hs,$ms;
-	$ns->join("#services");
-	$cs->join("#services");
-	$cs->join("#PossumsOnly");
-	$bs->join("#services");
-	$os->join("#services");
-	$gb->join("#services");
-	$hs->join("#services");
-	$ms->join("#services");
+	global $ns,$cs,$bs,$os,$gb,$hs,$ms,$cf;
+	$ns->join($cf['logchan']);
+	$cs->join($cf['logchan']);
+	$bs->join($cf['logchan']);
+	$os->join($cf['logchan']);
+	$gb->join($cf['logchan']);
+	$hs->join($cf['logchan']);
+	$ms->join($cf['logchan']);
 	//global_notice("Services is back online. Have a great day!");
 });
-*/
+
 
 function global_notice($msg) : bool
 {
