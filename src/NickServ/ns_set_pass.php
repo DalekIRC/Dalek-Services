@@ -11,12 +11,12 @@
 //				
 \\				
 //				
-\\	Title: Set Email
+\\	Title: Set Password
 //	
-\\	Desc: Allows a user to update the email address associated
+\\	Desc: Allows a user to update the password associated
 //	with their account.
 \\	
-//	Syntax: SET EMAIL <new email>
+//	Syntax: SET PASSWORD <new password>
 \\	
 //	
 \\	Version: 1.1
