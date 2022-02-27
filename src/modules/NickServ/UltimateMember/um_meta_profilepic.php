@@ -83,18 +83,18 @@ class um_meta_profilepic {
 		$pic = self::get_pic($u['account']);
 
 		if (!$pic)
-        {
+		{
 			if (!($pic = um_meta_profilepic::check_for_irccloud($u)))
-                $pic = um_meta_profilepic::check_for_gravatar($u);
-        }
+				$pic = um_meta_profilepic::check_for_gravatar($u);
+		}
 		ns_metadata::send_usermeta(NULL, $u['nick'], 'avatar', $pic);
 	
 		return true;
 	}
-    static function check_for_irccloud($u)
-    {
-	    $tok = substr($u['ident'], 0, 3);
-        if ($tok !== "sid" && $tok !== "uid")
+	static function check_for_irccloud($u)
+	{
+		$tok = substr($u['ident'], 0, 3);
+		if ($tok !== "sid" && $tok !== "uid")
 			return false;
 		
 		$tok2 = mb_substr($u['ident'], 3);
@@ -108,7 +108,7 @@ class um_meta_profilepic {
 			return false;
 
 		return "$irccloudcdn$tok2";
-    }
+	}
 	static function check_for_gravatar($u)
 	{
 		global $wpconfig;
