@@ -59,8 +59,9 @@ hook::func("raw", function($u)
 			$token = explode(" ",$u['string']);
 			$nick = mb_substr($token[0],1);
 			$dest = $parv[2];
-			$string = ($p = explode(" :",$u['string'])) ? $p[1] : "";
+			$string = ($p = explode(" :",$u['string'])) ? mb_substr($u['string'],strlen($p[0]) + 2) : "";
 			// lowercase the command item
+            var_dump($string);
 			$string = str_replace($token[0],strtolower($token[0]),$string);
 			hook::run("privmsg", array(
 				"nick" => $nick,

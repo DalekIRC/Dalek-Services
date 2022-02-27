@@ -39,7 +39,7 @@ include "module.php";
 include "filter.php";
 include "misc.php";
 include "dalek.conf";
-include "NickServ/nickserv.php";
+include "modules/NickServ/nickserv.php";
 include "BotServ/botserv.php";
 include "ChanServ/chanserv.php";
 include "OperServ/operserv.php";
