@@ -1,4 +1,4 @@
-# IRCServices
+# IRCServices `WORK IN PROGRESS`
 Dalek IRC Services with SQL integration tailored to you.
 
 DO NOT USE YET - WORK IN PROGRESS

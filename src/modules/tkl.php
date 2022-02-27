@@ -31,7 +31,7 @@ class tkl {
 	public $description = "Provides TKL compatibility";
 	public $author = "Valware";
 	public $tkl = "1.0";
-    public $official = true;
+    	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
