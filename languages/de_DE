@@ -1,0 +1,62 @@
+<?php global $ns; $language = [
+	
+	
+	
+	/* Language name */
+	'NAME' => "Deutsch (DE)",
+	
+	/* Author */
+	'AUTHOR' => "Pain",
+	
+	/* Author email for update requests */
+	'EMAIL' => "admin@thepain.dev",
+	
+	
+	/* Internal Error */
+	'ERR_NOSUCHSTRING' => "Der Sprachstring konnte nicht geladen werden.",	
+	
+	
+	
+	
+	/* NickServ */
+	
+	//Identify
+	
+	'LOG_IDENTIFY' => "Eingeloggt im Account:",
+	'MSG_IDENTIFY' => "Du bist nun in folgendem Account eingeloggt:",
+	'HELPCMD_IDENTIFY' => "In deinem Account einloggen.",
+	
+	'MSG_PLZIDENT' => "Dieser Account ist registriert. Falls dies dein Account ist,<lf>bitte logge dich ein:",
+	
+	'LOG_IDENTIFAIL' => "einloggen fehleschlagen:",
+	'MSG_IDENTIFAIL' => "Einloggen fehlgeschlagen: Falsche Logindaten.",
+	
+	'ERR_IDENTIFAIL' => "Beim einloggen ist ein Fehler aufgetreten. Bitte wende dich an einen Mitarbeiter.",
+	
+	'MSG_IDENTIFY_SYNTAX' => "Syntax: /msg NickServ identify [account] <password>",
+	
+	'LOG_LOGGEDOUT' => "wurde aus folgendem Account abgemeldet:",
+	'MSG_LOGGEDOUT' => "Du wurdes abgemeldet.",
+	'HELPCMD_LOGOUT' => "Abmelden.",
+	
+	'ERR_NOTLOGGEDIN' => "Du bist nicht angemeldet.",
+	
+	'HELPCMD_REGISTER' => "Diesen Namen registrieren.",
+	'LOG_REGISTER' => "hat mit dem REGISTER befehl einen Account registriert:",
+	'MSG_REGISTER' => "Du bist nun unter folgendem Account angemeldet:",
+	'ERR_PASSTOOSHORT' => "Passwort zu kurz, mindestens 8 Zeichen.",
+	'ERR_BADEMAIL' => "Ungültige Email.",
+	'ERR_ALREADYREG' => "Du bist bereits registriert.",
+	
+	'LOG_REGAIN' => "du wurdest durch den Befehl >REGAIN< abgemeldet",
+	'HELPCMD_REGAIN' => "Also RECOVER. Schaltet deinen Account frei und meldet dich an.",
+	'MSG_REGAIN' => "wurde freigeschaltet. Du bist nun angemeldet.",
+	'REGAIN_QUITMSG' => "Freischaltung in arbeit",
+	
+	'ERR_NICKNOTONLINE' => "Nick ist nicht online.",
+
+	'HELPCMD_AJOIN' => "Betritt automatisch Channels bei der Anmeldung.",
+	'HELPCMD_INFO' => "Zeigt informationen über deinen Namen.",
+
+	
+];
