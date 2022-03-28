@@ -99,8 +99,7 @@ chanserv::func("setcmd", function($u)
 
 function channel_setting($channel,$key,$value)
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$conn = sqlnew();
 	if (!$conn)
 		return false;
 		
@@ -146,8 +145,8 @@ hook::func("SJOIN", function($u)
 
 function is_all_admin($chan)
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	global $ns;
+	$conn = sqlnew();
 	if (!$conn)
 		return false;
 		

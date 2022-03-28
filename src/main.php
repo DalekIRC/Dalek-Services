@@ -22,7 +22,7 @@
 \\	Author:		Valware
 //				
 */
-global $cf,$sql,$sqlip,$sqluser,$sqlpass,$sqldb,$server,$port,$serv,$servertime,$svs,$ns,$cs;
+global $cf,$sql,$server,$port,$serv,$servertime,$svs,$ns,$cs;
 
 
 include "hook.php";
@@ -83,13 +83,6 @@ $port = $cf['port'];
 $mypass = $cf['serverpassword'];
 
 
-
-// SQL config
-$sqlip = $cf['sqlip'];
-$sqluser = $cf['sqluser'];
-$sqlpass = $cf['sqlpass'];
-$sqldb = $cf['sqldb'];
-
 start:
 
 for (;;)
@@ -97,7 +90,7 @@ for (;;)
 	
 	if (!isset($sql))
 	{ 
-		$sql = new SQL($sqlip,$sqluser,$sqlpass,$sqldb); hook::run("preconnect", array());
+		$sql = new SQL(); hook::run("preconnect", array());
 	}
 	
 	if (!isset($serv)){ $serv = new Server($server,$port,$mypass);

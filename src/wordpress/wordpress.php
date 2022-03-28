@@ -189,8 +189,8 @@ class WPUserMeta {
 
 function wp_get_privs($role)
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	global $cf;
+	$conn = sqlnew();
 	if (!$conn) { return false; }
 	
 	$table = $cf['wp_prefix']."_options";
@@ -227,8 +227,8 @@ function wp_get_privs($role)
 
 function wp_get_caps($nicename)
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb,$wpconfig;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	global $wpconfig;
+	$conn = sqlnew();
 	if (!$conn) { return false; }
 	
 	$user = new WPUser($nicename);
