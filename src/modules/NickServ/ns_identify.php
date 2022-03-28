@@ -71,9 +71,7 @@ nickserv::func("privmsg",	 function($u){
 
 function df_verify_userpass($user,$pass){
 	
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
-	
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$conn = sqlnew();
 	if (!$conn) { return "ERROR"; }
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_accounts WHERE display = ?");
@@ -100,9 +98,7 @@ function df_verify_userpass($user,$pass){
 
 function df_login($nick,$account){
 	
-	
-	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$conn = sqlnew();
 	if (!$conn) { return "ERROR"; }
 	else {
 		

@@ -26,12 +26,10 @@
 
 class SQL {
 	
-	function __construct($ip,$user,$pass,$db){
-		global $ip,$user,$pass,$db;
+	function __construct(){
 	}
 	function query($query){
-		global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
-		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+		$conn = sqlnew();
 		if (!$conn) { return false; }
 		else {
 			$result = mysqli_query($conn,$query);
@@ -39,8 +37,7 @@ class SQL {
 		}
 	}
 	function user_insert($u){
-		global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
-		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+		$conn = sqlnew();
 		$user = new User($u['nick']);
 		if ($user->IsUser)
 			return;
@@ -120,8 +117,7 @@ class SQL {
 		}
 	}
 	function user_delete($u){
-		global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
-		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+		$conn = sqlnew();
 		if (!$conn) { return false; }
 		if (!$u)
 			return;
@@ -142,8 +138,7 @@ class SQL {
 		}
 	}
 	function sid($u){
-		global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
-		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+		$conn = sqlnew();
 		if (!$conn) { return false; }
 		else {
 			$prep = $conn->prepare("INSERT INTO dalek_server (
@@ -185,8 +180,7 @@ class SQL {
 		$conn->close();
 	}
 	function sjoin($u){
-		global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
-		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+		$conn = sqlnew();
 		if (!$conn) { return false; }
 		if (find_channel($u['channel']))
 			return;
@@ -210,8 +204,7 @@ class SQL {
 	
 	function get_userchmode($chan,$user)
 	{
-		global $sqlip,$sqluser,$sqlpass,$sqldb;
-		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+		$conn = sqlnew();
 		if (!$conn) { return false; }
 		else {
 			if (!($u = new User($user))->IsUser)
@@ -244,8 +237,7 @@ class SQL {
 		}
 	}
 	function del_userchmode($chan,$user,$mode){
-		global $sqlip,$sqluser,$sqlpass,$sqldb;
-		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+		$conn = sqlnew();
 		if (!$conn) { return false; }
 		else {
 			$mode = str_replace($mode,"",$this->get_userchmode($chan,$user));
@@ -261,8 +253,7 @@ class SQL {
 
 	function update_chmode($chan,$switch,$chr)
 	{
-		global $sqlip,$sqluser,$sqlpass,$sqldb;
-		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+		$conn = sqlnew();
 		if (!$conn) { return false; }
 		else {
 			$prep = $conn->prepare("UPDATE dalek_channels SET modes = ? WHERE channel = ?");
@@ -283,8 +274,7 @@ class SQL {
 		}
 	}
 	function insert_ison($chan,$uid,$mode = ""){
-		global $sqlip,$sqluser,$sqlpass,$sqldb,$cf;
-		$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+		$conn = sqlnew();
 		if (!$conn) { return false; }
 		else {
 
@@ -518,11 +508,10 @@ hook::func("SJOIN", function($u){
 });
 function umeta_add($person,$key = "",$data = "")
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
 	$user = new User($person);
 	if (!$user->IsUser)
 		return false;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$conn = sqlnew();
 	if ($data == "")
 		return;
 	if (!$conn) { return false; }
@@ -549,10 +538,7 @@ function umeta_add($person,$key = "",$data = "")
 
 function get_num_online_users()
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
-	
-
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$conn = sqlnew();
 
 	if (!$conn) { return false; }
 	else {
@@ -567,8 +553,7 @@ function get_num_online_users()
 
 function get_num_servers()
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$conn = sqlnew();
 
 	if (!$conn) { return false; }
 	else {
@@ -583,8 +568,7 @@ function get_num_servers()
 
 function get_num_channels()
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$conn = sqlnew();
 
 	if (!$conn) { return false; }
 	else {
@@ -599,8 +583,7 @@ function get_num_channels()
 
 function get_num_swhois()
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$conn = sqlnew();
 
 	if (!$conn) { return false; }
 	else {
@@ -615,8 +598,7 @@ function get_num_swhois()
 
 function get_num_meta()
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$conn = sqlnew();
 
 	if (!$conn) { return false; }
 	else {
@@ -632,13 +614,12 @@ function get_num_meta()
 
 function update_last($person)
 {
-	
-	global $sqlip,$sqluser,$sqlpass,$sqldb,$servertime;
+	global $servertime;
 	
 	$user = new User($person);
 	if (!$user->IsUser){ return false; }
 	
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$conn = sqlnew();
 	if (!$conn) { return false; }
 	else {
 		$prep = $conn->prepare("UPDATE dalek_user SET last = ? WHERE UID = ?");

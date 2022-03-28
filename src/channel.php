@@ -235,12 +235,10 @@ class Channel
 
 function cmode_type($chr)
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
-	
 	if (strlen($chr) !== 1)
 		return false;
 	
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$conn = sqlnew();
 	if (!$conn) { return false; }
 	
 	$type = NULL;
