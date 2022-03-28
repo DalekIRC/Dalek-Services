@@ -378,7 +378,10 @@ function get_chmode($channel)
 function sqlnew()
 {
 	global $cf;
-	$conn = mysqli_connect($cf['sqlip'],$cf['sqluser'],$cf['sqlpass'],$cf['sqldb']);
+	if (is_null($cf['sqlsock']))
+		$conn = mysqli_connect($cf['sqlip'],$cf['sqluser'],$cf['sqlpass'],$cf['sqldb'],$cf['sqlport']);
+	else
+		$conn = mysqli_connect($cf['sqlip'],$cf['sqluser'],$cf['sqlpass'],$cf['sqldb'],$cf['sqlport'],$cf['sqlsock']);
 	return $conn;
 }			
 
