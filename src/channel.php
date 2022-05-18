@@ -237,7 +237,10 @@ function cmode_type($chr)
 {
 	if (strlen($chr) !== 1)
 		return false;
+<<<<<<< HEAD
+=======
 	
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 	$conn = sqlnew();
 	if (!$conn) { return false; }
 	

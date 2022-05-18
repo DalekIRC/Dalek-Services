@@ -79,9 +79,20 @@ class chghost {
 	 */
 	public static function cmd_chghost($u)
 	{
+<<<<<<< HEAD
+		$parv = explode(" ",$u['params']);
+        $host = $parv[1];
+		$uid = $parv[0];
+
+		/* we give the client +xt when this happens */
+		$target = new User($uid);
+		$target->SetMode("+xt");
+
+=======
 		$parv = explode(" :",$u['params']);
         $host = $parv[1];
 		$uid = $parv[0];
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		$conn = sqlnew();
 		$prep = $conn->prepare("UPDATE dalek_user SET cloak = ? WHERE UID = ?");
 		$prep->bind_param("ss",$host,$uid);

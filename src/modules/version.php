@@ -31,7 +31,11 @@ class version {
 	public $description = "Provides VERSION compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
+<<<<<<< HEAD
+	public $official = true;
+=======
     public $official = true;
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */

@@ -67,8 +67,13 @@ class Server
 		$this->sendraw("PROTOCTL EAUTH=".$cf['servicesname'].",6000 SID=".$cf['sid']);
 		$this->sendraw("PROTOCTL NOQUIT NICKv2 SJOIN SJOIN2 SJ3 CLK TKLEXT2 NICKIP ESVID MLOCK NEXTBANS EXTSWHOIS SJSBY");
 		$this->sendraw("SERVER ".$cf['servicesname']." 1 :Dalek IRC Services");
+<<<<<<< HEAD
+		$this->sendraw("MD client ".$cf['sid']." saslmechlist :PLAIN,EXTERNAL");
+		$this->sendraw("EOS");
+=======
 		$this->sendraw("EOS");
 		$this->sendraw("MD client ".$cf['sid']." saslmechlist :PLAIN,EXTERNAL");
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		
 
 	}
@@ -84,8 +89,14 @@ class Server
 	function sendraw($string)
 	{
 		// Declare de globals;
+<<<<<<< HEAD
+		global $cf,$socket;
+		if ($cf['debugmode'] == "on")
+			echo "[SEND] $string\n";
+=======
 		global $socket;
 		echo "[SEND] $string\n";
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		fputs($socket, ircstrip($string)."\n");
 		
 	}

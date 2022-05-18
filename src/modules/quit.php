@@ -31,7 +31,11 @@ class quit {
 	public $description = "Provides QUIT compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
+<<<<<<< HEAD
+	public $official = true;
+=======
     public $official = true;
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -74,6 +78,20 @@ class quit {
 	 * $u['nick'] = User object
 	 */
 	public static function cmd_quit($u)
+<<<<<<< HEAD
+	{
+   
+		$nick = $u['nick'];
+		$quitmsg = $u['params'];
+		SVSLog("$nick->nick ($nick->ident@$nick->realhost) [$nick->ip] disconnected from the network. ($quitmsg) ($nick->sid)");
+		$nick->exit();
+		
+		hook::run("quit", array(
+			'uid' => $u['nick']->uid,
+			'quitmsg' => $quitmsg)
+		);
+	}
+=======
     {
         $quitmsg = mb_substr($u['params'],1);
         $u['nick']->exit();
@@ -83,4 +101,5 @@ class quit {
             'quitmsg' => $quitmsg)
         );
     }
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 }

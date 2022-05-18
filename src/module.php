@@ -16,13 +16,21 @@ class Module {
 		/* We take care of that fam */
 		if (mb_substr($mod,-4) == ".php")
 		{
+<<<<<<< HEAD
+			if (isset($os)) SVSLog("Could not load module: $mod. Remember NOT to use \".php\" when using loadmodule()\n");
+=======
 			if (isset($os)) $os->log("Could not load module: $mod. Remember NOT to use \".php\" when using loadmodule()\n");
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 			$err = true;
 		}
 		/* Couldn't find it anyway, return */
 		elseif (!($module = $this->find_module($mod)))
 		{
+<<<<<<< HEAD
+			if (isset($os)) SVSLog("Could not find module: $mod. Please check your configuration.\n");
+=======
 			if (isset($os)) $os->log("Could not find module: $mod. Please check your configuration.\n");
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 			$err = true;
 		}
 		/* Ay we got it, load it */
@@ -31,7 +39,11 @@ class Module {
 			
 			if (!($this->load_module($mod)))
 			{
+<<<<<<< HEAD
+				if (isset($os)) SVSLog("ERROR: Could not load module. Could not find class called $mod\n");
+=======
 				if (isset($os)) $os->log("ERROR: Could not load module. Could not find class called $mod\n");
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 				$err = true;
 			}
 		}
@@ -53,8 +65,13 @@ class Module {
 	/* function to load de m0dule */
 	function load_module($mod)
 	{
+<<<<<<< HEAD
+		global $modules;
+		$os = Client::find("OperServ");
+=======
 		global $modules,$os;
 
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		/* initiate array */
 		if (!isset($modules))
 			$modules = array();
@@ -63,12 +80,19 @@ class Module {
 
 		$tok = explode("/",$mod);
 		$modname = $tok[count($tok) - 1];
+<<<<<<< HEAD
+=======
 	
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		/* Module was already loaded */
 		foreach ($modules as $m)
 		{
 			if ($m->name == $modname)
 				return true;
+<<<<<<< HEAD
+
+=======
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		}
 		include_once("$dir$mod.php");
 
@@ -103,7 +127,11 @@ class Module {
 				{
 					foreach($missing as $i)
 						echo "ERROR: $i was not specified in the class header. please set \$$i in the header.\n";
+<<<<<<< HEAD
+					if (isset($os)) SVSLog("Errors were found and specified above. Please correct.\n");
+=======
 					if (isset($os)) $os->log("Errors were found and specified above. Please correct.\n");
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 					return false;
 				}
 			}
@@ -113,7 +141,11 @@ class Module {
 
 			if (!$module->__init())
 			{
+<<<<<<< HEAD
+				if (isset($os)) SVSLog("Couldn't initialise module: $module->name");
+=======
 				if (isset($os)) $os->log("Couldn't initialise module: $module->name");
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 				return false;
 			}
 			$this->success = true;
@@ -127,6 +159,16 @@ function loadmodule($mod){
 	$load = new Module($mod);
 	if (!$load->success)
 	{
+<<<<<<< HEAD
+		SVSLog("Could not load module: $mod");
+		return false;
+	}
+	else
+	{
+		SVSLog("Loaded module: $mod");
+		return true;
+	}
+=======
 		if (isset($os))
 			$os->log("Could not load module: $mod");
 		return false;
@@ -134,6 +176,7 @@ function loadmodule($mod){
 	if (isset($os))
 		$os->log("Loaded module: $mod");
 	return true;
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 }
 
 function unloadmodule($mod){
@@ -144,7 +187,11 @@ function unloadmodule($mod){
 			$modules[$i] = NULL;
 			array_splice($modules,$i);
 			$i--;
+<<<<<<< HEAD
+			SVSLog("Unloaded module: $mod");
+=======
 			$os->log("Unloaded module: $mod");
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		}
 	foreach (cmd::$commands as $id => $cmd)
 		if ($cmd['mod'] == $mod)
@@ -152,6 +199,10 @@ function unloadmodule($mod){
 			cmd::$commands[$id] = NULL;
 			unset(cmd::$commands[$id]);
 		}
+<<<<<<< HEAD
+	hook::run("unloadmod", $mod);
+=======
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 }
 
 function module_exists($modname)
@@ -165,4 +216,12 @@ function module_exists($modname)
 	return false;
 }
 
+<<<<<<< HEAD
+function require_module($module)
+{
+	if (!module_exists($module))
+		die("FATAL ERROR: Tried to load module which requires $module\n");
+}
+=======
 ?>
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a

@@ -79,7 +79,11 @@ class sethost {
 	 */
 	public static function cmd_sethost($u)
 	{
+<<<<<<< HEAD
+		$host = $u['dest'];
+=======
 		$host = $u['params'];
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		$conn = sqlnew();
 		$nick = $u['nick'];
 		$prep = $conn->prepare("UPDATE dalek_user SET cloak = ? WHERE UID = ?");

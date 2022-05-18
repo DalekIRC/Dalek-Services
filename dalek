@@ -1,2 +1,65 @@
+<<<<<<< HEAD
+#!/bin/sh
+
+print_dalek()
+{
+	echo "██████╗░░█████╗░██╗░░░░░███████╗██╗░░██╗  ██╗██████╗░░█████╗░"
+	echo "██╔══██╗██╔══██╗██║░░░░░██╔════╝██║░██╔╝  ██║██╔══██╗██╔══██╗"
+	echo "██║░░██║███████║██║░░░░░█████╗░░█████═╝░  ██║██████╔╝██║░░╚═╝"
+	echo "██║░░██║██╔══██║██║░░░░░██╔══╝░░██╔═██╗░  ██║██╔══██╗██║░░██╗"
+	echo "██████╔╝██║░░██║███████╗███████╗██║░╚██╗  ██║██║░░██║╚█████╔╝"
+	echo "╚═════╝░╚═╝░░╚═╝╚══════╝╚══════╝╚═╝░░╚═╝  ╚═╝╚═╝░░╚═╝░╚════╝░"
+}
+
+dalek_start()
+{
+	echo "Dalek IRC Services is booting"
+	screen -S dalek-serv -d -m php src/dalek
+	echo "Launching services...";
+	if screen -list | grep dalek-serv ; then
+		echo "Launched!"
+		echo "Connecting..."
+	else
+		echo "Failed"
+	fi
+}
+
+dalek_stop()
+{
+	echo "Dalek IRC Services is stopping..."
+	screen -ls | grep dalek-serv | cut -d. -f1 | awk '{print $1}' | xargs kill
+	echo "Stopped"
+}
+
+dalek_restart()
+{
+	echo "Dalek IRC Services is restarting..."
+	dalek_stop
+	dalek_start
+}
+
+if [ "$1" = "start" ] ; then
+	print_dalek
+	dalek_start
+
+elif [ "$1" = "restart" ] ; then
+	dalek_restart
+
+elif [ "$1" = "stop" ] ; then
+	dalek_stop
+
+# i think it's a good idea ,)
+elif [ "$1" = "restop"] ; then
+	dalek_start
+	dalek_stop
+
+
+else
+	echo "Command syntax: ./dalek start|restart|stop|restop"
+fi
+
+
+=======
 <?php
 include "src/main.php";
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a

@@ -75,7 +75,11 @@ class nick {
 	 */
 	public static function cmd_nick($u)
     {
+<<<<<<< HEAD
+        $ns = Client::find("NickServ");
+=======
         global $ns;
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
         $parv = explode(" ",$u['params']);
 
         update_nick($u['nick']->uid,$parv[0],$parv[1]);

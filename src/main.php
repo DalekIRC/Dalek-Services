@@ -22,30 +22,51 @@
 \\	Author:		Valware
 //				
 */
+<<<<<<< HEAD
+=======
 global $cf,$sql,$server,$port,$serv,$servertime,$svs,$ns,$cs;
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 
+/* Loading the base code :P */
+
+include __DIR__.'/../conf/dalek.conf';
+global $cf,$sql,$server,$port,$serv,$servertime;
 
 include "hook.php";
-include "dalek.conf";
 include "language.php";
+<<<<<<< HEAD
+=======
 
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 include "serv.php";
 include "sql.php";
 include "client.php";
 include "user.php";
+<<<<<<< HEAD
+include "modules/wordpress/wordpress.php";
 include "timer.php";
+include "channel.php";
+=======
+include "timer.php";
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 include "cmd.php";
 include "module.php";
 include "filter.php";
 include "misc.php";
+<<<<<<< HEAD
+include "servcmd.php";
+=======
 include "dalek.conf";
 include "modules/NickServ/nickserv.php";
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 include "BotServ/botserv.php";
-include "ChanServ/chanserv.php";
-include "OperServ/operserv.php";
 include "Global/global.php";
 include "HostServ/hostserv.php";
 include "MemoServ/memoserv.php";
+<<<<<<< HEAD
+
+
+=======
 include "wordpress/wordpress.php";
 include "channel.php";
 
@@ -75,6 +96,7 @@ loadmodule("part");
 loadmodule("md");
 loadmodule("uid");
 loadmodule("third/elmer");
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 
 //include "plugins/PATHWEB/uplink.php";
 // Server config
@@ -83,6 +105,21 @@ $port = $cf['port'];
 $mypass = $cf['serverpassword'];
 
 
+<<<<<<< HEAD
+
+// SQL config
+$sqlip = $cf['sqlip'];
+$sqluser = $cf['sqluser'];
+$sqlpass = $cf['sqlpass'];
+$sqldb = $cf['sqldb'] ?? "3306";
+$sqlport = $cf['sqlport'];
+
+/* Okay, we've established all the information lmao, let's load the modules */
+
+include __DIR__.'/../conf/modules.conf';
+
+=======
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 start:
 
 for (;;)
@@ -90,15 +127,27 @@ for (;;)
 	
 	if (!isset($sql))
 	{ 
+<<<<<<< HEAD
+		$sql = new SQL($sqlip,$sqluser,$sqlpass,$sqldb,$sqlport); hook::run("preconnect", array());
+=======
 		$sql = new SQL(); hook::run("preconnect", array());
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 	}
 	
 	if (!isset($serv)){ $serv = new Server($server,$port,$mypass);
 	}
 	if (!$socket)
 		die();
+<<<<<<< HEAD
+
+	stream_set_blocking($socket,0);
+	stream_set_timeout($socket,0);
+	while ($input = stream_get_line($socket, 0, "\n"))
+=======
 	while ($input = stream_get_line($socket, 8678, "\n"))
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 	{
+		
 		$timeget = microtime(true);	
 		$timetok = explode(".",$timeget);
 		if ($servertime != $timetok)
@@ -107,12 +156,13 @@ for (;;)
 		if (!$socket)
 			die();
 	
+		log_to_disk($input);
 		if ($cf['debugmode'] == "on")
-			echo $input."\n";
+			echo "[\e[0;30;47mRECV\e[0m] ".$input."\n";
 	
 		flush();
 		
-		$strippem = ircstrip(str_replace('\n','',str_replace('\r','',$input)));
+		$strippem = utf8_encode(ircstrip(str_replace('\n','',str_replace('\r','',$input))));
 		$splittem = explode(' ',$strippem);
 		
 		// If the server pings us
@@ -120,7 +170,11 @@ for (;;)
 		{
 			/* hook into ping lol */
 			hook::run("ping", array());
+<<<<<<< HEAD
+			S2S("PONG ".$splittem[1]); 	// Ping it back
+=======
 			$serv->sendraw("PONG ".$splittem[1]); 	// Ping it back
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		}
 		elseif ($splittem[0] == 'ERROR')
 		{
@@ -134,8 +188,22 @@ for (;;)
 			}
 			elseif (strpos($input,'Timeout') !== false)
 			{
+<<<<<<< HEAD
+				if (IsConnected())
+				{
+					$serv->hear("Connection issue. Trying again in 30 seconds");
+					sleep(30);
+					goto start;
+				}
+				else
+				{
+					die($serv->hear("Connection issue. Please check dalek.conf"));					
+				}
+				
+=======
 				$serv->hear("Hmmmm. It seems there was a problem. Please check dalek.conf");
 				die();
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 			}
 			else
 			{
@@ -156,6 +224,8 @@ for (;;)
 			}
 			if ($splittem[0] == "PASS")
 			{
+				global $isconn;
+				$isconn = NULL;
 				
 				$pass = mb_substr($splittem[1],1);
 				
@@ -163,9 +233,15 @@ for (;;)
 					die("Passwords do not match.");
 				
 				hook::run("connect", array());
+				$isconn = true;
 			}
 			$action = $splittem[1];
+<<<<<<< HEAD
+
+			/* well, we stopped supporting tags for the while for reasons */
+=======
 			
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 			if ($action == "TAGMSG")
 			{
 
@@ -179,7 +255,7 @@ for (;;)
 			
 			}
 			else
-				hook::run("raw", array('string' => $strippem));
+				hook::run("raw", array('mtags' => $tagmsg, 'string' => $strippem));
 			
 			
 		}
@@ -199,16 +275,20 @@ function get_string_between($string,$start, $end)
 
 function ircstrip($string)
 {
-
 	$_ircstrip = str_replace(array(
                 chr(10),
-                chr(13)
+                chr(13),
+				chr(2),
             ), '', $string);
 	return $_ircstrip;
 }
 function S2S($string) {
 	global $serv;
+<<<<<<< HEAD
+	$serv->sendraw($string);
+=======
 	$serv->send($string);
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 }
 
 function color($c,$string)
@@ -236,4 +316,8 @@ function whitespace(int $n)
 		$return .= " ";
 	
 	return $return;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a

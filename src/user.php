@@ -30,12 +30,25 @@ class User {
 	public function __construct($user)
 	{
 		global $cf;
+<<<<<<< HEAD
+
+		$this->IsClient = false;
+		$this->IsWordPressUser = false;
+		$this->IsServer = false;
+		$this->IsUser = false;
+
+		$u = find_person($user);
+		if ($u)
+			$this->IsUser = true;
+
+=======
 		$u = find_person($user);
 		
 		if (!$u)
 			$this->IsUser = false;
 		else 
 			$this->IsUser = true;
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		if ($this->IsUser)
 		{
 			$this->nick = $u['nick'];
@@ -59,14 +72,38 @@ class User {
 			$this->tls = (strpos($u['usermodes'],"z")) ? true : false;
 			$this->last = $u['last'];
 			$this->meta = new UserMeta($this);
+<<<<<<< HEAD
+			
+			$wp_user = new WPUser($this->account);
+			if ($wp_user->IsUser)
+			{
+				$this->IsWordPressUser = true;
+				$this->wp = $wp_user;
+			}
+			if (($c = Client::find($this->nick)) !== false)
+			{
+				$this->IsClient = true;
+				$this->client = $c;
+			}
+		}
+		elseif (!$this->IsUser)
+		{
+=======
 		}
 		if (!$this->IsUser)
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 			if (($s = find_serv($user)) !== false)
 			{
 				$this->IsServer = true;
 				$this->nick = $s['servername'];
 				$this->uid = $s['sid'];
+<<<<<<< HEAD
+				$this->serv = (object)$s;
 			}
+		}
+=======
+			}
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		else {
 			$this->IsServer = true;
 			$this->nick = $cf['servicesname'];
@@ -75,7 +112,11 @@ class User {
 	}
 	function NewNick($nick)
 	{
+<<<<<<< HEAD
+		global $servertime;
+=======
 		global $servertime,$cf;
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		
 		if (!$this->IsUser)
 		{ 
@@ -85,12 +126,17 @@ class User {
 		{
 			return false;
 		}
+<<<<<<< HEAD
+		S2S(" SVSNICK ".$this->nick." $nick $servertime");
+=======
 		S2S(":".$cf['sid']." SVSNICK ".$this->nick." $nick $servertime");
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		update_nick($this->uid,$nick,$servertime);
 		$this->nick = $nick;
 	}
 	function SetMode($mode)
 	{
+		var_dump($mode);
 		$charToAdd = NULL;
 		$charToDel = NULL;
 		if ($mode[0] !== "+" && $mode[0] !== "-")
@@ -201,11 +247,13 @@ function sendumode($uid,$mode)
 	return;
 }
 
+/* Figure out if the user already has the modes, and strip any duplicates */
 function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 {
 	$AddModeString = NULL;
 	$DelModeString = NULL;
-
+	$SetTheMode = "";
+	$UnsetTheMode = "";
 	$NewModes = $modesThatWeHave;
 	
 	for ($i = 0; $i < strlen($modesToAdd); $i++)
@@ -217,7 +265,7 @@ function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 		}
 	}
 	
-	if (isset($SetTheMode))
+	if (strlen($SetTheMode))
 	{	
 		$AddModeString = "+".$SetTheMode ?? NULL;
 		$NewModes = $modesThatWeHave.$SetTheMode;
@@ -232,7 +280,7 @@ function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 		}
 	}
 	
-	if (isset($UnsetTheMode))
+	if (strlen($UnsetTheMode))
 	{
 		$DelModeString = "-".$UnsetTheMode ?? NULL;
 		
@@ -258,30 +306,30 @@ function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 }
 		
 
-function validate_modechar($string)
-{
-	if (!s($string))
-	{
-		return false;
-	}
-}
-
 function validate_nick($string)
 {
 	
-	for ($i = 0; $i < strlen($string); $i++){
+	for ($i = 0; $i < strlen($string); $i++)
+	{
 		$val = $string[$i];
 		if ($i == 0){
 			
-			if (!ctype_alpha($val)){
+			if (!ctype_alpha($val))
+			{
 				
-				if ((ord($val) >= 91 && ord($val) <= 96) || (ord($val) >= 123 && ord($val) <= 125)){ continue; }
-				else { return false; }
+				if ((ord($val) >= 91 && ord($val) <= 96) || (ord($val) >= 123 && ord($val) <= 125))
+					continue;
+
+				else 
+					return false;
 			}
 		}
-		else {
-			if ((ord($val) >= 65 && ord($val) <= 125) || (ord($val) >= 48 && ord($val) <= 57) || ord($val) == 45){ continue; }
-				else { return false; }
+		else
+		{
+			if ((ord($val) >= 65 && ord($val) <= 125) || (ord($val) >= 48 && ord($val) <= 57) || ord($val) == 45)
+				continue;
+			else
+				return false;
 		}
 	}
 	return true;

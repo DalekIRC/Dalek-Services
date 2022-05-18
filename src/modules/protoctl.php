@@ -30,8 +30,13 @@ class protoctl {
 	public $name = "protoctl";
 	public $description = "Provides PROTOCTL compatibility";
 	public $author = "Valware";
+<<<<<<< HEAD
+	public $version = "1.0";
+	public $official = true;
+=======
 	public $protoctl = "1.0";
     public $official = true;
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -62,8 +67,11 @@ class protoctl {
 
 		if (!CommandAdd($this->name, 'PROTOCTL', 'protoctl::cmd_protoctl', 1))
 			return false;
+<<<<<<< HEAD
+=======
 
 		hook::func("preconnect", 'protoctl::table_init');
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		return true;
 	}
 
@@ -75,6 +83,13 @@ class protoctl {
 	 */
 	public static function cmd_protoctl($u)
 	{
+<<<<<<< HEAD
+		foreach ($u as $key => $value)
+			log_to_disk("$key => $value");
+		if (empty($u))
+			return;
+=======
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		$parv = explode(" ",$u['params']);
 		
 		$conn = sqlnew();
@@ -120,6 +135,14 @@ class protoctl {
 				$prep->bind_param("ss",$key,$all);
 				$prep->execute();
 			}
+<<<<<<< HEAD
+			if ($key == "SID")
+			{
+				$prep->bind_param("ss",$key,$val);
+				$prep->execute();
+			}
+=======
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 			$prep->close();
 		}
 	}

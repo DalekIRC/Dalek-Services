@@ -39,6 +39,36 @@ class cmd {
 
 hook::func("raw", function($u)
 {
+<<<<<<< HEAD
+	global $cf;
+	$parv = explode(" ", $u['string']);
+	$mtags = NULL;
+	if (is_numeric($parv[1]))
+		return;
+	
+	if (strlen($u['mtags']))
+	{
+		$mtags = $u['mtags'];
+		$mtag = array();
+
+		$tags = explode(";",mb_substr($mtags,1));
+		foreach($tags as $tag)
+		{
+			$tok = explode("=",$tag);
+
+			$key = $tok[0];
+			$value = mb_substr($tag,strlen($tok[0]) + 1);
+
+			$mtag[$key] = $value;
+		}
+	}
+	/* one of those commands without a 'sender', spoof it as our uplink */
+	if ($parv[0][0] !== ":")
+	{
+		if (!($serv = serv_attach($cf['sid'])))
+			return;
+		$u['string'] = ":".$serv[0]." ".$u['string'];
+=======
 	global $os,$cf;
 	$parv = explode(" ", $u['string']);
 	if (is_numeric($parv[1]))
@@ -48,12 +78,26 @@ hook::func("raw", function($u)
 	if ($parv[0][0] !== ":")
 	{
 		$u['string'] = ":".$cf['sid']." ".$u['string'];
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		$parv = explode(" ", $u['string']);
 	}
 	$user = new User(mb_substr($parv[0],1));
 	$str = strtolower($parv[1]);
 	if (!isset(cmd::$commands[$str]))
 	{
+<<<<<<< HEAD
+		//printf("421  ".$parv[1]." :Unknown command\n");
+		//SVSLog("WARNING: $user->nick used unknown command: ".$parv[1]);
+		return;
+	}
+	$dest = (isset($parv[2])) ? $parv[2] : NULL;
+	
+	$params = (isset($parv[3])) ? mb_substr($u['string'], strlen($parv[0]) + strlen($parv[1]) + 2) : NULL;
+	cmd::run($str, array(
+		'mtags' => $mtag ?? NULL,
+		'nick' => $user,
+		'dest' => $dest,
+=======
 		if ($str == "privmsg")
 		{
 			$token = explode(" ",$u['string']);
@@ -77,6 +121,7 @@ hook::func("raw", function($u)
 	}
 	$params = mb_substr($u['string'], strlen($parv[0]) + strlen($parv[1]) + 2);
 	cmd::run($str, array('nick' => $user,
+>>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		'cmd' => $str,
 		'params' => ltrim($params," :"),
 		'parc' => cmd::$commands[$str]['parc']));
