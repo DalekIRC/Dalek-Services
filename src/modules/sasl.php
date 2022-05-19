@@ -194,7 +194,7 @@ class IRC_SASL {
 		{
 			return;
 		}
-		elseif (isset($_SASL[$uid]) && ($cmd == "S" || $cmd == "C"))
+		elseif (isset($_SASL[$uid]) &&  $cmd == "S")
 		{
 			$_SASL[$uid]["mech"] = strtoupper($param1);
 			$_SASL[$uid]["key"] = $param2 ?? NULL;
