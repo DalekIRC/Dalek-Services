@@ -39,7 +39,6 @@ class cmd {
 
 hook::func("raw", function($u)
 {
-<<<<<<< HEAD
 	global $cf;
 	$parv = explode(" ", $u['string']);
 	$mtags = NULL;
@@ -68,24 +67,12 @@ hook::func("raw", function($u)
 		if (!($serv = serv_attach($cf['sid'])))
 			return;
 		$u['string'] = ":".$serv[0]." ".$u['string'];
-=======
-	global $os,$cf;
-	$parv = explode(" ", $u['string']);
-	if (is_numeric($parv[1]))
-		return;
-	
-	/* one of those commands without a 'sender', spoof it as us? and retokenise */
-	if ($parv[0][0] !== ":")
-	{
-		$u['string'] = ":".$cf['sid']." ".$u['string'];
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		$parv = explode(" ", $u['string']);
 	}
 	$user = new User(mb_substr($parv[0],1));
 	$str = strtolower($parv[1]);
 	if (!isset(cmd::$commands[$str]))
 	{
-<<<<<<< HEAD
 		//printf("421  ".$parv[1]." :Unknown command\n");
 		//SVSLog("WARNING: $user->nick used unknown command: ".$parv[1]);
 		return;
@@ -97,31 +84,6 @@ hook::func("raw", function($u)
 		'mtags' => $mtag ?? NULL,
 		'nick' => $user,
 		'dest' => $dest,
-=======
-		if ($str == "privmsg")
-		{
-			$token = explode(" ",$u['string']);
-			$nick = mb_substr($token[0],1);
-			$dest = $parv[2];
-			$string = ($p = explode(" :",$u['string'])) ? mb_substr($u['string'],strlen($p[0]) + 2) : "";
-			// lowercase the command item
-            var_dump($string);
-			$string = str_replace($token[0],strtolower($token[0]),$string);
-			hook::run("privmsg", array(
-				"nick" => $nick,
-				"dest" => $dest,
-				"parv" => $string)
-			);
-			update_last($nick);
-			return;
-		}
-		printf("421 $user->nick ".$parv[1]." :Unknown command\n");
-		//if (isset($os))$os->log("WARNING: $user->nick used unknown command: ".$parv[1]);
-		return;
-	}
-	$params = mb_substr($u['string'], strlen($parv[0]) + strlen($parv[1]) + 2);
-	cmd::run($str, array('nick' => $user,
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		'cmd' => $str,
 		'params' => ltrim($params," :"),
 		'parc' => cmd::$commands[$str]['parc']));

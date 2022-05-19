@@ -83,11 +83,6 @@ class squit {
     public static function squit($sid)
     {
         $r = recurse_serv_attach($sid);
-<<<<<<< HEAD
-=======
-        $s = find_serv($sid);
-        $l = count($r) - 1;
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
         foreach ($r as $v)
 	    	del_sid($v);
     }   

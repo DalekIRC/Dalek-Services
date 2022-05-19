@@ -100,8 +100,9 @@ chanserv::func("privmsg", function($u)
 
 function register_channel($chan,$owner)
 {
-	global $servertime;
-	$conn = sqlnew();
+	global $sqlip,$sqluser,$sqlpass,$sqldb,$servertime;
+
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 	if (!$conn)
 		return false;
 	$chatlink = "/chat/?channel=".$chan;

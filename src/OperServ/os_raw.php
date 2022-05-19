@@ -31,10 +31,11 @@ operserv::func("privmsg", function($u){
 
 	
 	$parv = explode(" ",$u['msg']);
-	
 	if ($parv[0] !== "raw"){ return; }
+	var_dump($u['msg']);
 	
-	$raw = str_replace($parv[0]." ","",$u['msg']);
-	$os->msg("#Services","RAW cmd from ".$u['nick'].": ".$u['msg']);
+	$raw = mb_substr($u['msg'],strlen($parv[0]) + 1);
+	var_dump($raw);
+	$os->msg("#Services","RAW cmd from ".$u['nick'].": $raw");
 	$os->sendraw($raw);
 });

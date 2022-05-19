@@ -30,7 +30,6 @@ class User {
 	public function __construct($user)
 	{
 		global $cf;
-<<<<<<< HEAD
 
 		$this->IsClient = false;
 		$this->IsWordPressUser = false;
@@ -41,14 +40,6 @@ class User {
 		if ($u)
 			$this->IsUser = true;
 
-=======
-		$u = find_person($user);
-		
-		if (!$u)
-			$this->IsUser = false;
-		else 
-			$this->IsUser = true;
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		if ($this->IsUser)
 		{
 			$this->nick = $u['nick'];
@@ -72,7 +63,6 @@ class User {
 			$this->tls = (strpos($u['usermodes'],"z")) ? true : false;
 			$this->last = $u['last'];
 			$this->meta = new UserMeta($this);
-<<<<<<< HEAD
 			
 			$wp_user = new WPUser($this->account);
 			if ($wp_user->IsUser)
@@ -88,22 +78,14 @@ class User {
 		}
 		elseif (!$this->IsUser)
 		{
-=======
-		}
-		if (!$this->IsUser)
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 			if (($s = find_serv($user)) !== false)
 			{
 				$this->IsServer = true;
 				$this->nick = $s['servername'];
 				$this->uid = $s['sid'];
-<<<<<<< HEAD
 				$this->serv = (object)$s;
 			}
 		}
-=======
-			}
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		else {
 			$this->IsServer = true;
 			$this->nick = $cf['servicesname'];
@@ -112,11 +94,7 @@ class User {
 	}
 	function NewNick($nick)
 	{
-<<<<<<< HEAD
 		global $servertime;
-=======
-		global $servertime,$cf;
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		
 		if (!$this->IsUser)
 		{ 
@@ -126,11 +104,7 @@ class User {
 		{
 			return false;
 		}
-<<<<<<< HEAD
 		S2S(" SVSNICK ".$this->nick." $nick $servertime");
-=======
-		S2S(":".$cf['sid']." SVSNICK ".$this->nick." $nick $servertime");
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		update_nick($this->uid,$nick,$servertime);
 		$this->nick = $nick;
 	}

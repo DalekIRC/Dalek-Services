@@ -30,11 +30,7 @@ class mode {
 	public $name = "mode";
 	public $description = "Provides MODE compatibility";
 	public $author = "Valware";
-<<<<<<< HEAD
 	public $version = "1.0";
-=======
-	public $mode = "1.0";
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
     public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
@@ -87,11 +83,7 @@ class mode {
 		$toAdd = array();
 		$toDel = array();
 		
-<<<<<<< HEAD
 		$params = str_replace($parv[0]." ".$parv[1]." ","",$u['params']);
-=======
-		$params = str_replace($parv[0]." ".$parv[1]." ","",$u['string']);
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 			
 		MeatballFactory($chan,$modes,$params,$u['nick']->uid);
 	}

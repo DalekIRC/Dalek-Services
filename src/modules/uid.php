@@ -90,13 +90,8 @@ class uid {
 		$ipb64 = ($parv[10] !== "*") ? $parv[10] : NULL;
 		$ip = inet_ntop(base64_decode($ipb64)) ?? "*";
 		if (!$ip){ $ip = ""; }
-<<<<<<< HEAD
 		$tok = explode(" :",$u['params']);
 		$gecos = str_replace($tok[0]." :","",$u['params']);
-=======
-		$tok = explode(":",$u['params']);
-		$gecos = $tok[count($tok) - 1];
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		hook::run("UID", array(
 			"sid" => $sid,
 			"nick" =>$nick,

@@ -80,16 +80,10 @@ class md {
 		{
 			$user = $parv[1];
 			$key = $parv[2];
-<<<<<<< HEAD
 			$t = explode(" :",$u['params']);
 			$value = (isset($t[1])) ? $t[1] : "";
 			
 			md::md_add($user,$key,$value);
-=======
-			$value = ($t = explode(" :",$u['params'])) ? $t[1] : "";
-			if (!md::md_add($user,$key,$value))
-			{ }
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		}
     }
 	public static function md_add($person,$key,$value)

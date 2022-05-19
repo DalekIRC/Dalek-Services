@@ -26,28 +26,17 @@
 
 class Client {
 	
-<<<<<<< HEAD
 	static $list = array();
 
 	function __construct($nick,$ident,$hostmask,$uid = NULL, $gecos ,$modinfo = NULL)
-=======
-	function __construct($nick,$ident,$hostmask,$uid,$gecos)
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 	{
 		global $servertime,$cf;
 		
 		$this->nick = $nick;
-<<<<<<< HEAD
 		$this->uid = $uid = generate_uid($nick);
 		$this->modinfo = $modinfo;
 		$this->cmds = NULL;
 		S2S("UID $nick 0 $servertime $ident $hostmask $uid 0 +oiqS * * * :$gecos");
-=======
-		$this->uid = $uid;
-
-
-		$this->sendraw("UID $nick 0 $servertime $ident $hostmask $uid $nick +oiqS * * * :$gecos");
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		
 		hook::run("UID", array(
 			'nick' => $nick,
@@ -62,7 +51,6 @@ class Client {
 			'ipb64' => "",
 			'gecos' => $gecos)
 		);
-<<<<<<< HEAD
 		self::add_to_client_list($this);
 		$this->user = new User($this->nick);
 		$this->join($cf['logchan']);
@@ -74,11 +62,6 @@ class Client {
 		$me = new User($this->nick);
 		$me->exit();
 	}
-=======
-		
-		
-	}
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 	function sendraw($string)
 	{
 		// Declare de globals;
@@ -87,7 +70,6 @@ class Client {
 		fputs($socket, ircstrip($string)."\n");
 		
 	}
-<<<<<<< HEAD
 	function quit($msg = 'Connection closed')
 	{
 		global $sql;
@@ -106,14 +88,6 @@ class Client {
 				$string = preg_match('[rl]','w',$string);
 			S2S(":$this->uid PRIVMSG $dest :$string");
 		}
-=======
-	function msg($dest,$string)
-	{
-		$nick = new User($this->nick);
-		if (function_exists('IsElmer') && IsElmer($nick))
-			$string = preg_match('[rl]','w',$string);
-		$this->sendraw(":$this->uid PRIVMSG $dest :$string");
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 	}
 	function log($string){
 		global $cf;
@@ -121,7 +95,6 @@ class Client {
 		$this->msg($cf['logchan'],$string);
 	}
 		
-<<<<<<< HEAD
 	function join(...$dests)
 	{
 		global $sql,$servertime;
@@ -135,19 +108,6 @@ class Client {
 			S2S("SJOIN $timestamp $dest :~".$this->uid);
 			$sql->insert_ison($dest,$this->uid);
 		}
-=======
-	function join($dest)
-	{
-		global $sql,$servertime;
-		
-		$chan = new Channel($dest);
-
-		if ($chan->HasUser($this->uid))
-			return;
-		$timestamp = (isset($chan->timestamp)) ? $chan->timestamp : $servertime;
-		$this->sendraw("SJOIN $timestamp $dest :~".$this->uid);
-		$sql->insert_ison($dest,$this->uid);
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 	}
 	function part($dest)
 	{
@@ -157,7 +117,6 @@ class Client {
 		if (!$chan){ return; }
 		if (!$chan->HasUser($this->uid))
 			return;
-<<<<<<< HEAD
 		S2S("SJOIN $chan->timestamp $dest :~".$this->uid);
 		$sql->delete_ison($dest,$this->uid);
 	}
@@ -219,23 +178,6 @@ class Client {
 
 			for ($i = 0; isset($tok[$i]); $i++)		
 				S2S("$mtags_to_send :$uid NOTICE $dest :".$tok[$i]);
-=======
-		$this->sendraw("SJOIN $chan->timestamp $dest :~".$this->uid);
-		$sql->delete_ison($dest,$this->uid);
-	}
-	function notice($dest,$string)
-	{
-		$nick = new User($this->nick);
-		if (function_exists('IsElmer') && IsElmer($nick))
-			$string = str_replace(array('r','R','l','L'),array('w','W','w','W'),$string);
-
-		$uid = $this->uid;
-		$tok = explode("<lf>",$string) ?? $string;
-		if ($string == "Array"){ $tok = $string; }
-		for ($i = 0; isset($tok[$i]); $i++){
-			
-			$this->sendraw(":$uid NOTICE $dest :".$tok[$i]);
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		}
 	}
 	function mode($dest,$string)
@@ -256,32 +198,18 @@ class Client {
 			}
 		}
 			
-<<<<<<< HEAD
 		S2S(":$this->uid MODE $dest $string");
-=======
-		$this->sendraw(":$this->uid MODE $dest $string");
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 	}
 	function svs2mode($nick,$string){
 		$nick = new User($nick);
 		if (!$nick->IsUser){ return; }
 		
-<<<<<<< HEAD
 		$nick->SetMode("$string");
 		S2S(":$this->uid SVS2MODE $nick->uid $string");
 	}
 	function svslogin($uid,$account)
 	{
 		S2S(":$this->uid SVSLOGIN * $uid $account");
-=======
-		$uid = $nick->uid;
-		$nick->SetMode("$string");
-		$this->sendraw(":$this->uid SVS2MODE $uid $string");
-	}
-	function svslogin($uid,$account)
-	{
-		$this->sendraw(":$this->uid SVSLOGIN * $uid $account");
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 	}
 	function up(Channel $chan, User $user)
 	{
@@ -306,7 +234,6 @@ class Client {
 	}
 	function kick($chan,$nick,$reason = '')
 	{
-<<<<<<< HEAD
 		S2S(":$this->uid KICK $chan $nick :$reason");
 		do_part($chan,$nick);
 	}
@@ -354,29 +281,4 @@ function generate_uid($str)
 {
 	global $cf;
 	return $cf['sid'].strtoupper(mb_substr(md5($str),0,6));
-=======
-		$this->sendraw(":$this->uid KICK $chan $nick :$reason");
-		do_part($chan,$nick);
-	}
-}
-
-hook::func("start", function(){
-	global $ns,$cs,$bs,$os,$gb,$hs,$ms,$cf;
-	$ns->join($cf['logchan']);
-	$cs->join($cf['logchan']);
-	$bs->join($cf['logchan']);
-	$os->join($cf['logchan']);
-	$gb->join($cf['logchan']);
-	$hs->join($cf['logchan']);
-	$ms->join($cf['logchan']);
-	//global_notice("Services is back online. Have a great day!");
-});
-
-
-function global_notice($msg) : bool
-{
-	global $gb;
-	$gb->notice("$*",$msg);
-	return true;
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 }

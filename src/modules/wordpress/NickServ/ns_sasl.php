@@ -43,10 +43,11 @@ hook::func("preconnect", function($u)
 hook::func("start", function($u)
 {
 	
-	global $sql,$ns,$cf,$wpconfig,$nickserv;
+	global $sql,$cf,$wpconfig,$nickserv;
 	if ($nickserv['login_method'] !== "wordpress"){
 		return;
 	}
+	$ns = Client::find("NickServ");
 	$query = "SELECT * FROM dalek_user";
 	$result = $sql::query($query);
 	
@@ -70,17 +71,18 @@ hook::func("start", function($u)
 		elseif ($row['account'] && strtolower($row['account']) == strtolower($row['nick']) )
 		{ 
 			$ns->svs2mode($row['UID'],"+r");
-			nickserv::run("identify", array('nick' => $row, 'account' => $row['account']));
+			hook::run("auth", array('uid' => $row['UID'], 'nick' => $row, 'account' => $row['account']));
 		}
 	}
 	
 });
 hook::func("UID", function($u)
 {
-	global $ns,$nickserv;
+	global $nickserv;
 	if ($nickserv['login_method'] !== "wordpress"){
 		return;
 	}
+	$ns = Client::find("NickServ");
 	if (!$ns)
 		return;
 	
@@ -97,6 +99,7 @@ hook::func("UID", function($u)
 	}
 	elseif ($nick->nick == $u['account']) {
 		$ns->svs2mode($u['nick'],"+r");
+		hook::run("auth", ['uid' => $nick->uid,'account' => $u['account'], 'nick' => $u['nick']]);
 	}
 });
 
@@ -115,7 +118,7 @@ hook::func("raw", function($u)
 }); 	
 nickserv::func("sasl", function($u){
 	
-	global $ns,$nickserv,$sasl;
+	global $nickserv,$sasl;
 	if ($nickserv['login_method'] !== "wordpress")
 		return;
 
@@ -132,6 +135,8 @@ nickserv::func("sasl", function($u){
 	$param2 = $parv[6] ?? NULL;
 
 	$sasl = new IRC_SASL($origin,$uid,$cmd,$param1,$param2);
+
+	
 });
 
 function SendSasl($string)
@@ -168,9 +173,14 @@ class IRC_SASL {
 			$_SASL[$uid]["key"] = $param2;
 
 			$this->check = $this->check_pass($_SASL[$uid]["key"]);
-			if ($this->check == 0)
+			if ($param1 !== "EXTERNAL" && $this->check == 0)
 				SendSasl("$source $uid C +");
-
+			elseif ($param1 == "EXTERNAL" && $this->check == 0)
+			{
+				SendSasl("$source $UID D F");
+				$this->fail();
+				return;
+			}
 			elseif ($this->check > 0)
 				$this->success($this->check);
 		}
@@ -197,7 +207,9 @@ class IRC_SASL {
 	}
 	private function success(int $i)
 	{
-		global $ns,$_SASL;
+		global $_SASL;
+
+		$ns = Client::find("NickServ");
 
 		if ($i)
 		{
@@ -207,12 +219,19 @@ class IRC_SASL {
 
 		SendSasl("$this->source $this->uid D S");
 		fail2ban($_SASL[$this->uid]['ip'], 0);
+
+		/* if they're already connected, run the auth hook */
+		$client = new User($this->uid);
+		if ($client->IsUser)
+			hook::run("auth", ['uid' => $client->uid, 'account' => $this->account, 'nick' => $client->nick]);
+
 		unset($_SASL[$this->uid]);
 		
 	}
 	private function fail()
 	{
-		global $ns,$_SASL;
+		global $_SASL;
+		$ns = Client::find("NickServ");
 		$r = ($this->reason) ? " ".$this->reason : "";
 		if (!isset($this->account) || !strlen($this->account))
 			$this->account = "No account provided";

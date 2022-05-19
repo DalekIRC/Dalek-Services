@@ -1,6 +1,5 @@
 <?php
 
-<<<<<<< HEAD
 /* Some defines */
 define( "LOG_WARN","[07WARN] ");
 define( "LOG_FATAL","[04FATAL] ");
@@ -29,8 +28,6 @@ function IsMe($srv)
 	return true;
 }
 
-=======
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 function MeatballFactory(Channel $chan,$modes,$params,$source)
 {
 	for ($i = 0; isset($modes[$i]); $i++)
@@ -124,7 +121,6 @@ function rparv($string)
 	return false;
 }
 
-<<<<<<< HEAD
 function global_notice($msg) 
 {
 	global $gb;
@@ -137,8 +133,6 @@ function IsConnected(){
 		return false;
 	return true;
 }
-=======
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 
 function IsUser(User $nick)
 {
@@ -158,7 +152,6 @@ function IsServiceBot(User $nick)
 		return true;
 	return false;
 }
-<<<<<<< HEAD
 
 function IsBot(User $nick)
 {
@@ -248,5 +241,3 @@ function log_to_disk($str) : void
 	fwrite($logfile,$str);
 	fclose($logfile);
 }
-=======
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a

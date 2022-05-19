@@ -1,4 +1,4 @@
-s<?php
+<?php
 
 
 nickserv::func("privmsg", function($u)

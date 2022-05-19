@@ -65,7 +65,7 @@ nickserv::func("privmsg",	 function($u){
 	$ns->svs2mode($nick->uid," +r");
 	$ns->notice($nick->uid,IRC("MSG_IDENTIFY")." $account");
 	
-	nickserv::run("identify", array('nick' => $nick, 'account' => $account));
+	hook::run("auth", ['account' => $account, 'nick' => $nick->nick]);
 	
 });
 

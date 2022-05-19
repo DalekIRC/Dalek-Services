@@ -73,36 +73,20 @@ class ns_metadata {
 	{
 		$parv = explode(" ",$u['params']);
 
-<<<<<<< HEAD
-=======
-		$target = new User($parv[0]);
-		$uid = $target->uid;
-
-
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		$key = $parv[1];
 		
 		$tok = explode("* :",$u['params']);
 		$value = mb_substr($u['params'],strlen($tok[0]) + 3);
 	
-<<<<<<< HEAD
 		md::md_add($parv[0],$key,$value);
 		hook::run("usermeta", ['nick' => $parv[0], 'key' => $key, 'value' => $value]);
-=======
-		md::md_add($uid,$key,$value);
-		hook::run("usermeta", ['nick' => $target, 'key' => $key, 'value' => $value]);
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 	}
 	/* Send USERMETA command */
 	public static function send_usermeta($from = NULL, $to, $key, $value)
 	{
 		global $cf;
 		if (!$from)
-<<<<<<< HEAD
 			$from = $cf['sid'];
-=======
-			$from = $cf['servicesname'];
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 
 		S2S(":$from METADATA $to $key * :$value");
 		md::md_add($to,$key,$value);

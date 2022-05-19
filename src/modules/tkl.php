@@ -30,13 +30,8 @@ class tkl {
 	public $name = "tkl";
 	public $description = "Provides TKL compatibility";
 	public $author = "Valware";
-<<<<<<< HEAD
 	public $version = "1.0";
     public $official = true;
-=======
-	public $tkl = "1.0";
-    	public $official = true;
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -161,8 +156,4 @@ class tkl {
 		$prep->execute();
 		$conn->close();
 	}
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a

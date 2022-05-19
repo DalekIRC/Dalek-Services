@@ -64,7 +64,7 @@ nickserv::func("privmsg",	 function($u){
 
 // default create user function
 function df_create_user($user,$password,$email){
-	global $servertime;
+	global $sqlip,$sqluser,$sqlpass,$sqldb,$servertime;
 	
 	if (strlen($password) < 8){ return IRC("ERR_PASSTOOSHORT"); }
 	
@@ -72,7 +72,7 @@ function df_create_user($user,$password,$email){
 	
 	$password = password_hash($password, PASSWORD_DEFAULT);
 	
-	$conn = sqlnew();
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 	if (!$conn) { return "ERROR"; }
 	else {
 		$prep = $conn->prepare("INSERT INTO dalek_accounts (
@@ -108,7 +108,9 @@ function validate_email($email){
 // check if is registered user using default
 function df_IsRegUser($user){
 	
-	$conn = sqlnew();
+	global $sqlip,$sqluser,$sqlpass,$sqldb;
+	
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 	if (!$conn) { return "ERROR"; }
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_accounts WHERE display = ?");
@@ -125,7 +127,10 @@ function df_IsRegUser($user){
 
 function df_AccountDetails($account){
 	
-	$conn = sqlnew();
+	global $sqlip,$sqluser,$sqlpass,$sqldb;
+	
+	
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 	if (!$conn) { return false; }
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_accounts WHERE display = ?");

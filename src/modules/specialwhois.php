@@ -192,7 +192,6 @@ class specialwhois {
     
         return $buffer;
     }
-<<<<<<< HEAD
     public static function send_swhois($uid,$tag,$swhois)
     {
         $cmd = "SWHOIS $uid + $tag -500 :$swhois";
@@ -202,12 +201,6 @@ class specialwhois {
     public static function del_swhois($uid,$tag)
     {
         $cmd = "SWHOIS $uid - $tag -500 *";
-=======
-    public static function send_swhois($uid,$swhois)
-    {
-    
-        $cmd = "SWHOIS $uid + services -500 :$swhois";
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
         self::SWHOIS($cmd);
         S2S($cmd);
     }

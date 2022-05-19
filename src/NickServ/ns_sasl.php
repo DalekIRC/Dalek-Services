@@ -168,6 +168,3 @@ nickserv::func("sasl", function($u){
 			break;
 	}
 });
-			
-			
-			

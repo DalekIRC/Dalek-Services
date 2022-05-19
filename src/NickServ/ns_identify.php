@@ -28,9 +28,10 @@
 nickserv::func("privmsg",	 function($u){
 	
 	// our global for bot $ns and config $nickserv
-	global $ns,$nickserv;
+	global $nickserv;
 	
-	$nick = new User($u['nick']); // find 'em
+	$ns = Client::find($nickserv['nick']);
+	$nick = $u['nick'] // find 'em
 	
 	$parv = explode(" ",$u['msg']); // splittem
 	
@@ -71,7 +72,9 @@ nickserv::func("privmsg",	 function($u){
 
 function df_verify_userpass($user,$pass){
 	
-	$conn = sqlnew();
+	global $sqlip,$sqluser,$sqlpass,$sqldb;
+	
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 	if (!$conn) { return "ERROR"; }
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_accounts WHERE display = ?");
@@ -98,7 +101,9 @@ function df_verify_userpass($user,$pass){
 
 function df_login($nick,$account){
 	
-	$conn = sqlnew();
+	
+	global $sqlip,$sqluser,$sqlpass,$sqldb,$ns;
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 	if (!$conn) { return "ERROR"; }
 	else {
 		
@@ -179,6 +184,8 @@ nickserv::func("help", function($u){
 hook::func("UID", function($u)
 {
 	global $ns;
+	if (!isset($u['account']))
+		return;
 	if ($u['account'] == $u['nick'])
 		$ns->sendraw(":$ns->nick SVS2MODE ".$u['nick']." +r");
 });

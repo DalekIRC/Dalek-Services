@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #!/bin/sh
 
 print_dalek()
@@ -59,7 +58,3 @@ else
 fi
 
 
-=======
-<?php
-include "src/main.php";
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a

@@ -73,8 +73,9 @@ nickserv::func("setcmd", function($u)
 function RegainOnSasl($account,$option)
 {
 	
+	global $sqlip,$sqluser,$sqlpass,$sqldb;
 	$opt = "regainonsasl";
-	$conn = sqlnew();
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 	if (!$conn) { return false; }
 	else
 	{
@@ -115,7 +116,9 @@ function RegainOnSasl($account,$option)
 }
 function IsRegainOnSasl($account)
 {
-	$conn = sqlnew();
+	global $sqlip,$sqluser,$sqlpass,$sqldb;
+	
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 	if (!$conn) { return false; }
 	else
 	{

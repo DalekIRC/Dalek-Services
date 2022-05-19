@@ -96,14 +96,9 @@ class sjoin {
 		global $sql;
 	
 		$tokens = explode(" ",$u['full']);
-<<<<<<< HEAD
 		var_dump($u['full']);
 		$chan = $tokens[3];
 		$list = explode(" :",$u['full']);
-=======
-		$chan = $tokens[3];
-		$list = explode(":",$u['full']);
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		$parv = explode(" ",$list[count($list) - 1]);
 		
 		if (!$parv)

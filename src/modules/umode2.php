@@ -31,11 +31,7 @@ class umode2 {
 	public $description = "Provides UMODE2 compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
-<<<<<<< HEAD
 	public $official = true;
-=======
-    public $official = true;
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -85,11 +81,7 @@ class umode2 {
 		$nick = $u['nick'];
 
 		/* Tokenise the incoming string into $parv */ 
-<<<<<<< HEAD
 		$parv = explode(" ",$u['dest']);
-=======
-		$parv = explode(" ",$u['params']);
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		
 		/* errors and shit lol */
 		if (count($parv) < $u['parc'])
@@ -98,11 +90,7 @@ class umode2 {
 			return;
 		}
 
-<<<<<<< HEAD
         $nick->SetMode($u['dest']);
-=======
-        $nick->SetMode($u['params']);
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 
 		/* You don't HAVE to return, butt-fuck it */
 		return;

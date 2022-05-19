@@ -1,4 +1,4 @@
-<?php
+ <?php
 /*				
 //	(C) 2022 DalekIRC Services
 \\				
@@ -14,9 +14,11 @@
 \\	Desc:		Example module for template purposes
 \\				Adds ELMER compatibility to services
 //				But WHY Valware?! Just why?! For example purposes.
-\\				Still funny asf
+\\				Still funny asf. Also it's the template for writing a
+//				server command.
+\\
 //				
-\\	Version:	1
+\\	Version:	1.0
 //				
 \\	Author:		Valware
 //				
@@ -78,6 +80,9 @@ class elmer {
 	 * In this example (and throughout the source), $u contains an array with
 	 * information passed along by the caller
 	 * $u['nick'] = User object
+	 *
+	 * It's important to note here that the elmer check is built-in to source...
+	 * this module just provides the command and ability to activate it/deactivate it.
 	 */
 	public function cmd_elmer($u)
 	{
@@ -86,27 +91,17 @@ class elmer {
 
 		/* User object of caller */
 		$nick = $u['nick'];
-
-		/* Tokenise the incoming string into $parv */ 
-		$parv = explode(" ",$u['params']);
 		
-		/* errors and shit lol */
-		if (count($parv) < $u['parc'])
-		{
-			S2S("461 $nick->nick $cmd :Need more parameters.");
-			return;
-		}
 
 		/* Check which command we got */
-		if ($cmd !== "elmer" && $cmd !== "delmer")
+		if (!strcasecmp("elmer",$cmd) && !strcasecmp("delmer",$cmd))
 			return;
 
 		/* Are we adding or removing */
-		$add = ($cmd == "elmer") ? true : false;
-
+		$add = (!strcasecmp("elmer",$cmd)) ? true : false;
+		
 		/* Locating target, beep bzzzzzz errchhh *fax sounds* */
-		$target = new User($u['params']);
-
+		$target = new User($u['dest']);
 		/* If we're adding and they're not already elmer'd */
 		if ($add)
 		{
@@ -119,6 +114,7 @@ class elmer {
 			/* Let them know and update the array */
 			S2S("NOTICE $nick->uid :$target->nick is now talking like Elmer.");
 			array_push(self::$elmer,strtolower($target->nick));
+			var_dump(self::$elmer);
 		}
 
 		/* Looks like we removing instead =] */
@@ -146,11 +142,15 @@ class elmer {
  * IsElmer($nick)
  * returns true or false
 */
-function IsElmer(User $client) : bool
+function IsElmer($user) : bool
 {
 	if (!isset(elmer::$elmer))
 		return false;
-	if (in_array(strtolower($client->nick),elmer::$elmer))
+
+	if (!$user->IsUser)
+		return false;
+
+	if (in_array(strtolower($user->client->nick),elmer::$elmer))
 		return true;
 	return false;
 }

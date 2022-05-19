@@ -72,7 +72,9 @@ nickserv::func("setcmd", function($u){
 
 function df_UpdatePass($account,$password){
 	
-	$conn = sqlnew();
+	global $sqlip,$sqluser,$sqlpass,$sqldb;
+	
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 	if (!$conn) { return false; }
 	else {
 		$prep = $conn->prepare("UPDATE dalek_accounts SET pass = ? WHERE display = ?");

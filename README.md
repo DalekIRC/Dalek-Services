@@ -1,5 +1,5 @@
-# IRCServices `WORK IN PROGRESS`
-Dalek IRC Services with WordPress integration tailored to you.
+# IRCServices
+Dalek IRC Services with SQL integration tailored to you.
 
 DO NOT USE YET - WORK IN PROGRESS
 

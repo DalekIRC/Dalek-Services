@@ -97,8 +97,9 @@ chanserv::func("help", function($u){
 
 function channel_owner_list($nick)
 {
-	global $cs;
-	$conn = sqlnew();
+	global $db,$sqlip,$sqluser,$sqlpass,$sqldb,$cs;
+		
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 	$table = "dalek_chaninfo";
 	$prep = $conn->prepare("SELECT * FROM $table WHERE owner = ?");
 	$prep->bind_param("s",$nick);

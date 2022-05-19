@@ -11,12 +11,12 @@
 //				
 \\				
 //				
-\\	Title: Set Password
+\\	Title: Set Email
 //	
-\\	Desc: Allows a user to update the password associated
+\\	Desc: Allows a user to update the email address associated
 //	with their account.
 \\	
-//	Syntax: SET PASSWORD <new password>
+//	Syntax: SET EMAIL <new email>
 \\	
 //	
 \\	Version: 1.1
@@ -72,7 +72,9 @@ nickserv::func("setcmd", function($u){
 
 function df_UpdatePass($account,$password){
 	
-	$conn = sqlnew();
+	global $sqlip,$sqluser,$sqlpass,$sqldb;
+	
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 	if (!$conn) { return false; }
 	else {
 		$prep = $conn->prepare("UPDATE dalek_accounts SET pass = ? WHERE display = ?");

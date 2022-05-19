@@ -29,10 +29,10 @@
 nickserv::func("privmsg",	 function($u){
 	
 	// our global for bot $ns and config $nickserv
-	global $ns,$nickserv,$wpconfig;
+	global $nickserv,$wpconfig;
 	
-	if (!($nick = new User($u['nick']))->IsUser){ return; } // find 'em
-	
+	$ns = Client::find("NickServ");
+	$nick = $u['nick'];
 	$parv = explode(" ",$u['msg']); // splittem
 	if ($parv[0] !== "register")
 		return;

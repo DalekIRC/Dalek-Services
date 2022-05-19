@@ -48,11 +48,7 @@ class um_meta_profilepic {
 	function __destruct()
 	{
 		hook::del("auth", 'um_meta_profilepic::setpic');
-<<<<<<< HEAD
 		
-=======
-		hook::del("UID", 'um_meta_profilepic::setpic');
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 	}
 
 
@@ -63,22 +59,12 @@ class um_meta_profilepic {
 	*/
 	function __init() : bool
 	{
-<<<<<<< HEAD
 		$help_string = "Updates your METADATA avatar with your website profile picture";
 		$syntax = "PICUPDATE";
 		$extended_help = 	"$help_string\n$syntax";
 
 		hook::func("auth", 'um_meta_profilepic::setpic');
 		AddServCmd('um_meta_profilepic', 'NickServ', 'PICUPDATE', 'um_meta_profilepic::picupdate', $help_string, $syntax, $extended_help);
-=======
-		hook::func("UID", 'um_meta_profilepic::setpic');
-		hook::func("auth", 'um_meta_profilepic::setpic');
-
-		nickserv::func("help", 'um_meta_profilepic::ns_hcmd');
-		nickserv::func("helplist", 'um_meta_profilepic::ns_cmd');
-
-		nickserv::func("privmsg", 'um_meta_profilepic::picupdate');
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		return true;
 	}
 
@@ -91,15 +77,10 @@ class um_meta_profilepic {
 	public static function setpic($u)
 	{
 		if (!isset($u['account']))
-<<<<<<< HEAD
 		{
 			um_meta_profilepic::check_for_gravatar($u);
 			return;
 		}
-=======
-			um_meta_profilepic::check_for_gravatar($u);
-
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		$pic = self::get_pic($u['account']);
 
 		if (!$pic)
@@ -113,20 +94,12 @@ class um_meta_profilepic {
 	}
 	static function check_for_irccloud($u)
 	{
-<<<<<<< HEAD
 		$nick = new User($u['account']);
 		$tok = substr($nick->ident, 0, 3);
 		if ($tok !== "sid" && $tok !== "uid")
 			return false;
 		
 		$tok2 = mb_substr($nick->ident, 3);
-=======
-		$tok = substr($u['ident'], 0, 3);
-		if ($tok !== "sid" && $tok !== "uid")
-			return false;
-		
-		$tok2 = mb_substr($u['ident'], 3);
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		if (!is_numeric($tok2))
 			return false;
 
@@ -141,7 +114,6 @@ class um_meta_profilepic {
 	static function check_for_gravatar($u)
 	{
 		global $wpconfig;
-<<<<<<< HEAD
 		if (!isset($u['account']))
 			return;
 		$user = new User($u['nick']);
@@ -150,11 +122,6 @@ class um_meta_profilepic {
 			return;
 		$email = $wp_user->user_email;
 
-=======
-		$user = new User($u['nick']);
-		$wp_user = new WPUser($user->account);
-		$email = $wp_user->user_email;
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		$hash = md5($email);
 
 
@@ -179,7 +146,6 @@ class um_meta_profilepic {
 		$row = $result->fetch_assoc();
 		$type = $row['meta_value'];
 
-<<<<<<< HEAD
 		$url = str_replace("https://","https://i0.wp.com/",$wpconfig['siteurl']."/wp-content/uploads/ultimatemember/".$user->user_id."/".$type);
 		return $url;
 	}
@@ -192,44 +158,6 @@ class um_meta_profilepic {
 		$parv = explode(" ",$u['msg']);
 
 		$nick = $u['nick'];
-=======
-		$url = $wpconfig['siteurl']."/wp-content/uploads/ultimatemember/".$user->user_id."/".$type;
-		return $url;
-	}
-
-	/* nickserv help command */
-	static function ns_cmd($u)
-	{
-		global $ns;
-	
-		$nick = $u['nick'];
-	
-		$ns->notice($nick,"PICUPDATE           Updates your IRC avatar according to your profile picture");
-	}
-	/* help with extra */
-	static function ns_hcmd($u)
-	{
-		global $ns;
-		$nick = $u['nick'];
-		if ($u['key'] !== "picupdate")
-			return;
-
-		$ns->notice($nick,"Syntax: /msg $ns->nick PICUPDATE<lf>".
-							"For when you have updated your profile picture and you<lf>".
-							"wish to update it in chat.");
-
-	}
-	/* So, you want to update your picture */
-	static function picupdate($u)
-	{
-		global $ns;
-
-		$parv = explode(" ",$u['msg']);
-		if (strtolower($parv[0]) !== "picupdate")
-			return;
-
-		$nick = new User($u['nick']);
->>>>>>> 1d6af964a27a04cb46dafb3c58b0c93538e7352a
 		$u['nick'] = $nick->nick;
 		$u['account'] = (isset($nick->account)) ? $nick->account : false;
 

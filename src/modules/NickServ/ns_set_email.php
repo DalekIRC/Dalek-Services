@@ -59,7 +59,9 @@ nickserv::func("setcmd", function($u){
 
 function df_UpdateEmail($account,$email){
 	
-	$conn = sqlnew();
+	global $sqlip,$sqluser,$sqlpass,$sqldb;
+	
+	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
 	if (!$conn) { return false; }
 	else {
 		$prep = $conn->prepare("UPDATE dalek_accounts SET email = ? WHERE display = ?");
