@@ -206,15 +206,6 @@ class privmsg {
 }
 
 
-hook::func("chanmsg", function($u)
-{
-	$parv = explode(" ",$u['params']);
-	$parv = explode(" ",mb_substr($u['params'],strlen($parv[0]) + 2));
-	$u['params'] = implode(" ",$parv);
-	if ($parv[0] == "raw")
-		S2S(mb_substr($u['params'],strlen($parv[0]) + 1));
-});
-
 function generate_random_msgid()
 {
 	global $servertime;
