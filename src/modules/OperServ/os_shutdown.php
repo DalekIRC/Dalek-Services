@@ -54,7 +54,7 @@ class os_shutdown {
 		$extended_help = 	"Shuts down Dalek Services.\nMust have Services Admin privileges or above.";
 
 		if (!AddServCmd(
-			'os_restart', /* Module name */
+			'os_shutdown', /* Module name */
 			'OperServ', /* Client name */
 			$cmd, /* Command */
 			'os_shutdown::cmd', /* Command function */
@@ -72,7 +72,7 @@ class os_shutdown {
 
 		$nick = $u['nick'];
 
-		if (!ValidatePermissionsForPath("can_shutdown", $nick, NULL, NULL, NULL))
+		if (!ValidatePermissionsForPath("can_shutdown", $nick))
 		{
 			Client::find("OperServ")->notice($nick->uid,"Permission denied!");
 			return;

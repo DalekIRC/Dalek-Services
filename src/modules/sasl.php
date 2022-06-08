@@ -40,7 +40,6 @@ class SASL {
 	function __construct()
 	{
 		hook::func("preconnect", 'SASL::create_table');
-		hook::func("start", 'SASL::on_connect');
 		hook::func("UID", 'SASL::hook_uid');
 	}
 
@@ -64,6 +63,8 @@ class SASL {
 		if (!CommandAdd($this->name, 'SASL', 'SASL::cmd_sasl', 0))
 			return false;
 		return true;
+
+		hook::func("start", 'SASL::on_connect');
 	}
 
 	function create_table($u)
@@ -114,7 +115,6 @@ class SASL {
 					SVSLog(LOG_WARN."User with nick '".$row['nick']."' was logged into account '".$row['account']."', which doesn't exist. They have been logged out.");
 					return;
 				}
-				sendumode($row['UID'],"+r");
 				hook::run("auth", array('uid' => $row['UID'], 'nick' => $row['nick'], 'account' => $row['account']));
 			}
 		}
@@ -128,7 +128,7 @@ class SASL {
 		$nick = new User($u['uid']);
 		if (!$nick->IsUser)
 			return;
-		if (!isset($u['account']) && $u['account'] !== 0 && $u['account'] !== "*"){
+		if (!isset($u['account']) || !$u['account'] || $u['account'] == "0" || $u['account'] == "*"){
 			if (!IsRegUser($nick->nick)){
 				return;
 			}
@@ -136,7 +136,6 @@ class SASL {
 			
 		}
 		elseif ($nick->nick == $u['account']) {
-			$ns->svs2mode($u['nick'],"+r");
 			hook::run("auth", ['uid' => $nick->uid,'account' => $u['account'], 'nick' => $u['nick']]);
 		}
 	}
@@ -201,7 +200,6 @@ class IRC_SASL {
 			if (strcasecmp($param1,"plain") && strcasecmp($param1,"external"))
 			{
 				$this->account = "Unsupported mechanism: $param1";
-				SendSasl("$source $this->uid D F");
 				$this->fail();
 				return;
 			}
@@ -211,7 +209,6 @@ class IRC_SASL {
 			
 			elseif ($param1 == "EXTERNAL" && $this->check == 0)
 			{
-				SendSasl("$source $this->uid D F");
 				$this->fail();
 				return;
 			}
@@ -231,7 +228,6 @@ class IRC_SASL {
 					$this->reason = "Client asked to do PLAIN but is trying to continue as if it has sent us a CertFP and is waiting for us to process it";
 					$this->fail();
 				}
-				SVSLog("Uhhh, we ended up here... so yeah...");
 			}
 			else {
 				$_SASL[$uid]["pass"] = $param1;

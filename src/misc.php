@@ -3,7 +3,7 @@
 /* Some defines */
 define( "LOG_WARN","[07WARN] ");
 define( "LOG_FATAL","[04FATAL] ");
-
+define( "CHAN_CONTEXT", "+draft/channel-context");
 
 $tok = explode("/",__DIR__);
 $n = sizeof($tok) - 1;
@@ -16,8 +16,9 @@ define( "__DALEK__", $ddir);
 
 function servertime()
 {
-	global $servertime;
-	return $servertime;
+	$timeget = microtime(true);	
+	$timetok = explode(".",$timeget);
+	return $timetok[0];
 }
 function IsMe($srv)
 {
@@ -174,7 +175,7 @@ function IsWebUser(User $nick)
 
 function IsLoggedIn(User $nick)
 {
-	if ($nick->account && strlen($nick->account))
+	if (isset($nick->account) && $nick->account && strlen($nick->account))
 		return true;
 	return false;
 }
@@ -225,7 +226,7 @@ function SVSLog($string, $type = "") : void
 
 	elseif (isset($serv)) // if nobody connected yet, fkn log using the server!!
 	{
-		S2S(":".$cf['servicesname']." PRIVMSG ".$cf['logchan']." :".$string);
+		S2S("PRIVMSG ".$cf['logchan']." :".$string);
 	}
 	log_to_disk($string);
 }
@@ -237,7 +238,118 @@ function log_to_disk($str) : void
 		mkdir(__DALEK__."/logs/");
 	
 	$lfile = __DALEK__."/logs/dalek.".date("d-m-Y").".log";
-	$logfile = fopen($lfile, "w") or die("Unable to log to disk. Please check directory permissions.");
-	fwrite($logfile,$str);
+	$logfile = fopen($lfile, "a") or die("Unable to log to disk. Please check directory permissions.");
+	fwrite($logfile,$str."\n");
 	fclose($logfile);
+}
+
+
+
+/* check invitation credentials */
+
+function is_invite($one, $two) : bool
+{
+	global $servertime;
+
+	$return = false;
+
+	$conn = sqlnew();
+
+	/* quickly clear up any expired invitations (12hrs) */
+
+	$exptime = $servertime - 43200;
+	$result  = $conn->query("DELETE FROM dalek_invite WHERE realtime < $exptime");
+	/* check their credentials */ 
+	$prep = $conn->prepare("SELECT * FROM dalek_invite WHERE timestamp = ?");
+	$prep->bind_param("s",$one);
+	$prep->execute();
+	$result = $prep->get_result();
+	if (!$result || $result->num_rows == 0)
+	{
+		$prep->close();
+		return false;
+	}
+	while ($row = $result->fetch_assoc())
+		if ($row['code'] == $two)
+			$return = true;
+
+	if ($return)
+	{
+		$prep = $conn->prepare("DELETE FROM dalek_invite WHERE code = ?");
+		$prep->bind_param("s",$two);
+		$prep->execute();
+	}	
+	$prep->close();
+	return $return;
+}
+
+
+
+
+/* actually generate the invite code */
+function already_invited($invitee)
+{
+	$conn = sqlnew();
+	$ts = $invitee;
+	$prep = $conn->prepare("SELECT * FROM dalek_invite WHERE timestamp = ?");
+	$prep->bind_param("s",$invitee);
+	$prep->execute();
+	$result = $prep->get_result();
+	echo $result->num_rows."\n\n";
+	if ($result->num_rows == 0)
+		return false;
+	return true;
+}
+
+function generate_invite_code($invitee)
+{
+	global $servertime;
+	$conn = sqlnew();
+
+	$ts = $invitee;
+	
+	$invite = "";
+
+	/* generate some random ascii 40 chars long */
+	for ($i = 0; strlen($invite) !== 40; $i++)
+	{
+		$r = rand(32,126);
+		$invite .= chr($r);
+	}
+	
+	/* hash it in, lets say, sha512 */
+	$hash = hash("sha512",$invite);
+
+	/* put to table */
+	$prep = $conn->prepare("INSERT INTO dalek_invite (code,timestamp,realtime) VALUES (?,?,?)");
+	$prep->bind_param("ssi",$hash,$ts,$servertime);
+	$prep->execute();
+
+	return $ts.":".$hash;
+}
+
+function list_users_by_account($account)
+{
+	if (!$account)
+		return [];
+	else $account = strtoupper($account);
+	$users = [];
+	$conn = sqlnew();
+	$prep = $conn->prepare("SELECT UID FROM dalek_user WHERE UPPER(account) = ?");
+	$prep->bind_param("s",$account);
+	$prep->execute();
+	$result = $prep->get_result();
+	if (!$result || !$result->num_rows)
+		return false;
+
+	while($row = $result->fetch_assoc())
+		$users[] = new User($row['UID']);
+
+	$prep->close();
+	return $users;
+}
+
+function split($str) : array
+{
+	return explode(" ",str);
 }

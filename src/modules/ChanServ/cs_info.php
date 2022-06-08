@@ -26,7 +26,7 @@ class cs_info {
 	/* Module handle */
 	/* $name needs to be the same name as the class and file lol */
 	public $name = "cs_info";
-	public $description = "NickServ INFO Command";
+	public $description = "ChanServ INFO Command";
 	public $author = "Valware";
 	public $version = "1.0";
     public $official = true;
@@ -53,7 +53,7 @@ class cs_info {
 	*/
 	function __init()
 	{
-		$help_string = "View information on a user or account";
+		$help_string = "View information on a channel";
 		$syntax = "INFO [<nick>|<account>]";
 		$extended_help = 	"$help_string\n$syntax";
 
@@ -81,16 +81,31 @@ class cs_info {
 		$cs = $u['target'];
 		$nick = $u['nick'];
 		$parv = explode(" ",$u['msg']);
-		$chan = new Channel($parv[1]);
+		$chan = NULL;
+		$mtags = [];
+
+		if (isset($parv[1]))
+			$chan = new Channel($parv[1]);
+		
+		elseif (isset($u['mtags'][CHAN_CONTEXT]))
+		{
+			$chan = new Channel($u['mtags'][CHAN_CONTEXT]);
+			$mtags[CHAN_CONTEXT] = $chan->chan;
+		}
+		if (!$chan)
+		{
+			$cs->notice($nick,"Invalid parameters");
+			return;
+		}
 	
 		if (!$chan->IsReg)
 		{
-			$cs->notice($nick->uid,"$chan->chan is not registered.");
+			$cs->notice_with_mtags($mtags,$nick->uid,"$chan->chan is not registered.");
 			return;
 		}
-		$cs->notice($nick->uid,"$chan->chan is registered to $chan->owner");
-		$cs->notice($nick->uid,"$chan->chan was registered on: ".gmdate("Y-m-d\TH:i:s\Z", $chan->RegDate));
-		$cs->notice($nick->uid,"Channel email: $chan->email");
-		$cs->notice($nick->uid,"Channel URL: $chan->url");
+		$cs->notice_with_mtags($mtags,$nick->uid,"$chan->chan is registered to $chan->owner");
+		$cs->notice_with_mtags($mtags,$nick->uid,"$chan->chan was registered on: ".gmdate("Y-m-d\TH:i:s\Z", $chan->RegDate));
+		$cs->notice_with_mtags($mtags,$nick->uid,"Channel email: $chan->email");
+		$cs->notice_with_mtags($mtags,$nick->uid,"Channel URL: $chan->url");
 	}
 }

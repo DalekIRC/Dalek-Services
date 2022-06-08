@@ -62,15 +62,19 @@ class os_autooper {
 			
 		$nick = new User($u['nick']);
 		$wp = $nick->wp;
-
+		if (strpos($nick->usermode,"o") !== false) // If they already have oper, don't touch ;)
+			return;
 		if (in_array("administrator",$wp->role_array) || in_array("irc_admin",$wp->role_array))
-			S2S("SVSO $nick->uid $nick->nick netadmin-with-override - - +bcdfkoqsBOS valware.uk");
-
+		{
+			S2S("SVSO $nick->uid $nick->nick netadmin-with-override - - bcdfkoqsBOS -");
+		}
 		elseif (in_array("irc_oper",$wp->role_array))
+		{
 			S2S("SVSO $nick->uid $nick->nick globop - - - -");
-		
+		}
 		elseif (in_array("irc_helper",$wp->role_array))
+		{
 			S2S("SVSO $nick->uid $nick->nick locop +h - - -");
-
+		}
 	}
 }

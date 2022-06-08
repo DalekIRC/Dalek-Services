@@ -38,6 +38,7 @@ class protoctl {
 	function __construct()
 	{
 	
+		hook::del("preconnect", 'cmd_protoctl::table_init');
 	}
 
 	/* To run when the class is destroyed/when the module is unloaded */
@@ -62,6 +63,8 @@ class protoctl {
 
 		if (!CommandAdd($this->name, 'PROTOCTL', 'protoctl::cmd_protoctl', 1))
 			return false;
+
+		hook::func("preconnect", 'protoctl::table_init');
 		return true;
 	}
 
@@ -73,8 +76,6 @@ class protoctl {
 	 */
 	public static function cmd_protoctl($u)
 	{
-		foreach ($u as $key => $value)
-			log_to_disk("$key => $value");
 		if (empty($u))
 			return;
 		$parv = explode(" ",$u['params']);
@@ -142,10 +143,7 @@ class protoctl {
 			);
 
 			TRUNCATE TABLE dalek_protoctl_meta;
-			DELETE FROM dalek_channel_meta WHERE meta_key = 'ban';
-			DELETE FROM dalek_channel_meta WHERE meta_key = 'invite';
-			DELETE FROM dalek_channel_meta WHERE meta_key = 'except'"
-		);
+		);");
 	}
 }
 
