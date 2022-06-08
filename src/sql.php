@@ -25,7 +25,6 @@
 
 
 class SQL {
-	
 	function __construct($ip,$user,$pass,$db){
 		global $ip,$user,$pass,$db;
 	}
@@ -166,25 +165,24 @@ class SQL {
 			$prep->close();
 		}
 	}
-	function delsid($u){
+	function delsid($sid){
+		global $sql;
 		$conn = sqlnew();
+
+		$prep = $conn->prepare("SELECT * FROM dalek_user WHERE sid = ?");
+		$prep->bind_param("s",$sid);
+		$prep->execute();
+		$result = $prep->get_result();
+		while($row = $result->fetch_assoc())
+		{
+			$sql::user_delete($row['UID']);
+		}
 		$prep = $conn->prepare("DELETE FROM dalek_server WHERE sid = ?");
 		$prep->bind_param("s",$u);
 		$prep->execute();
-		$prep = $conn->prepare("DELETE FROM dalek_user_meta WHERE UID LIKE ?");
-		$t = $u."%";
-		$prep->bind_param("s",$t);
-		$prep->execute();
-		$prep = $conn->prepare("DELETE FROM dalek_ison WHERE nick LIKE ?");
-		$prep->bind_param("s",$t);
-		$prep->execute();
-		$prep = $conn->prepare("DELETE FROM dalek_user WHERE SID = ?");
-		$prep->bind_param("s",$u);
-		$prep->execute();
-
-		$conn->close();
 	}
-	function sjoin($u){
+	static function sjoin($u)
+	{
 		global $cf;
 		$conn = sqlnew();
 		if (!$conn) { return false; }
@@ -228,7 +226,8 @@ class SQL {
 			return $row['mode'];
 		}
 	}
-	function add_userchmode($chan,$user,$mode){
+	function add_userchmode($chan,$user,$mode)
+	{
 		$conn = sqlnew();
 		if (!$conn) { return false; }
 		else {
@@ -403,7 +402,6 @@ function sqlnew()
 }			
 
 hook::func("preconnect", function($u){
-	
 	$conn = sqlnew();
 	
 	$conn->multi_query("CREATE TABLE IF NOT EXISTS dalek_user (
@@ -501,19 +499,18 @@ hook::func("UID", function($u)
 
 hook::func("raw", function($u){
 
-	global $narray;
+	global $narray,$sql;
 	
 	$parv = explode(" ",$u['string']);
 	if ($parv[1] !== "EOS")
 		return;
 
-	SQL::user_insert_by_serv($narray);
+	$sql::user_insert_by_serv($narray);
 	unset($narray);		
 });
 
 
 hook::func("SID", function($u){
-	
 	global $sql;
 	
 	$sql::sid($u);
@@ -527,7 +524,6 @@ hook::func("SJOIN", function($u){
 });
 function umeta_add($person,$key = "",$data = "")
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
 	$user = new User($person);
 	if (!$user->IsUser)
 		return false;
@@ -558,7 +554,6 @@ function umeta_add($person,$key = "",$data = "")
 
 function get_num_online_users()
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
 	
 
 	$conn = sqlnew();
@@ -576,7 +571,6 @@ function get_num_online_users()
 
 function get_num_servers()
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
 	$conn = sqlnew();
 
 	if (!$conn) { return false; }
@@ -592,7 +586,6 @@ function get_num_servers()
 
 function get_num_channels()
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
 	$conn = sqlnew();
 
 	if (!$conn) { return false; }
@@ -608,7 +601,6 @@ function get_num_channels()
 
 function get_num_swhois()
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
 	$conn = sqlnew();
 
 	if (!$conn) { return false; }
@@ -624,7 +616,6 @@ function get_num_swhois()
 
 function get_num_meta()
 {
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
 	$conn = sqlnew();
 
 	if (!$conn) { return false; }
@@ -641,7 +632,6 @@ function get_num_meta()
 
 function update_last($person)
 {
-	
 	global $servertime;
 	if (!isset($person->IsUser) && is_string($person))
 	{
@@ -658,8 +648,20 @@ function update_last($person)
 	}
 }
 
-function find_person($person = NULL){
-	
+function is_a_ban($chan,$ban)
+{
+	$conn = sqlnew();
+	$prep = $conn->prepare("SELECT * FROM dalek_channel_meta WHERE chan = ? AND meta_value = ?");
+	$prep->bind_param("ss",$chan->chan,$ban);
+	$prep->execute();
+	$result = $prep->get_result();
+	if (!$result || !$result->num_rows)
+		return false;
+	return true;
+}
+
+function find_person($person = NULL)
+{
 	if (!$person or $person == "")
 		return;
 	$ns = Client::find("NickServ");
@@ -691,8 +693,8 @@ function find_person($person = NULL){
 	}
 }
 
-function update_nick($uid,$nick,$ts){
-	
+function update_nick($uid,$nick,$ts)
+{
 	global $ns;
 	$conn = sqlnew();
 	if (!$conn) { return false; }
@@ -707,8 +709,8 @@ function update_nick($uid,$nick,$ts){
 		$prep->close();
 	}
 }
-function update_usermode($uid,$new){
-	
+function update_usermode($uid,$new)
+{
 	$conn = sqlnew();
 	if (!$conn) { return false; }
 	else {
@@ -722,8 +724,8 @@ function update_usermode($uid,$new){
 		$prep->close();
 	}
 }
-function find_serv($serv){
-	
+function find_serv($serv)
+{
 	global $ns;
 	$conn = sqlnew();
 	if (!$conn) { return false; }
@@ -752,9 +754,8 @@ function find_serv($serv){
 		return $row;
 	}
 }
-function get_ison($uid){
-	
-	global $ns;
+function get_ison($uid)
+{
 	$conn = sqlnew();
 	if (!$conn) { return false; }
 	else {

@@ -40,10 +40,10 @@ class cmd {
 hook::func("raw", function($u)
 {
 	global $cf;
+	
 	$parv = explode(" ", $u['string']);
 	$mtags = NULL;
-	if (is_numeric($parv[1]))
-		return;
+	
 	
 	if (strlen($u['mtags']))
 	{
@@ -65,7 +65,7 @@ hook::func("raw", function($u)
 	if ($parv[0][0] !== ":")
 	{
 		if (!($serv = serv_attach($cf['sid'])))
-			return;
+			$serv = [$cf['sid']];
 		$u['string'] = ":".$serv[0]." ".$u['string'];
 		$parv = explode(" ", $u['string']);
 	}

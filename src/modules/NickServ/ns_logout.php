@@ -77,17 +77,20 @@ class ns_logout {
 		return true;
 	}
 
-	public static function UserLogout(User $nick)
+	public static function UserLogout(...$nicks)
 	{
 		$ns = Client::find("NickServ");
 		$conn = sqlnew();
-		$account = $nick->account;
 		
-		$conn->query = "UPDATE dalek_user SET account=NULL WHERE UID='".$nick->uid."'";
-		$ns->svslogin($nick->uid,"0");
-		$ns->svs2mode($nick->uid,"-r");
-		$ns->log($nick->nick." (".$nick->uid.") ".IRC("LOG_LOGGEDOUT")." $account"); 
-		$ns->notice($nick->uid,IRC("MSG_LOGGEDOUT"));
+		$prep = $conn->prepare("UPDATE dalek_user SET account=NULL WHERE UID=?");
+		foreach($nicks as $nick)
+		{	$prep->bind_param("s",$nick->uid);
+			$prep->execute();
+			$ns->svslogin($nick->uid,"0");
+			$ns->svs2mode($nick->uid,"-r"); /* we supported setting this, but... just in case I guess */
+			$ns->log($nick->nick." (".$nick->uid.") ".IRC("LOG_LOGGEDOUT")." $nick->account"); 
+			$ns->notice($nick->uid,IRC("MSG_LOGGEDOUT"));
+		}
 	}
 	/* The public command function that we are calling with CommandAdd in __init.
 	 * In this example (and throughout the source), $u contains an array with

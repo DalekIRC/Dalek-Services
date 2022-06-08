@@ -75,11 +75,10 @@ class specialwhois {
 	 */
 	public static function cmd_swhois($u)
     {
-        global $ns;
         $parv = explode(" ",$u['params']);
 
     
-        $username = $parv[0];
+        $username = (!($user = new User($parv[0]))->IsUser) ? $parv[0] : $user->nick;
         $switch = $parv[1];
         $tag = $parv[2];
         $priority = $parv[3];
@@ -101,7 +100,7 @@ class specialwhois {
         $conn = sqlnew();
         $parv = explode(" ",$string);
         
-        $user = $parv[0];
+        $user = (!($u = new User($parv[0]))->IsUser) ? $parv[0] : $u->nick;
         $switch = $parv[1];
         $tag = $parv[2];
         $priority = $parv[3];
@@ -110,6 +109,7 @@ class specialwhois {
         
         if ($switch == "+")
         {
+            $whois = ($whois[0] == ":") ? mb_substr($whois,1) : $whois;
             if (!$conn) { return false; }
             else
             {
@@ -141,67 +141,55 @@ class specialwhois {
         }
     }
 
-    public static function server($u)
-    {
-        global $_LINK;
-	
-        $parv = explode(" ",$u['string']);
-        if ($parv[0] !== "SERVER")
-        { 
-            return;
-        }
-        $sid = $_LINK;
-        $_LINK = NULL;
-        $name = $parv[1];
-        $hops = $parv[2];
-        $desc = str_replace("$parv[0] $parv[1] $parv[2] $parv[3] ","",$u['string']);
-        
-        sql::sid(array('server' => $name,'hops' => $hops,'sid' => $sid,'desc' => $desc));
-    }
 
-    public static function chan_buffer($chans)
-    {
-        if (!strlen($chans))
-            return NULL;
-    
-        $buffer = array();
-        if (strlen($chans) <= 230)
-        {
-            $buffer[] = $chans;
-            return $buffer;
-        }
-    
-        $a = "";
-    
-        $chan = explode(" ",$chans);
-        for ($i = 0; isset($chan[$i]); $i++)
-        {
-            if (strlen($a." ".$chan[$i]) <= 230)
-            {
-                $a .= " ".$chan[$i];
-            }
-            else
-            {
-                $buffer[] = trim($a);
-                $a = "";
-                $i--;
-            }
-        }
-        if (strlen($a))
-            $buffer[] = $a;
-    
-        return $buffer;
-    }
     public static function send_swhois($uid,$tag,$swhois)
     {
-        $cmd = "SWHOIS $uid + $tag -500 :$swhois";
+        self::del_swhois($uid,$tag);
+        $cmd = "$uid + $tag -500 :$swhois";
         self::SWHOIS($cmd);
-        S2S($cmd);
+        S2S("SWHOIS $cmd");
     }
     public static function del_swhois($uid,$tag)
     {
-        $cmd = "SWHOIS $uid - $tag -500 *";
+        $cmd = "$uid - $tag -500 *";
         self::SWHOIS($cmd);
-        S2S($cmd);
+        S2S("SWHOIS $cmd");
+    }
+
+    static function list_swhois_for_user(User $user, $tag = NULL)
+	{
+		$swhois = [];
+		$conn = sqlnew();
+		if (!$tag || $tag == "*")
+		{
+			$prep = $conn->prepare("SELECT * FROM dalek_swhois WHERE uid = ?");
+			$prep->bind_param("s",$user->nick);
+		}
+		else
+		{
+			$prep = $conn->prepare("SELECT * FROM dalek_swhois WHERE uid = ? AND tag = ?");
+			$prep->bind_param("ss",$user->nick,$tag);
+		}
+		$prep->execute();
+		$result = $prep->get_result();
+		if (!$result || !$result->num_rows)
+			return $swhois;
+		
+		while($row = $result->fetch_assoc())
+			$swhois[$row['tag']] = $row['swhois'];
+
+		return $swhois;
+	}
+
+    static function is_swhois($nick,$tag)
+    {
+        $conn = sqlnew();
+        $prep = $conn->prepare("SELECT * FROM dalek_swhois WHERE uid = ? AND tag = ?");
+        $prep->bind_param("ss",$nick,$tag);
+        $prep->execute();
+		$result = $prep->get_result();
+		if (!$result || !$result->num_rows)
+            return false;
+        return true;
     }
 }

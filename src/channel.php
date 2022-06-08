@@ -84,6 +84,14 @@ class Channel
 		}
 		return false;
 	}
+	function IsHalfop($user)
+	{
+		if ($var = $this->UserHasMode($user,"h"))
+		{
+			return true;
+		}
+		return false;
+	}
 	
 	function IsVoice($user)
 	{
@@ -91,7 +99,21 @@ class Channel
 			return true;
 		return false;
 	}
+	function IsOwner($user)
+	{
+		if ($var = $this->UserHasMode($user,"q"))
+		{
+			return true;
+		}
+		return false;
+	}
 	
+	function IsAdmin($user)
+	{
+		if ($this->UserHasMode($user,"a"))
+			return true;
+		return false;
+	}
 	function SetMode($mode)
 	{
 		global $cf;

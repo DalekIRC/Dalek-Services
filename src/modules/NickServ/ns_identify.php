@@ -46,7 +46,7 @@ class ns_identify {
 	/* Destruction: Here's where to clear up your globals or databases or anything */
 	function __destruct()
 	{
-		
+		hook::del("UID", "ns_identify::must_identify");
 	}
 
 
@@ -77,6 +77,8 @@ class ns_identify {
 			$extended_help /* Extended help */
 		)) return false;
 		
+		hook::func("UID", "ns_identify::must_identify");
+
 		return true;
 	}
 
@@ -111,5 +113,26 @@ class ns_identify {
 		$sasl = new IRC_SASL($nick->server,$nick->uid,"H",$nick->ip,$nick->ip);
 		$sasl = new IRC_SASL($nick->server,$nick->uid,$s,$mech,$extra);
 		
+	}
+
+	public static function must_identify($u)
+	{
+		$nick = new User($u['uid']);
+		if ($nick->IsUser && !IsLoggedIn($nick) && IsRegUser($nick->nick))
+		{
+			$ns = Client::find("NickServ");
+			$ns->notice($nick->uid,"That nick is registered. If it's yours, please authenticate for it using SASL.");
+			Events::Add(servertime() + 120, 1, NULL, 'identify_timeout', array($nick->nick), 'ns_identify');
+		}
+	}
+	public static function identify_timeout($nick)
+	{
+		if (($user = new User($nick))->IsUser)
+		{
+			if (!IsLoggedIn($user) || $user->account != $user->nick)
+				$user->NewNick("Guest".rand(11111,99999));
+
+			Client::find("NickServ")->notice($user->uid,"You may not use that nick.");
+		}
 	}
 }

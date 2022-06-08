@@ -138,7 +138,12 @@ function loadmodule($mod){
 }
 
 function unloadmodule($mod){
-	global $modules,$os;
+	global $modules;
+	if (!$mod)
+	{
+		SVSLog("Just attempted to unload all modules with NULL modinfo. This action has been cancelled.");
+		return;
+	}
 	for ($i = 0; isset($modules[$i]); $i++)
 		if (get_class($modules[$i]) == $mod)
 		{

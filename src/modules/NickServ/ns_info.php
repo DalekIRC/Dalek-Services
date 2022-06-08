@@ -125,7 +125,7 @@ class ns_info {
 		
 		$ns->notice($nick->uid,"Account information about $wp_target->user_login");
 		$ns->notice($nick->uid," ");
-		if ($wp_user->IsUser)
+		if ($wp_target->IsUser)
 			if ($extended)
 				$ns->notice($nick->uid,"Email addr: $wp_target->user_email");
 			
@@ -139,7 +139,8 @@ class ns_info {
 			$roles = rtrim($roles,", ");
 		}
 		$ns->notice($nick->uid,"Permissions: $roles");
-		
+		if ($wp_target->IsAdmin)
+			$ns->notice($nick->uid,"$wp_target->user_login is a member of staff on this network.");
 		$ns->notice($nick->uid,"Number of website posts: ".$wp_target->user_meta->num_posts);
 		$ns->notice($nick->uid," ");
 
@@ -147,6 +148,17 @@ class ns_info {
 				if (_is_disabled($wp_target))
 					$ns->notice($nick->uid,"This account has been disabled by an administrator.");
 
+		if ($extended)
+		{
+			if (empty($users = list_users_by_account($wp_target->user_login)))
+				return;
+			$ns->notice($nick->uid,"Nicks logged in as $wp_target->user_login:");
+			for ($i = 0; isset($users[$i]); $i++)
+			{
+				$u = $users[$i];
+				$ns->notice($nick->uid,$i+1 .". $u->nick ($u->ident@$u->realhost)");
+			}
+		}
 		return;
 	}
 }

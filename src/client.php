@@ -52,15 +52,14 @@ class Client {
 			'gecos' => $gecos)
 		);
 		self::add_to_client_list($this);
-		$this->user = new User($this->nick);
+		
 		$this->join($cf['logchan']);
 		
 		
 	}
 	function __destruct()
 	{
-		$me = new User($this->nick);
-		$me->exit();
+		$this->quit("Unloaded");
 	}
 	function sendraw($string)
 	{
@@ -80,14 +79,9 @@ class Client {
 	}
 	function msg($dest, ...$strings)
 	{
-		$nick = new User($this->uid);
-
 		foreach($strings as $string)
-		{	
-			if (function_exists('IsElmer') && IsElmer($nick))
-				$string = preg_match('[rl]','w',$string);
 			S2S(":$this->uid PRIVMSG $dest :$string");
-		}
+		
 	}
 	function log($string){
 		global $cf;
@@ -109,7 +103,7 @@ class Client {
 			$sql->insert_ison($dest,$this->uid);
 		}
 	}
-	function part($dest)
+	function part($dest,$reason = "")
 	{
 		global $sql;
 		
@@ -117,39 +111,18 @@ class Client {
 		if (!$chan){ return; }
 		if (!$chan->HasUser($this->uid))
 			return;
-		S2S("SJOIN $chan->timestamp $dest :~".$this->uid);
+		S2S(":$this->uid PART $dest :$reason");
 		$sql->delete_ison($dest,$this->uid);
 	}
 	function notice($dest, ...$strings)
 	{
-		$nick = new User($this->nick);
-		$uid = $this->uid;
-
-		foreach($strings as $string)
-		{
-			/* TO DO: Move this into an actual part of a filter system... */
-			if (function_exists('IsElmer') && IsElmer($nick))
-				$string = str_replace(array('r','R','l','L'),array('w','W','w','W'),$string);
-
-			/* We switched from <lf> to \n, so convert */
-			$string = str_replace("<lf>", "\n",$string);
-
-			$tok = array();
-			if (strpos($string,"\n") !== false)
-				$tok = explode("\n",$string);
-			
-			else
-				$tok[0] = $string;
-
-			for ($i = 0; isset($tok[$i]); $i++)		
-				S2S(":$uid NOTICE $dest :".$tok[$i]);
-		}
+		foreach ($strings as $string)
+			$this->notice_with_mtags(NULL, $dest, $string);
 	}
 	function notice_with_mtags(array $mtags = NULL, $dest, ...$strings)
 	{
-		$nick = new User($this->nick);
 		$uid = $this->uid;
-		
+		$mtags_to_send = NULL;
 		if ($mtags)
 		{
 			$mtags_to_send = "@";
@@ -157,15 +130,11 @@ class Client {
 				$mtags_to_send .= $mkey."=".$mval.";";
 
 			$mtags_to_send = rtrim($mtags_to_send,";");
-
+			$mtags_to_send .= " ";
 		}
 
 		foreach($strings as $string)
 		{
-			/* TO DO: Move this into an actual part of a filter system... */
-			if (function_exists('IsElmer') && IsElmer($nick))
-				$string = str_replace(array('r','R','l','L'),array('w','W','w','W'),$string);
-
 			/* We switched from <lf> to \n, so convert */
 			$string = str_replace("<lf>", "\n",$string);
 
@@ -177,7 +146,7 @@ class Client {
 				$tok[0] = $string;
 
 			for ($i = 0; isset($tok[$i]); $i++)		
-				S2S("$mtags_to_send :$uid NOTICE $dest :".$tok[$i]);
+				S2S("$mtags_to_send:$uid NOTICE $dest :".$tok[$i]);
 		}
 	}
 	function mode($dest,$string)

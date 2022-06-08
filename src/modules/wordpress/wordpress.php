@@ -70,6 +70,7 @@ hook::func("preconnect", function($u)
 			'can_ignore' => true,
 			'can_oper' => true,
 			'extended_info' => true,
+			'can_swhois' => true
 		];
 		$roles["irc_admin"] = $admin_array;
 		$admin_array = NULL;
@@ -526,6 +527,7 @@ function WPNewUser(array $user) : bool
 }
 
 
+
 function activation_code()
 {
 	$i = microtime(false);
@@ -618,13 +620,21 @@ function ValidatePermissionsForPath(String $path, User $user, User $victim = NUL
 		{
 			if (IsOper($victim))
 					return false;
-			
-			if (ChanAccessAsInt($chan, $victim) >= ChanAccessAsInt($chan, $user))
+			$v_access = ChanAccessAsInt($chan,$victim);
+			$u_access = ChanAccessAsInt($chan,$user);
+
+			if ($u_access)
 				return false;
 
-			if (!ChanAccessAsInt($chan, $user))
+			if ($v_access >= $u_access)
 				return false;
 
+			if ($path == "can_kick" || $path == "can_ban" || $path == "can_unban" || $path == "can_topic")
+			{
+				if ($u_access > $v_access && $u_access >= ChanAccess2Int("operator"))
+					return true;
+				return false;
+			}
 			return true;
 		}
 
@@ -637,7 +647,7 @@ function ValidatePermissionsForPath(String $path, User $user, User $victim = NUL
 		}
 	}
 
-	elseif (isset($user->wp))
+	elseif (isset($user->account) && strlen($user->account) && isset($user->wp))
 	{
 		for ($i = 0; isset($user->wp->role_array[$i]); $i++)
 		{

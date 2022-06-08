@@ -76,6 +76,7 @@ class privmsg {
 	{
 		update_last($u['nick']->nick);
 
+		/* Check if they have addressed us as nick@host */
 		if (strpos($u['dest'],"@") !== false)
 		{
 			$n = explode("@",$u['dest']);
@@ -83,15 +84,27 @@ class privmsg {
 		}
 		else { $dest = $u['dest']; }
 		
+		/* Check if it's actually a channel lol */
 		if ($dest[0] == "#")
 		{
-			/* start and run our channel message hook */
-			/* IMPORTANT:
-			/* using `hook::func("chanmsg", x);` will not work if this module is not loaded */
+			/* start and run our channel message hook
+			 * IMPORTANT:
+			 * using `hook::func("chanmsg", x);` will not work if this module is not loaded */
 			hook::run("chanmsg", $u);
 			return;
 		}
-		if (is_numeric($dest[0]))
+
+		$client = NULL;
+		/* Bot-check
+		 * Here is where we check if we're supporting botz and if so, deal w/ it
+		 */
+		if (class_exists('Bot'))
+			$client = Bot::find_by_uid($dest) ?? $client = Bot::find($dest);
+				
+			
+		/* check if we've got a UID or a nick and return the Client object */
+
+		if (!$client && is_numeric($dest[0]))
 			$client = Client::find_by_uid($dest);
 		
 		else
@@ -101,22 +114,30 @@ class privmsg {
 		if (!isset($client->nick))
 			return;
 
+		/* just shifting them parvs back one space */
 		$parv = explode(" ", $u['params']);
-		
 		for ($i = 0; isset($parv[$i]); $i++)
 			$parv[$i] = (isset($parv[$i + 1])) ? $parv[$i + 1] : NULL;
-
 		$u['params'] = implode(" ",$parv);
 		
+		/* User object of caller */
 		$nick = $u['nick'];
+
+		/* Command they wanna perform */
 		$c = mb_substr(strtoupper($parv[0]),1);
 		
+		/* Looking for our command */
 		$found = 0;
 		$found_elsweyr = 0;
+		/* if we have a channel-context then we parrot it back */
+		$mtags = (isset($u['mtags'][CHAN_CONTEXT])) ? [CHAN_CONTEXT => $u['mtags'][CHAN_CONTEXT]] : NULL;
+		if (!$mtags)
+			$mtags = (isset($u['mtags']['+channel-context'])) ? ['+channel-context' => $u['mtags']['+channel-context']] : NULL;
 
-		if ($client->nick == "OperServ" && !IsOper($nick))
+		/* If they're messaging OperServ and they're not an oper, deny them */
+		if (!strcasecmp($client->nick,"OperServ") && !IsOper($nick))
 		{
-			$client->notice($nick->uid,"Permission denied!");
+			$client->notice_with_mtags($mtags,$nick->uid,"Permission denied!");
 			return;
 		}
 		if (!strcasecmp($c,"help"))
@@ -127,8 +148,8 @@ class privmsg {
 				{
 					if (!strcasecmp($cmd->client,$client->nick) && !strcasecmp($cmd->command,$parv[1]))
 					{
-						$client->notice($nick->uid,"Help for command $cmd->command");
-						$client->notice($nick->uid,$cmd->extended_help,"/msg $client->nick $cmd->syntax");
+						$client->notice_with_mtags($mtags,$nick->uid,"Help for command $cmd->command");
+						$client->notice_with_mtags($mtags,$nick->uid,$cmd->extended_help,"/msg $client->nick $cmd->syntax");
 					}
 				}
 				return;
@@ -137,23 +158,23 @@ class privmsg {
 
 			
 
-			$client->notice($nick->uid,ul("Help available for $client->nick:"));
+			$client->notice_with_mtags($mtags,$nick->uid,ul("Help available for $client->nick:"));
 
 			if (empty(ServCmd::$list))
-				$client->notice($nick->uid,"No commands have been loaded.");
+				$client->notice_with_mtags($mtags,$nick->uid,"No commands have been loaded.");
 			
 			$f = 0;
 			foreach(ServCmd::$list as $cmd)
 			{
-				if (!strcasecmp($cmd->client,$client->nick))
+				if (!strcasecmp($cmd->client,$client->nick) || (isset($client->IsBotServBot) && !strcasecmp($cmd->client,"ChanServ")))
 				{
 					$f = 1;
-					$client->notice($nick->uid,clean_align($cmd->command).$cmd->help_cmd_entry);
+					$client->notice_with_mtags($mtags,$nick->uid,clean_align($cmd->command).$cmd->help_cmd_entry);
 				}
 			}
 			if (!$f || !isset($client->modinfo))
 			{
-				$client->notice($nick->uid,"No commands have been loaded for this pseudoclient yet.");
+				$client->notice_with_mtags($mtags,$nick->uid,"No commands have been loaded for this pseudoclient yet.");
 				return;
 			}
 		}
@@ -182,7 +203,7 @@ class privmsg {
 		}
 		if (!$found && $found_elsweyr)
 		{
-			$client->notice($nick->uid, "Unrecognised command: \"".bold($c)."\"",
+			$client->notice_with_mtags($mtags,$nick->uid, "Unrecognised command: \"".bold($c)."\"",
 			"However, that command exists in ".bold($found_in).". Try:",
 			"/msg $found_in HELP $c",
 			"If you still think you're in the right place, try:",
@@ -190,7 +211,7 @@ class privmsg {
 		}
 		if (!$found && !$found_elsweyr)
 		{
-			$client->notice($nick->uid,	"Unrecognised command: \"".bold($c)."\"",
+			$client->notice_with_mtags($mtags,$nick->uid,	"Unrecognised command: \"".bold($c)."\"",
 							"For a list of commands available to you, type:",
 							bold("/msg $client->nick HELP"));
 		}

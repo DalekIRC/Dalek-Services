@@ -75,14 +75,7 @@ class nick {
 	 */
 	public static function cmd_nick($u)
     {
-        $ns = Client::find("NickServ");
         $parv = explode(" ",$u['params']);
-
         update_nick($u['nick']->uid,$parv[0],$parv[1]);
-        $nick = new User($parv[0]);
-        if (!isset($nick->account))
-            return;
-        if (!strcasecmp($nick->account,$nick->nick))
-            S2S(":$ns->nick SVS2MODE $nick->nick +r");
     }
 }

@@ -75,6 +75,11 @@ class User {
 				$this->IsClient = true;
 				$this->client = $c;
 			}
+			if (($b = Bot::find($this->nick)) !== false)
+			{
+				$this->IsBotServBot = true;
+				$this->bsb = $b;
+			}
 		}
 		elseif (!$this->IsUser)
 		{
@@ -190,7 +195,19 @@ class User {
 		
 }
 
-
+function user_list()
+{
+	$users = [];
+	$conn = sqlnew();
+	if (!($result = $conn->query("SELECT * FROM dalek_user")))
+		return false;
+	while ($row = $result->fetch_assoc())
+	{
+		$newUser = new User($row['UID']);
+		$users[] = $newUser;
+	}
+	return $users;
+}
 
 class UserMeta {
 

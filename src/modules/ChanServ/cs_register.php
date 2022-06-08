@@ -127,6 +127,7 @@ class cs_register {
 			return;
 		}
 		$chan->SetMode("+rq $nick->nick");
+		$cs->join($chan->chan);
 		$cs->log("Channel $chan->chan has been registered by $nick->nick to account $nick->account");
 		$cs->notice($nick->uid,"Channel $chan->chan has been registered under account $nick->account");
 		
@@ -150,6 +151,8 @@ class cs_register {
 			if (!$chan->IsChan)
 				continue;
 
+			if (!$chan->HasUser("ChanServ"))
+				Client::find("ChanServ")->join($chan->chan);
 			if (!$chan->HasMode("r") == false)
 				$chan->SetMode("+r");
 		}
@@ -160,9 +163,8 @@ class cs_register {
 		$conn = sqlnew();
 		if (!$conn)
 			return false;
-		$chatlink = "/chat/?channel=".$chan;
-		$prep = $conn->prepare("INSERT INTO dalek_chaninfo (channel, owner, regdate, chatlink) VALUES (?, ?, ?, ?)");
-		$prep->bind_param("ssss",$chan,$owner,$servertime,$chatlink);
+		$prep = $conn->prepare("INSERT INTO dalek_chaninfo (channel, owner, regdate) VALUES (?, ?, ?)");
+		$prep->bind_param("sss",$chan,$owner,$servertime);
 		$prep->execute();
 		
 		$permission = "owner";
@@ -183,7 +185,7 @@ class cs_register {
 					regdate varchar(15) NOT NULL,
 					url varchar(255),
 					email varchar(255),
-					chatlink varchar(255),
+					topic varchar(255),
 					PRIMARY KEY(id)
 				)";
 		$conn->query($query);
@@ -201,7 +203,15 @@ class cs_register {
 	function hook_do_join($u)
 	{
 		$chan = new Channel($u['chan']);
-		if ($chan->IsReg && !$chan->HasMode("r"))
-			$chan->SetMode("+r");
+		$cs = Client::find("ChanServ");
+		if ($chan->IsReg)
+		{
+			if (!$chan->HasUser($cs->nick))
+				$cs->join($chan->chan);
+				
+			if (!$chan->HasMode("r"))
+				$cs->mode($chan->chan,"+r");
+			
+		}
 	}
 }

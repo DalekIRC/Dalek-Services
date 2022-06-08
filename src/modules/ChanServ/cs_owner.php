@@ -101,7 +101,8 @@ class cs_owner {
 		}
 		
 		$chan = (isset($parv[1])) ? new Channel($parv[1]) : false;
-		
+		if (!$chan)
+			$chan = isset($u['mtags'][CHAN_CONTEXT]) ? new Channel($u['mtags'][CHAN_CONTEXT]) : false;
 		$target = (isset($parv[2])) ? new User($parv[2]) : $nick;
 
 		if (!$chan)
@@ -137,7 +138,8 @@ class cs_owner {
 		}
 		
 		$chan = (isset($parv[1])) ? new Channel($parv[1]) : false;
-		
+		if (!$chan)
+			$chan = isset($u['mtags'][CHAN_CONTEXT]) ? new Channel($u['mtags'][CHAN_CONTEXT]) : false;
 		$target = (isset($parv[2])) ? new User($parv[2]) : $nick;
 
 		if (!$chan)
