@@ -1,4 +1,4 @@
-# IRCServices
+# IRCServices (Work In Progress)
 Dalek IRC Services with WordPress integration tailored to you.
 
 
