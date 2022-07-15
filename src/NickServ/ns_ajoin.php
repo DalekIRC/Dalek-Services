@@ -118,9 +118,7 @@ function IsAjoin($account,$channel){
 		
 function ajoin_list($account){
 	
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
-	
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$conn = sqlnew();
 	if (!$conn) { return false; }
 	else {
 		$prep = $conn->prepare("SELECT channel FROM dalek_ajoin WHERE account = ?");
@@ -137,9 +135,7 @@ function ajoin_list($account){
 
 function ajoin_add($account,$channel){
 	
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
-	
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$conn = sqlnew();
 	if (!$conn) { return false; }
 	
 	if (IsAjoin($account,$channel)){ return "That channel is already on your list."; return; }
@@ -154,9 +150,7 @@ function ajoin_add($account,$channel){
 
 function ajoin_del($account,$channel){
 	
-	global $sqlip,$sqluser,$sqlpass,$sqldb;
-	
-	$conn = mysqli_connect($sqlip,$sqluser,$sqlpass,$sqldb);
+	$conn = sqlnew();
 	if (!$conn) { return false; }
 	
 	if (!IsAjoin($account,$channel)){ return "That channel is not on your list."; return; }
