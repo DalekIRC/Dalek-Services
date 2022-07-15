@@ -390,7 +390,11 @@ function sqlnew()
 	if ($i >= 15)
 		die(SVSLog("Could not connect to the database for 30 seconds. Shutting down.", LOG_FATAL));
 		
-	$conn = mysqli_connect($cf['sqlip'],$cf['sqluser'],$cf['sqlpass'],$cf['sqldb'], $cf['sqlport'] = "3306");
+	if (is_null($cf['sqlsock']))
+		$conn = mysqli_connect($cf['sqlip'],$cf['sqluser'],$cf['sqlpass'],$cf['sqldb'],$cf['sqlport'] = "3306");
+	else
+		$conn = mysqli_connect($cf['sqlip'],$cf['sqluser'],$cf['sqlpass'],$cf['sqldb'],$cf['sqlport'] = "3306",$cf['sqlsock']);
+
 	if (!$conn)
 	{
 		SVSLog("Could not connect to mysql database (".$conn->connect_error.") Trying again in 2 seconds", LOG_WARN);
