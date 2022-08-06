@@ -1,0 +1,62 @@
+<?php global $ns; $language = [
+	
+	
+	
+	/* Language name */
+	'NAME' => "Romanian (RO)",
+	
+	/* Author */
+	'AUTHOR' => "Valware",
+	
+	/* Author email for update requests */
+	'EMAIL' => "v.a.pond@outlook.com",
+	
+	
+	/* Internal Error */
+	'ERR_NOSUCHSTRING' => "A aparut o eroare in selectarea limbii.",	
+	
+	
+	
+	
+	/* NickServ */
+	
+	//Identify
+	
+	'LOG_IDENTIFY' => "autentificat la cont:",
+	'MSG_IDENTIFY' => "Esti autentificat in contul:",
+	'HELPCMD_IDENTIFY' => "Autentifica-te in contul tau.",
+	
+	'MSG_PLZIDENT' => "Acest cont este inregistrat. Daca acesta este contul tau,<daca>te rog autentifi-cate folosind:",
+	
+	'LOG_IDENTIFAIL' => "eroare la autentificarea contului:",
+	'MSG_IDENTIFAIL' => "Autentificarea a esuat: datele sunt incorecte.",
+	
+	'ERR_IDENTIFAIL' => "A aparut o eroare in procesul de autentificare. Te rog sa contactezzi pe cineva din staff.",
+	
+	'MSG_IDENTIFY_SYNTAX' => "Sintaxa: /msg NickServ identify [cont] <parola>",
+	
+	'LOG_LOGGEDOUT' => "s-a deconectat din contul:",
+	'MSG_LOGGEDOUT' => "Te-ai deconectat.",
+	'HELPCMD_LOGOUT' => "Deconecteaza-te de la cont.",
+	
+	'ERR_NOTLOGGEDIN' => "Nu esti autentificat.",
+	
+	'HELPCMD_REGISTER' => "Inregistreaza numele de utilizator.",
+	'LOG_REGISTER' => "a folosit REGISTER pentru a-si inregistra utilizatorul:",
+	'MSG_REGISTER' => "Te-ai inregistrat sub numele de utilizator:",
+	'ERR_PASSTOOSHORT' => "Parola aleasa este prea scurta. Utilizati un minimum de 8 caractere.",
+	'ERR_BADEMAIL' => "Adresa de email nu este valida. Va rog sa verificati adresa buna.",
+	'ERR_ALREADYREG' => "Esti deja inregistrat.",
+	
+	'LOG_REGAIN' => "ai fost deconectat in urma utilizarii comenzii REGAIN folosita de",
+	'HELPCMD_REGAIN' => "Deasemenea RECOVER. Recupereaza, si te autentifica la contul personal.",
+	'MSG_REGAIN' => "a fost recuperat. Acum esti autentificat.",
+	'REGAIN_QUITMSG' => "Recuperare in progres",
+	
+	'ERR_NICKNOTONLINE' => "Utilizatorul nu este online.",
+
+	'HELPCMD_AJOIN' => "Te conecteaza automat la canale dupa ce te autentifici.",
+	'HELPCMD_INFO' => "Se afiseaza informatii despre un nick/canal selectat.",
+
+	
+];
