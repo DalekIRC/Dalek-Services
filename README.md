@@ -4,6 +4,9 @@ Dalek IRC Services with WordPress integration tailored to you.
 
 ### Brief Overview ###
 
+- [x] WordPress integration
+- [x] JSON-RPC API
+
 Planned Pseudoservices
 
 - [x] NickServ
