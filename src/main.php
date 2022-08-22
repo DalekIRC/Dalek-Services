@@ -54,8 +54,6 @@ include "filter.php";
 include "servcmd.php";
 include "events.php";
 include "buffer.php";
-include "Global/global.php";
-include "MemoServ/memoserv.php";
 
 
 
@@ -248,3 +246,4 @@ function whitespace(int $n)
 	
 	return $return;
 }
+
