@@ -1,8 +1,12 @@
 # IRCServices (Work In Progress)
 Dalek IRC Services with WordPress integration tailored to you.
 
+### Integral methodology ###
+- [x] WordPress integration
+- [x] JSON-RPC API
 
 ### Brief Overview ###
+
 
 Planned Pseudoservices
 
