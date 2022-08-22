@@ -102,21 +102,9 @@ class ns_regain {
 		$account = $nick->account ?? NULL;
 		$parv = explode(" ",$u['msg']);
 	
-		$parv = explode(" ",$u['msg']);
 		
-	
-		if ($parv[0] !== "recover" && $parv[0] !== "regain")
-			return;
-		
-		$account = (isset($parv[1])) ? $parv[1] : NULL;
+		$account = ($account) ? $parv[1] : NULL;
 		$password = (isset($parv[2])) ? $parv[2] : NULL;
-		
-		/* TO DO: Make better response for incorrect parameters */
-		if (!$account || !$password)
-		{
-			$ns->notice($nick->uid,"Incorrect parameters.");
-			return;
-		}
 		
 		if (!($nickToRegain = new User($account))->IsUser)
 		{
@@ -128,7 +116,7 @@ class ns_regain {
 			$ns->notice($nick->uid,"You are already using that nick.");
 			return;
 		}
-		if (!wp_verify_userpass($account,$password))
+		if (!IsLoggedIn($nick) && !($account = new WPUser($account))->ConfirmPassword($password))
 		{
 			$ns->notice($nick->uid,IRC("MSG_IDENTFAIL"));
 			return;
@@ -136,14 +124,19 @@ class ns_regain {
 		
 		$ns->log($nickToRegain->nick." (".$nickToRegain->uid.") ".IRC("LOG_REGAIN")." ".$nick->nick." (".$nick->uid.")");
 		
-		$ns->sendraw(":$ns->uid KILL ".$nickToRegain->nick." :".IRC("REGAIN_QUITMSG"));
-		$ns->sendraw(":".$cf['sid']." SVSNICK ".$nick->uid." ".$nickToRegain->nick." $servertime");
-		
+		svslogin($nickToRegain->nick, 0, $ns); // log out the target (may kill them in some instances)
+		$retain = $nickToRegain->nick;
 
-		df_login($nickToRegain->nick,$account);
-		
-		$ns->svslogin($nick->uid,$account);
-		$ns->svs2mode($nick->uid,"+r");
+		/* check if they're online still */
+		$nickToRegain = new User($nickToRegain->uid);
+		/* if so, change their nick */
+		if ($nickToRegain->IsUser)
+			$nickToRegain->NewNick("Guest".rand(1111,9999));
+		$nick->NewNick($retain);		
+
+		if (!IsLoggedIn($nick))
+			svslogin($nick->uid, $account->user_login, $ns);
+
 		$ns->notice($nick->uid,"$account ".IRC("MSG_REGAIN"));
 	}
 	

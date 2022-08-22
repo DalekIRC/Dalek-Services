@@ -1,25 +1,24 @@
 <?php
 /*				
-	(C) 2022 DalekIRC Services
+//	(C) 2022 DalekIRC Services
 \\				
-			pathweb.org
+//			pathweb.org
 \\				
-	GNU GENERAL PUBLIC LICENSE
+//	GNU GENERAL PUBLIC LICENSE
 \\				v3
-				
+//				
 \\				
-				
+//				
 \\	Title:		PRIVMSG
-				
-\\	Desc:		PRIVMSG redirection
+//				
+\\	Desc:		PRIVMSG redirection		
+//
 \\				
-				
-\\				
-				
+//				
 \\	Version:	1
-				
+//				
 \\	Author:		Valware
-				
+//				
 */
 
 /* class name needs to be the same name as the file */
@@ -74,6 +73,26 @@ class privmsg {
 	 */
 	public static function cmd_privmsg($u)
 	{
+
+		/* if they're fakelagged */
+		if ($u['nick']->IsUser && !$u['nick']->IsService && !IsOper($u['nick']))
+		{
+			if (FakeLag::find($u['nick']))
+			{
+				if (!isset($u['mtags'][RECYCLED_MESSAGE]))
+					add_fake_lag($u['nick'], 1);
+
+				add_mtag($u['mtags'], RECYCLED_MESSAGE, "true"); // let future us know it's a recycled message lol
+				Buffer::add_to_buffer(array_to_mtag($u['mtags'])." ".$u['raw']); // recycle it to the buffer
+				return;
+			}
+			else add_fake_lag($u['nick'], 1);
+		}
+
+		/* User may have been killed from fake lag, make sure we're here */
+		if (!isset($u['nick']->uid) || !(new User($u['nick']->uid))->IsUser)
+			return;
+		
 		update_last($u['nick']->nick);
 
 		/* Check if they have addressed us as nick@host */
@@ -89,8 +108,8 @@ class privmsg {
 		{
 			/* start and run our channel message hook
 			 * IMPORTANT:
-			 * using `hook::func("chanmsg", x);` will not work if this module is not loaded */
-			hook::run("chanmsg", $u);
+			 * using `hook::func(HOOKTYPE_CHANNEL_MESSAGE, x);` will not work if this module is not loaded */
+			hook::run(HOOKTYPE_CHANNEL_MESSAGE, $u);
 			return;
 		}
 
@@ -99,7 +118,7 @@ class privmsg {
 		 * Here is where we check if we're supporting botz and if so, deal w/ it
 		 */
 		if (class_exists('Bot'))
-			$client = Bot::find_by_uid($dest) ?? $client = Bot::find($dest);
+			$client = Bot::find_by_uid($dest) ?? Bot::find($dest);
 				
 			
 		/* check if we've got a UID or a nick and return the Client object */
@@ -122,7 +141,12 @@ class privmsg {
 		
 		/* User object of caller */
 		$nick = $u['nick'];
-
+		
+		if (!$nick->uid) // bug
+		{
+			SVSLog("Bug: User lookup by UID for a command failed - is the database synced properly?");
+			return;
+		}
 		/* Command they wanna perform */
 		$c = mb_substr(strtoupper($parv[0]),1);
 		
@@ -132,7 +156,7 @@ class privmsg {
 		/* if we have a channel-context then we parrot it back */
 		$mtags = (isset($u['mtags'][CHAN_CONTEXT])) ? [CHAN_CONTEXT => $u['mtags'][CHAN_CONTEXT]] : NULL;
 		if (!$mtags)
-			$mtags = (isset($u['mtags']['+channel-context'])) ? ['+channel-context' => $u['mtags']['+channel-context']] : NULL;
+			$mtags = (isset($u['mtags'][CHAN_CONTEXT])) ? [CHAN_CONTEXT => $u['mtags'][CHAN_CONTEXT]] : NULL;
 
 		/* If they're messaging OperServ and they're not an oper, deny them */
 		if (!strcasecmp($client->nick,"OperServ") && !IsOper($nick))
@@ -142,15 +166,34 @@ class privmsg {
 		}
 		if (!strcasecmp($c,"help"))
 		{
+			$helpfound = 0;
+			$helpfound_elsweyr = 0;
+			$helpfound_elsweyr_user = "";
 			if (isset($parv[1]))
 			{
 				foreach(ServCmd::$list as $cmd)
 				{
 					if (!strcasecmp($cmd->client,$client->nick) && !strcasecmp($cmd->command,$parv[1]))
 					{
+						$helpfound = 1;
 						$client->notice_with_mtags($mtags,$nick->uid,"Help for command $cmd->command");
 						$client->notice_with_mtags($mtags,$nick->uid,$cmd->extended_help,"/msg $client->nick $cmd->syntax");
 					}
+					if (strcasecmp($cmd->client,$client->nick) && !strcasecmp($cmd->command,$parv[1])) // found elsweyr
+						$helpfound_elsweyr = 1;
+						$helpfound_elsweyr_user = $cmd->client;
+				}
+				
+				if (!$helpfound && !$helpfound_elsweyr)
+					$client->notice_with_mtags($mtags,$nick->uid,"No help available for that command.");
+
+				elseif (!$helpfound && $helpfound_elsweyr && $helpfound_elsweyr_user != "OperServ")
+				{
+					$client->notice_with_mtags($mtags,$nick->uid, "Unrecognised command: \"".bold($parv[1])."\"",
+					"However, that command exists in ".bold($helpfound_elsweyr_user).". Try:",
+					"/msg $helpfound_elsweyr_user HELP ".$parv[1]."",
+					"If you still think you're in the right place, try:",
+					bold("/msg $client->nick HELP"));
 				}
 				return;
 			}

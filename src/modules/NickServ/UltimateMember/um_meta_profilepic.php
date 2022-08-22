@@ -146,7 +146,7 @@ class um_meta_profilepic {
 		$row = $result->fetch_assoc();
 		$type = $row['meta_value'];
 
-		$url = str_replace("https://","https://i0.wp.com/",$wpconfig['siteurl']."/wp-content/uploads/ultimatemember/".$user->user_id."/".$type);
+		$url = $wpconfig['siteurl']."/wp-content/uploads/ultimatemember/".$user->user_id."/".$type;
 		return $url;
 	}
 

@@ -79,13 +79,19 @@ class mode {
 		$chan = new Channel($dest);
 		
 		$modes = $parv[1];
-		
-		$toAdd = array();
-		$toDel = array();
-		
+		$oldmodes = $chan->modes;
+
 		$params = str_replace($parv[0]." ".$parv[1]." ","",$u['params']);
-			
+		
 		MeatballFactory($chan,$modes,$params,$u['nick']->uid);
+
+		/* run that hook:
+		 * @nick (Obj: User)
+		 * @channel (Obj: Channel)
+		 * @modes (String)
+		 * @oldmodes (String)
+		 */
+		hook::run(HOOKTYPE_CHANNELMODE, ["nick" => $u['nick'], "chan" => $chan, "modes" => $modes, "oldmodes" => $oldmodes]);
 	}
 
 }

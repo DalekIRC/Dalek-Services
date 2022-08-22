@@ -64,6 +64,12 @@ class md {
 		if (!CommandAdd($this->name, 'MD', 'md::cmd_md', 0))
 			return false;
 
+		$err = NULL;
+		if (!RPCHandlerAdd($this->name, 'md.get', 'md::rpc_get', $err))
+			return false;
+
+		/* we have only .get from md because of the unknown nature around remote-write permissions in the module */
+
 		return true;
 	}
 
@@ -75,26 +81,109 @@ class md {
 	 */
 	public static function cmd_md($u)
     {
-        $parv = explode(" ",$u['params']);
-		if ($parv[0] == "client")
-		{
-			$user = $parv[1];
-			$key = $parv[2];
-			$t = explode(" :",$u['params']);
-			$value = (isset($t[1])) ? $t[1] : "";
-			
-			md::md_add($user,$key,$value);
-		}
+		$parv = split($u['params']);
+		$user = $parv[1];
+		$key = $parv[2];
+		$t = explode(" :",$u['params']);
+		$value = (isset($t[1])) ? $t[1] : "";
+		
+		md::add($user,$key,$value);
     }
-	public static function md_add($person,$key,$value)
+	public static function add($person,$key,$value)
 	{
 		$conn = sqlnew();
 		if (!$conn)
 			return false;
 
-		$prep = $conn->prepare("INSERT INTO dalek_user_meta (UID, meta_key, meta_data) VALUES (?, ?, ?)");
+
+		$prep = $conn->prepare("SELECT * FROM dalek_user_meta WHERE UID = ? AND meta_key = ? AND meta_data = ?");
 		$prep->bind_param("sss",$person,$key,$value);
 		$prep->execute();
+		$result = $prep->get_result();
+		if (!$result || !$result->num_rows)
+		{
+			$prep = $conn->prepare("INSERT INTO dalek_user_meta (UID, meta_key, meta_data) VALUES (?, ?, ?)");
+			$prep->bind_param("sss",$person,$key,$value);
+		}
+		else
+		{
+			$prep = $conn->prepare("UPDATE dalek_user_meta SET meta_key = ?, meta_data = ? WHERE UID = ?");
+			$prep->bind_param("sss",$key,$value,$person);
+		}
+
+		$prep->execute();
 		$prep->close();
+	}
+
+	/* Get a users MD
+	 * Returns an array
+	 */
+	public static function get(User $u, $key = NULL) : array
+	{
+		$conn = sqlnew();
+		if (!$conn)
+			return false;
+
+		$md_array = [];
+		
+		if (!BadPtr($key))
+		{
+			$prep = $conn->prepare("SELECT * FROM dalek_user_meta WHERE UID = ? AND meta_key = ?");
+			$prep->bind_param("ss", $u->uid, $key);
+			$prep->execute();
+			$result = $prep->get_result();
+			if (!$result || !$result->num_rows)
+				return [];
+
+			while ($row = $result->fetch_assoc())
+				$md_array[$row['meta_key']] = $row['meta_data'];
+		}
+		else
+		{
+			$prep = $conn->prepare("SELECT * FROM dalek_user_meta WHERE UID = ?");
+			$prep->bind_param("s", $u->uid);
+			$prep->execute();
+			$result = $prep->get_result();
+			if (!$result || !$result->num_rows)
+				return [];
+
+			while ($row = $result->fetch_assoc())
+				$md_array[$row['meta_key']] = $row['meta_data'];
+		}
+		if (!empty($md_array))
+			return $md_array;
+		return [];
+	}
+
+	public static function rpc_get($id, $params)
+	{
+		$reply = rpc_new_reply();
+		if (!isset($params['user']))
+		{
+			rpc_append_error($reply, "Request expects param 'user'", RPC_ERR_INVALID_PARAMS);
+			rpc_append_id($reply, $id);
+			rpc_send_reply($id, $reply);
+			return;
+		}
+		$err = 0;
+		var_dump($params);
+		$user = new User($params['user']);
+		if (!$user->IsUser)
+		{
+			$err++;
+			rpc_append_error($reply, "That user is not online", RPC_ERR_INVALID_REQUEST);
+		}
+		
+		if ($err > 0)
+		{
+			rpc_append_id($reply, $id);
+			rpc_send_reply($id, $reply);
+			return;
+		}
+		SVSLog("Requested MD for user $user->nick ($user->ident@$user->realhost)", LOG_RPC);
+		/* return info about it to the RPC caller */
+		rpc_append_result($reply, md::get($user));
+		rpc_append_id($reply, $id);
+		rpc_send_reply($id, $reply);
 	}
 }

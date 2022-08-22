@@ -87,8 +87,16 @@ class Server
 	{
 		// Declare de globals;
 		global $socket,$cf;
+		
+		if ($string[0] !== "@") // if there are no mtags on it
+		{
+			$new_mtags = array_to_mtag(generate_new_mtags());
+			strprefix($string, $new_mtags);
+		}
+
 		if ($cf['debugmode'] == "on")
 			echo "[\e[0;30;42mSEND\e[0m] $string\n";
+			
 		fputs($socket, ircstrip($string)."\n");
 		
 	}
@@ -107,6 +115,7 @@ class Server
 		echo "[".$me."][<--] ".$string."\n";
 	}
 }
+
 hook::func("raw", function($u)
 {
 	global $fsync,$cf;
@@ -149,3 +158,4 @@ hook::func("raw", function($u)
 		"intro_by" => $us)
 	);
 });
+

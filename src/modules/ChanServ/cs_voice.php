@@ -107,7 +107,7 @@ class cs_voice {
 			return;
 		}
 
-		if ($chan->IsVoice($target->uid) !== false)
+		if ($chan->IsVoice($target))
 		{
 			$targ = (!strcmp($target->nick,$nick->nick)) ? "You are" : "$target->nick is";
 			$cs->notice_with_mtags([CHAN_CONTEXT => $chan->chan ], $nick->uid,"$targ already voiced on that channel.");
@@ -145,7 +145,7 @@ class cs_voice {
 			return;
 		}
 
-		if (!$chan->IsVoice($target->uid))
+		if (!$chan->IsVoice($target))
 		{
 			$targ = (!strcmp($target->nick,$nick->nick)) ? "You are" : "$target->nick is";
 			$cs->notice_with_mtags([CHAN_CONTEXT => $chan->chan ], $nick->uid,"$targ are not voiced on that channel.");

@@ -25,29 +25,36 @@
 
 /* Loading the base code :P */
 
+/*
+ * Language files. Please uncomment yours!
+ * If yours isn't available and you would like to contribute
+ * one, please make a pull request via github.
+ */
+ 
+include "languages/en_GB";
+//include "languages/tr_TR";
+
 include __DIR__.'/../conf/dalek.conf';
 global $cf,$sql,$server,$port,$serv,$servertime;
-
+include "misc.php";
+include "rpc.php";
+include "conf.php";
 include "hook.php";
 include "language.php";
 include "serv.php";
 include "sql.php";
 include "client.php";
 include "user.php";
-include "modules/wordpress/wordpress.php";
+include "wordpress/wordpress.php";
 include "timer.php";
 include "channel.php";
 include "cmd.php";
 include "module.php";
 include "filter.php";
-include "misc.php";
 include "servcmd.php";
 include "events.php";
 include "buffer.php";
-//include "BotServ/botserv.php";
-//include "OperServ/operserv.php";
 include "Global/global.php";
-include "HostServ/hostserv.php";
 include "MemoServ/memoserv.php";
 
 
@@ -58,7 +65,8 @@ $server = $cf['uplink'];
 $port = $cf['port'];
 $mypass = $cf['serverpassword'];
 
-
+/* Config run */
+Conf::run();
 
 // SQL config
 $sqlip = $cf['sqlip'];
@@ -67,24 +75,30 @@ $sqlpass = $cf['sqlpass'];
 $sqldb = $cf['sqldb'];
 $sql = new SQL($sqlip,$sqluser,$sqlpass,$sqldb); hook::run("preconnect", array());
 /* Okay, we've established all the information lmao, let's load the modules */
-$serv = new Server($server,$port,$mypass);
+
 
 include __DIR__.'/../conf/modules.conf';
 
 start:
-
+$serv = new Server($server,$port,$mypass);
 
 if (!$socket)
 	die();
+
+stream_set_blocking($socket, 0);
+
 for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer::do_buf(stream_get_line($socket, 0, "\n")))
 {
-	stream_set_blocking($socket, 0);
 
+	/* Check for new events */
 	if ($servertime != servertime())
 	{
 		Events::CheckForNew();
 		$servertime = servertime();
 	}
+	
+	/* Check for RPC Calls */
+	rpc_check();
 	if (!$socket)
 		die();
 	if (!$input)
@@ -93,9 +107,9 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 	log_to_disk($input);
 	if ($cf['debugmode'] == "on")
 		echo "[\e[0;30;47mRECV\e[0m] ".$input."\n";
-
-	flush();
 	
+	flush();
+	//RPC::check();
 	$strippem = ircstrip(str_replace('\\','\\\\',$input));
 	$splittem = explode(' ',$strippem);
 	
@@ -133,7 +147,7 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 		else
 		{
 			$serv->hear("Unknown exit issue! Waiting 40 seconds and restarting");
-			sleep(40);
+			usleep(400000);
 			goto start;
 		}
 	}
@@ -202,6 +216,7 @@ function ircstrip($string)
             ), '', $string);
 	return $_ircstrip;
 }
+
 function S2S($string) {
 	global $serv;
 	$serv->sendraw($string);

@@ -97,7 +97,14 @@ class ns_certfp {
 
 		if (strtolower($parv[1]) == "add")
 		{
-			if (!isset($nick->meta->certfp))
+
+			if (isset($parv[2]) && isset($nick->meta->certfp) && strcmp($parv[2],$nick->meta->certfp))
+			{
+				$ns->notice($nick->uid,"You have tried to save a CertfFP that's not your current CertFP.",
+										"Please note that you can only save CertFP's that you are currently using.");
+				return;
+			}
+			else if (!isset($nick->meta->certfp))
 			{
 				$ns->notice($nick->uid,"You do not have a fingerprint to store.");
 				return;

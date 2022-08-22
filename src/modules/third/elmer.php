@@ -51,7 +51,7 @@ class elmer {
 	/* Destruction: Here's where to clear up your globals or databases or anything */
 	function __destruct()
 	{
-		/* Gets rid of $elmer array automatically */
+		Filter::Del($this->name,"*");
 	}
 
 
@@ -102,6 +102,10 @@ class elmer {
 		
 		/* Locating target, beep bzzzzzz errchhh *fax sounds* */
 		$target = new User($u['dest']);
+
+		/* if it's not ours, return */
+		if ($target && !($client = Client::find($target->nick)))
+			return;
 		/* If we're adding and they're not already elmer'd */
 		if ($add)
 		{
@@ -114,7 +118,7 @@ class elmer {
 			/* Let them know and update the array */
 			S2S("NOTICE $nick->uid :$target->nick is now talking like Elmer.");
 			array_push(self::$elmer,strtolower($target->nick));
-			var_dump(self::$elmer);
+			Filter::Add('elmer', $client, ['l','r','L','R'],['w','w','W','W']);
 		}
 
 		/* Looks like we removing instead =] */
@@ -127,15 +131,19 @@ class elmer {
 			}
 			/* Let them know and update the array */
 			S2S("NOTICE $nick->uid :$target->nick is no longer talking like Elmer.");
-
+			
 			foreach(self::$elmer as $val => $key) /* loop it */
 			  if ($key == strtolower($target->nick)) /* Find it */
+			  {
 				array_splice(self::$elmer,strtolower($val)); /* delete it */
+				Filter::Del('elmer',$target->nick); // Delete it from the filter
+			  }
 		}
 
 		/* You don't HAVE to return, butt-fuck it */
 		return;
 	}
+
 }
 
 /* Function to check if user is already elmer

@@ -111,7 +111,7 @@ class cs_op {
 			return;
 		}
 
-		if ($chan->IsOp($target->uid) !== false)
+		if ($chan->IsOp($target) !== false)
 		{
 			$targ = (!strcmp($target->nick,$nick->nick)) ? "You are" : "$target->nick is";
 			$cs->notice_with_mtags([CHAN_CONTEXT => $chan->chan ], $nick->uid,"$targ already opped on that channel.");
@@ -149,7 +149,7 @@ class cs_op {
 			return;
 		}
 
-		if (!$chan->IsOp($target->uid))
+		if (!$chan->IsOp($target))
 		{
 			$targ = (!strcmp($target->nick,$nick->nick)) ? "You are" : "$target->nick is";
 			$cs->notice_with_mtags([CHAN_CONTEXT => $chan->chan ], $nick->uid,"$targ already deopped on that channel.");

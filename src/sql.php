@@ -169,16 +169,14 @@ class SQL {
 		global $sql;
 		$conn = sqlnew();
 
-		$prep = $conn->prepare("SELECT * FROM dalek_user WHERE sid = ?");
+		$prep = $conn->prepare("SELECT * FROM dalek_user WHERE SID = ?");
 		$prep->bind_param("s",$sid);
 		$prep->execute();
 		$result = $prep->get_result();
 		while($row = $result->fetch_assoc())
-		{
 			$sql::user_delete($row['UID']);
-		}
-		$prep = $conn->prepare("DELETE FROM dalek_server WHERE sid = ?");
-		$prep->bind_param("s",$u);
+		$prep = $conn->prepare("DELETE FROM dalek_server WHERE SID = ?");
+		$prep->bind_param("s",$sid);
 		$prep->execute();
 	}
 	static function sjoin($u)
@@ -360,6 +358,7 @@ function do_part($chan,$nick)
 function find_channel($channel)
 {
 	$conn = sqlnew();
+	$return = [];
 	if (!$conn) { return false; }
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_channels WHERE channel = ?");
@@ -369,10 +368,20 @@ function find_channel($channel)
 		
 		if (!$result){ return false; }
 		if ($result->num_rows == 0){ return false; }
-		$row = $result->fetch_assoc();
+		$return = $result->fetch_assoc();
+
+		$prep = $conn->prepare("SELECT * FROM dalek_chaninfo WHERE channel = ?");
+		$prep->bind_param("s",$channel);
+		$prep->execute();
+		$result = $prep->get_result();
+		if ($result && $result->num_rows > 0)
+			while($row = $result->fetch_assoc())
+				$return['owner'] = $row['owner'];
+
+
 		$prep->close();
 	}
-	return $row;
+	return $return;
 }
 
 function get_chmode($channel)

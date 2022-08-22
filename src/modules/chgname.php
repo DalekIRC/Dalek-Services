@@ -64,7 +64,8 @@ class chgname {
 		if (!CommandAdd($this->name, 'CHGNAME', 'chgname::cmd_chgname', 1))
 			return false;
 
-       
+		if (!RPCHandlerAdd($this->name, 'chg.name', 'chgname::rpc_cmd', $err))
+			return false;
 
 		return true;
 	}
@@ -86,6 +87,49 @@ class chgname {
 		$prep = $conn->prepare("UPDATE dalek_user SET gecos = ? WHERE UID = ?");
 		$prep->bind_param("ss",$gecos,$uid);
 		$prep->execute();
-		return;
     }
+
+
+	public static function rpc_cmd($id, $params)
+	{
+		
+		$reply = rpc_new_reply();
+		if (!isset($params['user']) || !isset($params['name']))
+		{
+			rpc_append_error($reply, "Request expects params 'user' and 'name'", RPC_ERR_INVALID_PARAMS);
+			rpc_append_id($reply, $id);
+			rpc_send_reply($id, $reply);
+			return;
+		}
+		$err = 0;
+
+		$user = new User($params['user']);
+		if (!$user->IsUser)
+		{
+			$err++;
+			rpc_append_error($reply, "That user is not online", RPC_ERR_INVALID_REQUEST);
+		}
+		
+		if ($err > 0)
+		{
+			rpc_append_id($reply, $id);
+			rpc_send_reply($id, $reply);
+			return;
+		}
+
+		/* now we can probably pass it back through that thing over there */
+		$u['params'] = [$user->uid, $params['name']];
+		self::cmd_chgname($u);
+
+		/* send it */
+		S2S("CHGNAME $user->uid ".$params['name']);
+
+		/* log it */
+		SVSLog("Changed the 'real name' of $user->nick ($user->name@$user->realhost) to be: ".$params['name'], LOG_RPC);
+
+		/* return info about it to the RPC caller */
+		rpc_append_result($reply, "Success");
+		rpc_append_id($reply, $id);
+		rpc_send_reply($id, $reply);
+	}
 }

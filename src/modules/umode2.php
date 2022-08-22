@@ -89,8 +89,16 @@ class umode2 {
 			S2S("461 $nick->nick $cmd :Need more parameters.");
 			return;
 		}
-
+		$oldmodes = $nick->usermode;
         $nick->SetMode($u['dest']);
+		
+		/* Run the hook for usermode.
+		 * Information sent in the hook:
+		 * @nick (Obj: User)
+		 * @modes (string)
+		 * @oldmodes (string)
+		 */
+		hook::run(HOOKTYPE_USERMODE, ['nick' => $nick, 'modes' => $u['dest'], 'oldmodes' => $oldmodes]);
 
 		/* You don't HAVE to return, butt-fuck it */
 		return;

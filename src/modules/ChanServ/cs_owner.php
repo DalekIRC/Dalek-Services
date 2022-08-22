@@ -111,10 +111,10 @@ class cs_owner {
 			return;
 		}
 
-		if ($chan->UserHasMode($target->uid,"q"))
+		if ($chan->IsOwner($target))
 		{
 			$targ = (!strcmp($target->nick,$nick->nick)) ? "You are" : "$target->nick is";
-			$cs->notice_with_mtags(["+draft/channel-context" => $chan->chan ], $nick->uid,"$targ already set as owner on that channel.");
+			$cs->notice_with_mtags([CHAN_CONTEXT => $chan->chan ], $nick->uid,"$targ already set as owner on that channel.");
 			return;
 		}
 
@@ -122,7 +122,7 @@ class cs_owner {
 			$cs->mode($chan->chan,"+q $target->nick");
 
 		else
-			$cs->notice_with_mtags(["+draft/channel-context" => $chan->chan], $nick->uid, "Access denied!");
+			$cs->notice_with_mtags([CHAN_CONTEXT => $chan->chan], $nick->uid, "Access denied!");
 		return;
 	}
 	public static function cmd_deowner($u)
@@ -140,6 +140,8 @@ class cs_owner {
 		$chan = (isset($parv[1])) ? new Channel($parv[1]) : false;
 		if (!$chan)
 			$chan = isset($u['mtags'][CHAN_CONTEXT]) ? new Channel($u['mtags'][CHAN_CONTEXT]) : false;
+
+			
 		$target = (isset($parv[2])) ? new User($parv[2]) : $nick;
 
 		if (!$chan)
@@ -148,10 +150,10 @@ class cs_owner {
 			return;
 		}
 
-		if (!$chan->UserHasMode($target->uid,"q"))
+		if (!$chan->IsOwner($target))
 		{
 			$targ = (!strcmp($target->nick,$nick->nick)) ? "You are" : "$target->nick is";
-			$cs->notice_with_mtags(["+draft/channel-context" => $chan->chan ], $nick->uid,"$targ not owner on that channel.");
+			$cs->notice_with_mtags([CHAN_CONTEXT => $chan->chan ], $nick->uid,"$targ not owner on that channel.");
 			return;
 		}
 
@@ -159,7 +161,7 @@ class cs_owner {
 			$cs->mode($chan->chan,"-q $target->nick");
 
 		else
-			$cs->notice_with_mtags(["+draft/channel-context" => $chan->chan], $nick->uid, "Access denied!");
+			$cs->notice_with_mtags([CHAN_CONTEXT => $chan->chan], $nick->uid, "Access denied!");
 		return;
 	}
 

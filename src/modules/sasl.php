@@ -1,6 +1,4 @@
 <?php
-
-
 /*				
 //	(C) 2021 DalekIRC Services
 \\				
@@ -24,6 +22,8 @@
 \\	Author:	Valware
 //				
 */
+
+
 class SASL {
 
 	/* Module handle */
@@ -36,20 +36,19 @@ class SASL {
 
 
 	/* To run when this class is created/when the module is loaded */
-	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
+	/* Construction: Here's where you'll wanna initialise any globals or databases or early hooks */
 	function __construct()
 	{
-		hook::func("preconnect", 'SASL::create_table');
-		hook::func("UID", 'SASL::hook_uid');
+		hook::func(HOOKTYPE_PRE_CONNECT, 'SASL::create_table');
 	}
 
 	/* To run when the class is destroyed/when the module is unloaded */
 	/* Destruction: Here's where to clear up your globals or databases or anything */
 	function __destruct()
 	{
-		hook::del("UID", 'SASL::hook_uid');
-		hook::del("preconnect", 'SASL::create_table');
-		hook::del("start", 'SASL::on_connect');
+		hook::del(HOOKTYPE_WELCOME, 'SASL::hook_uid');
+		hook::del(HOOKTYPE_PRE_CONNECT, 'SASL::create_table');
+		hook::del(HOOKTYPE_START, 'SASL::on_connect');
 	}
 
 
@@ -62,9 +61,11 @@ class SASL {
 	{
 		if (!CommandAdd($this->name, 'SASL', 'SASL::cmd_sasl', 0))
 			return false;
+
 		return true;
 
-		hook::func("start", 'SASL::on_connect');
+		hook::func(HOOKTYPE_WELCOME, 'SASL::hook_uid');
+		hook::func(HOOKTYPE_START, 'SASL::on_connect');
 	}
 
 	function create_table($u)
@@ -85,8 +86,6 @@ class SASL {
 
 	function on_connect($u)
 	{
-		$ns = Client::find("NickServ");
-
 		$conn = sqlnew();
 		$query = "SELECT * FROM dalek_user";
 		$prep = $conn->prepare($query);
@@ -100,18 +99,17 @@ class SASL {
 		{
 			if (IsRegUser($row['nick']) && !$row['account'])
 			{
-				$ns->notice($row['UID'],SASL::$nickservprompt);
+				send_numeric($row['nick'],231,	"⚠️ ALERT ⚠️","That username is registered. If it's your account, please authenticate for it using SASL.",
+												"If you do not authenticate, your nick will be changed.");
 			}
 			elseif ($row['account'] && !strcasecmp($u['account'],$u['nick']))
 			{
 				/* find if the account actually exists damnit */
 				if (!IsRegUser($u['account']))
 				{
-					$ns->notice( $row['UID'],
-								"You are logged into an account that does not exist.",
-								"You will be logged out and this incident reported.");
+					send_numeric($row['nick'],231,"You are logged into an account that does not exist. You will be logged out and this incident reported.");
 
-					$ns->svslogin($row['UID'],"0");
+					svslogin($row['UID'],0);
 					SVSLog(LOG_WARN."User with nick '".$row['nick']."' was logged into account '".$row['account']."', which doesn't exist. They have been logged out.");
 					return;
 				}
@@ -160,7 +158,7 @@ class SASL {
 		
 		$param2 = $parv[4] ?? NULL;
 
-		$sasl = new IRC_SASL($origin,$uid,$cmd,$param1,$param2);
+		new IRC_SASL($origin,$uid,$cmd,$param1,$param2);
 	}
 }
 
@@ -172,38 +170,45 @@ if (!function_exists('SendSasl'))
 	}
 }
 class IRC_SASL {
+	static $list = [];
+	static $ignore = [];
+
 	function __construct($source,$uid,$cmd,$param1 = "", $param2 = "")
 	{
-		global $_SASL,$saslignore;
 		
 		$this->uid = $uid;
 		$this->source = $source;
 		$this->banned = "";
 		$this->reason = "";
-		if (!isset($_SASL[$uid]) && $cmd == "H")
+		if (!isset(self::$list[$uid]) && $cmd == "H")
 		{
-			$_SASL[$uid]["host"] = $param1;
-			$_SASL[$uid]["ip"] = $param2;
+			self::$list[$uid]["host"] = $param1;
+			self::$list[$uid]["ip"] = $param2;
 		}
 		//if in our ignore list
-		//make sure we're not reading an empty array
-		if (!isset($saslignore))
-			$saslignore = array();
-		if (in_array($param2,$saslignore))
+		
+		
+		if (in_array($param2,self::$ignore))
 		{
 			return;
 		}
-		elseif (isset($_SASL[$uid]) &&  $cmd == "S")
+		elseif (isset(self::$list[$uid]) &&  $cmd == "S")
 		{
-			$_SASL[$uid]["mech"] = strtoupper($param1);
-			$_SASL[$uid]["key"] = $param2 ?? NULL;
+			self::$list[$uid]["mech"] = strtoupper($param1);
+			self::$list[$uid]["key"] = $param2 ?? NULL;
+			if (!strcasecmp($param1,"*"))
+			{
+				$this->reason = "User aborted";
+				$this->fail();
+				return;
+			}
 			if (strcasecmp($param1,"plain") && strcasecmp($param1,"external"))
 			{
 				$this->account = "Unsupported mechanism: $param1";
 				$this->fail();
 				return;
 			}
-			$this->check = $this->check_pass($_SASL[$uid]["key"]);
+			$this->check = $this->check_pass(self::$list[$uid]["key"]);
 			if ($param1 !== "EXTERNAL" && $this->check == 0)
 				SendSasl("$source $uid C +");
 			
@@ -216,12 +221,12 @@ class IRC_SASL {
 			elseif ($this->check > 0)
 				$this->success($this->check,$source);
 		}
-		elseif (isset($_SASL[$uid]) && $cmd == "C")
+		elseif (isset(self::$list[$uid]) && $cmd == "C")
 		{
 			if ($param1 == "+")
 			{
-				if ($_SASL[$uid]["mech"] == "EXTERNAL")
-					if ($this->check_pass($_SASL[$uid]["key"]))
+				if (self::$list[$uid]["mech"] == "EXTERNAL")
+					if ($this->check_pass(self::$list[$uid]["key"]))
 						$this->fail();
 				else
 				{	
@@ -230,7 +235,7 @@ class IRC_SASL {
 				}
 			}
 			else {
-				$_SASL[$uid]["pass"] = $param1;
+				self::$list[$uid]["pass"] = $param1;
 				$this->check = $this->check_pass($param1);
 				if ($this->check == 0)
 					$this->fail();
@@ -238,21 +243,19 @@ class IRC_SASL {
 					$this->success($this->check,$source);
 			}
 		}
-		elseif (isset($_SASL[$uid]) && $cmd == "D")
+		elseif (isset(self::$list[$uid]) && $cmd == "D")
 			if ($param1 == "A")
-				unset($_SASL[$uid]);
-			
+				unset(self::$list[$uid]);			
 	}
 	private function success(int $i, $source = NULL)
 	{
-		global $_SASL;
 
-		$ns = Client::find("NickServ");
+		
 
 		if ($i)
 		{
-			SVSLog("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid identified using SASL for account: $this->account $this->reason");
-			$ns->svslogin($this->uid,$this->account);
+			SVSLog("[".self::$list[$this->uid]['host']."|".self::$list[$this->uid]['ip']."] $this->uid identified using SASL for account: $this->account $this->reason");
+			svslogin($this->uid,$this->account);
 		}
 
 		$conn = sqlnew();
@@ -261,33 +264,31 @@ class IRC_SASL {
 		$prep->execute();
 		$conn->close();
 		SendSasl("$source $this->uid D S");
-		fail2ban($_SASL[$this->uid]['ip'], 0);
+		fail2ban(self::$list[$this->uid]['ip'], 0);
 
 		/* if they're already connected, run the auth hook */
 		$client = new User($this->uid);
 		if ($client->IsUser)
-			hook::run("auth", ['uid' => $client->uid, 'account' => $this->account, 'nick' => $client->nick]);
+			hook::run(HOOKTYPE_AUTHENTICATE, ['uid' => $client->uid, 'account' => $this->account, 'nick' => $client->nick]);
 
-		unset($_SASL[$this->uid]);
+		unset(self::$list[$this->uid]);
 		
 	}
 	private function fail()
 	{
-		global $_SASL;
 		$ns = Client::find("NickServ");
 		$r = ($this->reason) ? " ".$this->reason : "";
 		if (!isset($this->account) || !strlen($this->account))
 			$this->account = "No account provided";
-		SVSLog("[".$_SASL[$this->uid]['host']."|".$_SASL[$this->uid]['ip']."] $this->uid failed to identify ($this->account)$r");
+		SVSLog("[".self::$list[$this->uid]['host']."|".self::$list[$this->uid]['ip']."] $this->uid failed to identify ($this->account)$r");
 		
 		SendSasl("$this->source $this->uid D F");
-		fail2ban($_SASL[$this->uid]['ip'],1);
-		unset($_SASL[$this->uid]);
+		fail2ban(self::$list[$this->uid]['ip'],1);
+		unset(self::$list[$this->uid]);
 	}
 		
 	 function check_pass($passwd)
 	{
-		global $_SASL;
 
 		if (ctype_xdigit($passwd))
 		{
@@ -352,12 +353,11 @@ class IRC_SASL {
 	}
 	function check_fingerprint($fp)
 	{
-		global $_SASL;
 		
 		$table = "dalek_fingerprints_external";	
 		$conn = sqlnew();
-		$prep = $conn->prepare("SELECT account FROM $table WHERE ip = ? and fingerprint = ? LIMIT 1");
-		$prep->bind_param("ss", $_SASL[$this->uid]['ip'], $_SASL[$this->uid]["key"]);
+		$prep = $conn->prepare("SELECT * FROM $table WHERE fingerprint = ? LIMIT 1");
+		$prep->bind_param("s", self::$list[$this->uid]["key"]);
 		$prep->execute();
 
 		if (!($result = $prep->get_result()))

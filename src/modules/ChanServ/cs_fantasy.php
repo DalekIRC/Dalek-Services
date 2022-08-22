@@ -60,16 +60,29 @@ class cs_fantasy {
 	{
 		global $cf;
 		$prefix = $cf['cmdprefix'] ?? "!";
+		
 		$parv = explode(" ",$u['params']);
-		if ($parv[1][1] != "!") // not a fantasy command
+		if ($parv[1][1] != $prefix) // not a fantasy command
 			return;
-		$parv[1] = ":".mb_substr($parv[1],2);
+		
+		if ($parv[2][0] != "#") // they didn't specify the channel which is supposed to be the case
+		{
+			$u['mtags'][CHAN_CONTEXT] = $u['dest'];
+			self::include_channel($u['dest'],$parv);
+		}
 		$parv[0] = "ChanServ";
 		$u['params'] = implode(" ",$parv);
-		$u['mtags']['+draft/channel-context'] = $u['dest'];
-		$u['dest'] = "ChanServ";
+		var_dump($u['params']);
 		cmd::run("privmsg", $u);
 		
+	}
+	static function include_channel($chan, &$parv)
+	{		
+		for ($i = count($parv); $i >= 2; $i--)
+		{
+			echo "$i\n";
+			$parv[$i] = $parv[$i - 1];
+		}
 	}
 }
 

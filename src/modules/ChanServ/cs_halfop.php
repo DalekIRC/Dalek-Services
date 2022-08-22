@@ -107,7 +107,7 @@ class cs_halfop {
 			return;
 		}
 
-		if ($chan->IsHalfop($target->uid) !== false)
+		if ($chan->IsHalfop($target) !== false)
 		{
 			$targ = (!strcmp($target->nick,$nick->nick)) ? "You are" : "$target->nick is";
 			$cs->notice_with_mtags([CHAN_CONTEXT => $chan->chan ], $nick->uid,"$targ already halfoped on that channel.");
@@ -145,7 +145,7 @@ class cs_halfop {
 			return;
 		}
 
-		if (!$chan->IsHalfop($target->uid))
+		if (!$chan->IsHalfop($target))
 		{
 			$targ = (!strcmp($target->nick,$nick->nick)) ? "You are" : "$target->nick is";
 			$cs->notice_with_mtags([CHAN_CONTEXT => $chan->chan ], $nick->uid,"$targ not halfopd on that channel.");

@@ -61,10 +61,12 @@ class chghost {
 		 * (both point to the same function which determines)
         */
 
+		$err = NULL;
 		if (!CommandAdd($this->name, 'CHGHOST', 'chghost::cmd_chghost', 1))
 			return false;
 
-       
+		if (!RPCHandlerAdd($this->name, 'chg.host', 'chghost::rpc_cmd', $err))
+			return false;
 
 		return true;
 	}
@@ -93,4 +95,51 @@ class chghost {
 		$prep->execute();
 		return;
     }
+
+	public static function rpc_cmd($id, $params)
+	{
+		
+		$reply = rpc_new_reply();
+		if (!isset($params['user']) || !isset($params['host']))
+		{
+			rpc_append_error($reply, "Request expects params 'user' and 'host'", RPC_ERR_INVALID_PARAMS);
+			rpc_append_id($reply, $id);
+			rpc_send_reply($id, $reply);
+			return;
+		}
+		$err = 0;
+
+		$user = new User($params['user']);
+		if (!$user->IsUser)
+		{
+			$err++;
+			rpc_append_error($reply, "That user is not online", RPC_ERR_INVALID_REQUEST);
+		}
+		if (!is_valid_hostmask($params['host']))
+		{
+			$err++;
+			rpc_append_error($reply, "You did not specify a valid hostmask", RPC_ERR_INVALID_REQUEST);
+		}
+		if ($err > 0)
+		{
+			rpc_append_id($reply, $id);
+			rpc_send_reply($id, $reply);
+			return;
+		}
+
+		/* now we can probably pass it back through that thing over there */
+		$u['params'] = [$user->uid, $params['host']];
+		self::cmd_chghost($u);
+
+		/* send it */
+		S2S("CHGHOST $user->uid ".$params['host']);
+
+		/* log it */
+		SVSLog("Changed the host of $user->nick ($user->ident@$user->realhost) to be: ".$params['host'], LOG_RPC);
+
+		/* return info about it to the RPC caller */
+		rpc_append_result($reply, "Success");
+		rpc_append_id($reply, $id);
+		rpc_send_reply($id, $reply);
+	}
 }

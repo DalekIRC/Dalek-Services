@@ -46,7 +46,7 @@ class ns_identify {
 	/* Destruction: Here's where to clear up your globals or databases or anything */
 	function __destruct()
 	{
-		hook::del("UID", "ns_identify::must_identify");
+		hook::del(HOOKTYPE_WELCOME, "ns_identify::must_identify");
 	}
 
 
@@ -77,7 +77,7 @@ class ns_identify {
 			$extended_help /* Extended help */
 		)) return false;
 		
-		hook::func("UID", "ns_identify::must_identify");
+		hook::func(HOOKTYPE_WELCOME, "ns_identify::must_identify");
 
 		return true;
 	}
@@ -85,7 +85,6 @@ class ns_identify {
 	
 	public static function cmd($u) : void
 	{
-		global $_SASL;
 		$ns = $u['target'];
 		$nick = $u['nick'];
 		$parv = explode(" ",$u['msg']);
@@ -110,8 +109,8 @@ class ns_identify {
 
 		$extra = ($mech == "EXTERNAL") ? $nick->meta->certfp : "";
 		$s = ($mech == "EXTERNAL") ? "S" : "C";
-		$sasl = new IRC_SASL($nick->server,$nick->uid,"H",$nick->ip,$nick->ip);
-		$sasl = new IRC_SASL($nick->server,$nick->uid,$s,$mech,$extra);
+		new IRC_SASL($nick->server,$nick->uid,"H",$nick->ip,$nick->ip);
+		new IRC_SASL($nick->server,$nick->uid,$s,$mech,$extra);
 		
 	}
 

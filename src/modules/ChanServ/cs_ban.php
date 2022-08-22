@@ -140,7 +140,7 @@ class cs_ban {
 
 		$newflags = "";
 		$dupflags = $flags;
-
+		
 		$bigstring = ""; // the big money
 		while(strlen($dupflags)) // Convert them
 		{
@@ -210,7 +210,7 @@ class cs_ban {
 						$targmask = "*!$victim->ident@*";
 				}
 				else $targmask = "*!*@$victim->cloak";
-				if (!strpos($flags,"q") && !strpos($flags,"j"))
+				if (!strstr($flags,"q") && !strstr($flags,"j"))
 				{
 					$toKick[] = $victim;
 				}

@@ -70,9 +70,11 @@ class os_raw {
 	{
 		/* we just assume that they are allowed to do this based on if they can message OperServ */
 		/* want it better? make it better */
+		$nick = $u['nick'];
 		$parv = explode(" ",$u['msg']);
 		$parv[0] = NULL;
 		$u['msg'] = implode(" ",$parv);
-		S2S(trim($u['msg']));
+		S2S($msg = trim($u['msg']));
+		SVSLog(bold("RAW:")." $nick->nick ($nick->ident@$nick->realhost) sent RAW: $msg");
 	}
 }

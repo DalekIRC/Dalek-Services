@@ -28,7 +28,7 @@ class modules {
 	/* Module handle */
 	/* $name needs to be the same name as the class and file lol */
 	public $name = "modules";
-	public $description = "Provides MODULE compatibility";
+	public $description = "Provides MODULE command";
 	public $author = "Valware";
 	public $version = "1.0";
     public $official = true;
@@ -74,7 +74,7 @@ class modules {
 	 */
 	public function cmd_module($u)
 	{
-        global $modules,$cf;
+        global $cf;
 		/* Get the command that called us */
 		$cmd = $u['cmd'];
 
@@ -86,7 +86,7 @@ class modules {
 		if ($parv[0] !== "-all")
         {
     		modules::module_response($nick, "Showing loaded 3rd party modules (use \"MODULE -all ".$cf['servicesname']."\" to show all modules):");
-            foreach ($modules as $m)
+            foreach (Module::$modules as $m)
 			{
 				if (isset($m->official))
 					continue;
@@ -98,7 +98,7 @@ class modules {
 
         else {
             modules::module_response($nick, "Showing ALL loaded modules");
-            foreach ($modules as $m)
+            foreach (Module::$modules as $m)
 			{
 				$third = (isset($m->official) && $m->official == true) ? "[OFFICIAL]" : "[3RD]";
                 modules::module_response($nick, "*** $m->name v$m->version - $m->description - by $m->author $third");

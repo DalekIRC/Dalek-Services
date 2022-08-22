@@ -111,7 +111,7 @@ class cs_admin {
 			return;
 		}
 
-		if ($chan->UserHasMode($target->uid,"a"))
+		if ($chan->IsAdmin($target))
 		{
 			$targ = (!strcmp($target->nick,$nick->nick)) ? "You are" : "$target->nick is";
 			$cs->notice_with_mtags([CHAN_CONTEXT => $chan->chan ], $nick->uid,"$targ already set as admin on that channel.");
@@ -147,7 +147,7 @@ class cs_admin {
 			return;
 		}
 
-		if (!$chan->UserHasMode($target->uid,"a"))
+		if (!$chan->IsAdmin($target))
 		{
 			$targ = (!strcmp($target->nick,$nick->nick)) ? "You are" : "$target->nick is";
 			$cs->notice_with_mtags([CHAN_CONTEXT => $chan->chan ], $nick->uid,"$targ not admin on that channel.");

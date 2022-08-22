@@ -28,9 +28,11 @@ class Channel
 		else
 		{
 			$this->IsChan = true;
+			$this->owner = isset($u['owner']) ?? NULL;
 			$this->modes = mb_substr($u['modes'],1) ?? false;
 			$this->topic = $u['topic'];
 			$this->timestamp = $u['timestamp'];
+			$this->userlist = $this->get_user_list();
 		}
 	}
 	
@@ -58,16 +60,26 @@ class Channel
 		}
 		return false;
 	}
-	
-	function UserHasMode($user,$mode)
+	function get_user_list()
 	{
-		$user = new User($user);
+		$userlist = [];
+		$conn = sqlnew();
+		$result = $conn->query("SELECT * FROM dalek_ison WHERE chan = lower('$this->chan')");
+		if (!$result)
+			return $userlist;
+		while($row = $result->fetch_assoc())
+			$userlist[] = $user = new User($row['nick']);
+		return $userlist;
+		
+	}
+	function UserHasMode(User $user,$mode)
+	{
 		$chanlist = get_ison($user->uid);
 		if (empty($chanlist))
 			return false;
 		for ($i = 0; isset($chanlist['list'][$i]); $i++)
 		{
-			if ($var = strpos($chanlist['mode'][$i],$mode) !== false && $chanlist['list'][$i] == $this->chan)
+			if (strpos($chanlist['mode'][$i],$mode) !== false && $chanlist['list'][$i] == $this->chan)
 			 {
 				return true;
 			}
@@ -78,7 +90,7 @@ class Channel
 	
 	function IsOp($user)
 	{
-		if ($var = $this->UserHasMode($user,"o"))
+		if ($this->UserHasMode($user,"o"))
 		{
 			return true;
 		}
@@ -86,7 +98,7 @@ class Channel
 	}
 	function IsHalfop($user)
 	{
-		if ($var = $this->UserHasMode($user,"h"))
+		if ($this->UserHasMode($user,"h"))
 		{
 			return true;
 		}
@@ -101,7 +113,7 @@ class Channel
 	}
 	function IsOwner($user)
 	{
-		if ($var = $this->UserHasMode($user,"q"))
+		if ($this->UserHasMode($user,"q"))
 		{
 			return true;
 		}
@@ -215,7 +227,7 @@ class Channel
 		$prep->execute();
 		$result = $prep->get_result();
 		
-		if ($result->num_rows == 0)
+		if (!$result || !$result->num_rows)
 			$this->IsReg = false;
 		else
 		{
@@ -284,4 +296,18 @@ function cmode_type($chr)
 		return false;
 	
 	return $type;
+}
+
+function channel_list() : array
+{
+	$conn = sqlnew();
+	$result = $conn->query("SELECT * FROM dalek_channels");
+	if (!$result)
+		return [];
+	
+	$chanlist = [];
+	while($row = $result->fetch_assoc())
+		$chanlist[] = new Channel($row['channel']);
+
+	return $chanlist;
 }

@@ -117,27 +117,28 @@ class cs_autoop {
 			$cs->notice($nick->uid,$parv[1].": That channel does not exist.");
 			return;
 		}
+		$mtags = ($chan->HasUser($nick->nick)) ? [CHAN_CONTEXT => $chan->chan] : NULL;
 		if (cs_autoop::can_autoop($account,$chan))
 		{
 			$user = $nick->wp;
 			
 			if ($toggle == "on" && cs_autoop::is_autoop($user,$chan->chan) == "on")
 			{
-				$cs->notice($nick->uid,"AUTOOP is already set to 'on' for $chan->chan");
+				sendnotice($nick, $cs, $mtags, "AUTOOP is already set to 'on' for $chan->chan");
 				return;
 			}
 			
 			elseif ($toggle == "off" && (!$isop = cs_autoop::is_autoop($user,$chan->chan) || $isop = "off"))
 			{
-				$cs->notice($nick->uid,"AUTOOP is already set to 'off' for $chan->chan");
+				sendnotice($nick, $cs, $mtags, "AUTOOP is already set to 'off' for $chan->chan");
 				return;
 			}
 			
 			cs_autoop::autoop_toggle($user,$chan->chan,$toggle);
-			$cs->notice($nick->uid,"AUTOOP has been set to '$toggle' for $chan->chan");
+			sendnotice($nick, $cs, $mtags, "AUTOOP has been set to '$toggle' for $chan->chan");
 			return;
 		}
-		$cs->notice($nick->uid,"Permission denied.");
+		sendnotice($nick, $cs, $mtags, "Permission denied.");
 	}
 
 	function can_autoop($nick,Channel $channel)
@@ -203,7 +204,7 @@ class cs_autoop {
 		
 		$wpuser = $nick->wp;
 	
-		if (cs_autoop::is_autoop($wpuser,$chan->chan) == "on" && !$chan->IsOp($nick->nick))
+		if (cs_autoop::is_autoop($wpuser,$chan->chan) == "on" && !$chan->IsOp($nick))
 		{
 			$cs->up($chan,$nick);
 		}
@@ -218,8 +219,10 @@ class cs_autoop {
 			return;
 		$user = new WPUser($nick->account);
 		foreach ($list['list'] as $chan)
+		{
 			$chan = new Channel($chan);
-			if (cs_autoop::is_autoop($user,$chan->chan) == "on" && !$chan->IsOp($nick->nick))
+			if (cs_autoop::is_autoop($user,$chan->chan) == "on" && !$chan->IsOp($nick))
 				$cs->mode($chan->chan,"+o $nick->nick");
+		}
 	}
 }

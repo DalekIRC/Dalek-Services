@@ -11,10 +11,9 @@ function AddServCmd
 	String $extended_help /* Something to show if in the HELP <cmd> response. Use \n for a new line */
 ) : bool /* Returns true or false */
 {
-	global $modules;
 	/* ERROR LOL */
 	$foundmodule = 0;
-	foreach($modules as $m)
+	foreach(Module::$modules as $m)
 		if (!strcasecmp($m->name,$modulehandle))
 			$foundmodule = 1;
 			

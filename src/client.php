@@ -79,6 +79,9 @@ class Client {
 	}
 	function msg($dest, ...$strings)
 	{
+		$mtags = generate_new_mtags($this);
+		Filter::StringArray($this->nick,$t,$strings);
+
 		foreach($strings as $string)
 			S2S(":$this->uid PRIVMSG $dest :$string");
 		
@@ -99,7 +102,7 @@ class Client {
 			if ($chan->HasUser($this->uid))
 				return;
 			$timestamp = (isset($chan->timestamp)) ? $chan->timestamp : $servertime;
-			S2S("SJOIN $timestamp $dest :~".$this->uid);
+			S2S("SJOIN $timestamp $dest :~@".$this->uid);
 			$sql->insert_ison($dest,$this->uid);
 		}
 	}
@@ -116,22 +119,18 @@ class Client {
 	}
 	function notice($dest, ...$strings)
 	{
+		$mtags = generate_new_mtags();
 		foreach ($strings as $string)
-			$this->notice_with_mtags(NULL, $dest, $string);
+			$this->notice_with_mtags($mtags, $dest, $string);
 	}
 	function notice_with_mtags(array $mtags = NULL, $dest, ...$strings)
 	{
-		$uid = $this->uid;
-		$mtags_to_send = NULL;
-		if ($mtags)
-		{
-			$mtags_to_send = "@";
-			foreach ($mtags as $mkey => $mval)
-				$mtags_to_send .= $mkey."=".$mval.";";
+		$new_mtags = generate_new_mtags($this);
+		duplicate_mtags($mtags, $new_mtags);
 
-			$mtags_to_send = rtrim($mtags_to_send,";");
-			$mtags_to_send .= " ";
-		}
+		Filter::StringArray($this->nick,$mtags,$strings);
+
+		$mtags_to_send = array_to_mtag($mtags);
 
 		foreach($strings as $string)
 		{
@@ -146,7 +145,7 @@ class Client {
 				$tok[0] = $string;
 
 			for ($i = 0; isset($tok[$i]); $i++)		
-				S2S("$mtags_to_send:$uid NOTICE $dest :".$tok[$i]);
+				S2S("$mtags_to_send :$this->uid NOTICE $dest :".$tok[$i]);
 		}
 	}
 	function mode($dest,$string)
@@ -171,20 +170,21 @@ class Client {
 	}
 	function svs2mode($nick,$string){
 		$nick = new User($nick);
-		if (!$nick->IsUser){ return; }
+		if (!$nick->IsUser)
+			return;
 		
 		$nick->SetMode("$string");
 		S2S(":$this->uid SVS2MODE $nick->uid $string");
 	}
 	function svslogin($uid,$account)
 	{
-		S2S(":$this->uid SVSLOGIN * $uid $account");
+		svslogin($uid, $account, $this->uid);
 	}
 	function up(Channel $chan, User $user)
 	{
 		$access = ChanAccessAsInt($chan,$user);
 		if (!$access)
-			return;
+			return false;
 
 		if ($access == 1)
 			$this->mode($chan->chan,"+v $user->nick");
@@ -200,6 +200,36 @@ class Client {
 
 		elseif ($access == 5)
 			$this->mode($chan->chan,"+qo $user->nick $user->nick");
+		
+		return true;
+	}
+	function kill(User $user, $message = "No reason")
+	{
+		S2S(":$this->uid KILL $user->uid :$message");
+		$user->exit();
+	}
+	function down(Channel $chan, User $user)
+	{
+		$access = ChanAccessAsInt($chan,$user);
+		if (!$access)
+			return false;
+
+		if ($access == 1)
+			$this->mode($chan->chan,"-v $user->nick");
+
+		elseif ($access == 2)
+			$this->mode($chan->chan,"-h $user->nick");
+
+		elseif ($access == 3)
+			$this->mode($chan->chan,"-o $user->nick");
+
+		elseif ($access == 4)
+			$this->mode($chan->chan,"-ao $user->nick $user->nick");
+
+		elseif ($access == 5)
+			$this->mode($chan->chan,"-qo $user->nick $user->nick");
+		
+		return true;
 	}
 	function kick($chan,$nick,$reason = '')
 	{
@@ -207,7 +237,7 @@ class Client {
 		do_part($chan,$nick);
 	}
 
-
+	
 	
 
 	function add_to_client_list($client)

@@ -78,8 +78,11 @@ class ns_metadata {
 		$tok = explode("* :",$u['params']);
 		$value = mb_substr($u['params'],strlen($tok[0]) + 3);
 	
-		md::md_add($parv[0],$key,$value);
-		hook::run("usermeta", ['nick' => $parv[0], 'key' => $key, 'value' => $value]);
+		md::add($parv[0],$key,$value);
+		hook::run(
+			HOOKTYPE_METADATA,
+			['nick' => $parv[0], 'key' => $key, 'value' => $value]
+		);
 	}
 	/* Send USERMETA command */
 	public static function send_usermeta($from = NULL, $to, $key, $value)
@@ -89,7 +92,10 @@ class ns_metadata {
 			$from = $cf['sid'];
 
 		S2S(":$from METADATA $to $key * :$value");
-		md::md_add($to,$key,$value);
-		hook::run("usermeta", ['nick' => $to, 'key' => $key, 'value' => $value]);
+		md::add($to,$key,$value);
+		hook::run(
+			HOOKTYPE_METADATA,
+			['nick' => $to, 'key' => $key, 'value' => $value]
+		);
 	}
 }

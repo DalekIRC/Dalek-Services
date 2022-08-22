@@ -1,6 +1,24 @@
 <?php
 
-
+/*				
+//	(C) 2021 DalekIRC Services
+\\				
+//			pathweb.org
+\\				
+//	GNU GENERAL PUBLIC LICENSE
+\\							v3
+//				
+\\				
+//				
+\\	Title:		Commands
+//				
+\\	Desc:		Factory for commands to be added, deleted, and found
+//				
+\\	Version:	1
+//				
+\\	Author:		Valware
+//				
+*/
 class cmd {
 
 	static $commands = array();
@@ -81,6 +99,7 @@ hook::func("raw", function($u)
 	
 	$params = (isset($parv[3])) ? mb_substr($u['string'], strlen($parv[0]) + strlen($parv[1]) + 2) : NULL;
 	cmd::run($str, array(
+		'raw' => $u['string'],
 		'mtags' => $mtag ?? NULL,
 		'nick' => $user,
 		'dest' => $dest,

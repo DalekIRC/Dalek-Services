@@ -75,9 +75,36 @@ class reportsync {
 	 */
 	public static function cmd_reportsync($u)
     {
-    	var_dump($u);
+		$parv = split($u['params']);
+
+		$add = $parv[0][0] == "+" ? 1 : 0;
+		$number = $parv[0][1];
+
+		$timestamp = $parv[1];
+		$reporter = $parv[2];
+		$report = cut_first_from($u['params'],":");
+
+		if ($add)
+			reportsync::add_report($number,$timestamp,$reporter,$report);
+		else
+			reportsync::del_report($number,$timestamp,$reporter,$report);
     }
 
+	public static function add_report($number, $timestamp, $reporter, $report)
+	{
+		$conn = sqlnew();
+		$prep = $conn->prepare("INSERT INTO dalek_reports (id, timestamp, reporter, report) VALUES (?, ?, ?, ?)");
+		$prep->bind_param("iiss", $number, $timestamp, $reporter, $report);
+		$prep->execute();
+		SVSLog(bold("REPORT").": [Reporter, $reporter] [Report: $report]");
+	}
+	public static function del_report($number, $timestamp, $reporter, $report)
+	{
+		$conn = sqlnew();
+		$prep = $conn->prepare("DELETE FROM dalek_reports WHERE id = ?");
+		$prep->bind_param("i",$number);
+		$prep->execute();
+	}
 	public static function table_init()
 	{
 		$conn = sqlnew();

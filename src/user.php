@@ -35,7 +35,7 @@ class User {
 		$this->IsWordPressUser = false;
 		$this->IsServer = false;
 		$this->IsUser = false;
-
+	
 		$u = find_person($user);
 		if ($u)
 			$this->IsUser = true;
@@ -64,6 +64,8 @@ class User {
 			$this->last = $u['last'];
 			$this->meta = new UserMeta($this);
 			
+			$this->IsService = (strpos($u['usermodes'],"S") !== false) ? true : false;
+
 			$wp_user = new WPUser($this->account);
 			if ($wp_user->IsUser)
 			{
@@ -115,7 +117,6 @@ class User {
 	}
 	function SetMode($mode)
 	{
-		var_dump($mode);
 		$charToAdd = NULL;
 		$charToDel = NULL;
 		if ($mode[0] !== "+" && $mode[0] !== "-")
