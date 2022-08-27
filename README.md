@@ -11,14 +11,21 @@
 # IRCServices (Work In Progress)
 Dalek IRC Services with WordPress integration tailored to you.
 
-### Integral methodology ###
-- [x] WordPress integration
-- [x] JSON-RPC API
-
 ### Brief Overview ###
+* Dalek is a set of IRC Services with the best WordPress integration on the market.
+* [WordPress](https://github.com/wordpress/wordpress) is an open-source Content Management System (CMS) [which makes up 43% of all websites](https://w3techs.com/technologies/details/cm-wordpress)
+* [UnrealIRCd](https://github.com/unrealircd/unrealircd is the most widely deployed Internet Relay Chat daemon (IRCd), (with a market share of 38.6% as of December 2021.)[https://www.ircstats.org/servers]
 
-
-Planned Pseudoservices
+### Why do I need Dalek? ###
+With WordPress + Dalek + UnrealIRCd, you have more creative control over things such as:
+  * How your users register and manage their profile:
+    - Works with [Ultimate Member](https://ultimatemember.com/), customise how your profiles look
+    - Create your own registration options like Date of Birth, Gender ID, Location etc. in WordPress, and these will be reflected in chat.
+    - Profile pictures are shown on IRC to clients who support [`METADATA`](https://github.com/ircv3/ircv3-specifications/blob/7c76d2022992d4f9ce088420a861f185169965a2/extensions/metadata.md)
+  * Confirmation emails, account deletion, bans and suspensions are all do-able from your WordPress dashboard.
+  * Add and remove Services staff via website, simply by adding or revoking their permission in the WordPress `Users` tab.
+  
+## Planned Pseudoservices ##
 
 - [x] NickServ
 - [x] ChanServ
@@ -27,27 +34,40 @@ Planned Pseudoservices
 - [x] Global
 - [ ] Inbox (MemoServ replacement with extra features)
 - [ ] MetaServ (HostServ replacement with extra features)
+- [x] bbServ (Optional: bbForums notification bot)
 
+### Knows how to talk with ###
+- [x] WordPress
+- [x] JSON-RPC (remote procedure calls)
+- [x] UnrealIRCd
+- [x] SQL Databases
+- [x] You!
 
-### NickServ ###
+__NickServ__
+
 As always, you can use NickServ to manage your account settings. These services support `SASL` and `draft/account-registration`, and so registering your account directly over IRC is also possible. The only main differences are you can't register an account by messaging NickServ, and the `IDENTIFY` command takes one of `PLAIN` or `EXTERNAL` based on however you have your client set up, and it will take this to mean that you would like to start/continue a SASL flow.
 
-### ChanServ ###
+__ChanServ__
+
 As always, you can use ChanServ to register and manage your channels, give op to people and whatnot.
 
-### OperServ ###
+__OperServ__
+
 As always, you can use OperServ to manage opery things.
 
-### BotServ ###
+__BotServ__
 As always, you can create and assign special bots in place of ChanServ in a channel.
 
-### Global ###
+__Global__
+
 Global noticer
 
-### Inbox ###
+__Inbox__
+
 Yes, I know an inbox isn't an outbox! Even though this provides outbox features, it's just how it is. Deal with it.
 
-### MetaServ ###
+__MetaServ__
+
 MetaServ will replace HostServ, and the reason for the name change is because it'll let you request and set more than just vHosts (swhois and other things)
 
 ## Requirements ##
