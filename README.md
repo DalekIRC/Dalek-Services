@@ -4,8 +4,8 @@
 [![catsuwu](https://forthebadge.com/images/badges/contains-cat-gifs.svg)]()
 
 [![Version](https://img.shields.io/badge/Beta-0.1-blue.svg)]()
-[![Version](https://img.shields.io/badge/Status-Work%20In%20Progress-yellow.svg)]()
-[![Maintained](https://img.shields.io/badge/Maintained-yes-violet.svg)]()
+[![Version](https://img.shields.io/badge/Status-Work%20In%20Progress-emerald.svg)]()
+[![Maintained](https://img.shields.io/badge/Maintained-yes-green.svg)]()
 [![Maintainer](https://img.shields.io/badge/Maintainer-Valware-purple.svg)](https://github.com/ValwareIRC/)
 [![Unreal](https://img.shields.io/badge/UnrealIRCd-6.0+-green.svg)]()
 [![Unreal](https://img.shields.io/badge/WordPress-6.0+-green.svg)]()
