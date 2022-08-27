@@ -5,9 +5,9 @@
 
 [![Version](https://img.shields.io/badge/Beta-0.1-blue.svg)]()
 [![Maintained](https://img.shields.io/badge/Maintained-yes-green.svg)]()
-[![Maintainer](https://img.shields.io/badge/Maintainer-Valware-blue.svg)](https://github.com/ValwareIRC/)
-[![Unreal](https://img.shields.io/badge/UnrealIRCd-6.0+-blue.svg)]()
-[![Unreal](https://img.shields.io/badge/WordPress-6.0+-blue.svg)]()
+[![Maintainer](https://img.shields.io/badge/Maintainer-Valware-purple.svg)](https://github.com/ValwareIRC/)
+[![Unreal](https://img.shields.io/badge/UnrealIRCd-6.0+-green.svg)]()
+[![Unreal](https://img.shields.io/badge/WordPress-6.0+-green.svg)]()
 # IRCServices (Work In Progress)
 Dalek IRC Services with WordPress integration tailored to you.
 
