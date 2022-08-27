@@ -1,4 +1,4 @@
-[![Version](https://img.shields.io/badge/Version-0.1beta-blue.svg)](https://shields.io/)
+[![Version](https://img.shields.io/badge/Version-0.1-beta-blue.svg)](https://shields.io/)
 
 # IRCServices (Work In Progress)
 Dalek IRC Services with WordPress integration tailored to you.
