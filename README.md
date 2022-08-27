@@ -14,7 +14,7 @@ Dalek IRC Services with WordPress integration tailored to you.
 ### Brief Overview ###
 * Dalek is a set of IRC Services with the best WordPress integration on the market.
 * [WordPress](https://github.com/wordpress/wordpress) is an open-source Content Management System (CMS) [which makes up 43% of all websites](https://w3techs.com/technologies/details/cm-wordpress)
-* [UnrealIRCd](https://github.com/unrealircd/unrealircd is the most widely deployed Internet Relay Chat daemon (IRCd), (with a market share of 38.6% as of December 2021.)[https://www.ircstats.org/servers]
+* [UnrealIRCd](https://github.com/unrealircd/unrealircd) is the most widely deployed Internet Relay Chat daemon (IRCd), [with a market share of 38.6% as of December 2021.](https://www.ircstats.org/servers)
 
 ### Why do I need Dalek? ###
 With WordPress + Dalek + UnrealIRCd, you have more creative control over things such as:
