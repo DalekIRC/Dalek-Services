@@ -1,5 +1,13 @@
-[![Version](https://img.shields.io/badge/Version-0.1-beta-blue.svg)](https://shields.io/)
 
+[![CodeBabes](https://forthebadge.com/images/badges/built-by-codebabes.svg)]()
+[![SpagYetti](https://forthebadge.com/images/badges/contains-tasty-spaghetti-code.svg)]()
+[![catsuwu](https://forthebadge.com/images/badges/contains-cat-gifs.svg)]()
+
+[![Version](https://img.shields.io/badge/Beta-0.1-blue.svg)]()
+[![Maintained](https://img.shields.io/badge/Maintained-yes-green.svg)]()
+[![Maintainer](https://img.shields.io/badge/Maintainer-Valware-blue.svg)](https://github.com/ValwareIRC/)
+[![Unreal](https://img.shields.io/badge/UnrealIRCd-6.0+-blue.svg)]()
+[![Unreal](https://img.shields.io/badge/WordPress-6.0+-blue.svg)]()
 # IRCServices (Work In Progress)
 Dalek IRC Services with WordPress integration tailored to you.
 
@@ -15,7 +23,7 @@ Planned Pseudoservices
 - [x] NickServ
 - [x] ChanServ
 - [x] OperServ
-- [ ] BotServ
+- [x] BotServ
 - [x] Global
 - [ ] Inbox (MemoServ replacement with extra features)
 - [ ] MetaServ (HostServ replacement with extra features)
@@ -41,3 +49,7 @@ Yes, I know an inbox isn't an outbox! Even though this provides outbox features,
 
 ### MetaServ ###
 MetaServ will replace HostServ, and the reason for the name change is because it'll let you request and set more than just vHosts (swhois and other things)
+
+## Requirements ##
+- UnrealIRCd 6.0 or later
+- WordPress 6.0 or later
