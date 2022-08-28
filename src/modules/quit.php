@@ -80,10 +80,9 @@ class quit {
 		$quitmsg = $u['params'];
 		SVSLog("$nick->nick ($nick->ident@$nick->realhost) [$nick->ip] disconnected from the network. ($quitmsg) ($nick->sid)");
 		$nick->exit();
-		
-		hook::run("quit", array(
+		$array = array(
 			'uid' => $u['nick']->uid,
-			'quitmsg' => $quitmsg)
-		);
+			'quitmsg' => $quitmsg);
+		hook::run("quit", $array);
 	}
 }

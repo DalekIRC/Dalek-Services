@@ -6,6 +6,7 @@ define( "LOG_FATAL","[04FATAL] ");
 define( "LOG_RPC", "[RPC] ");
 define( "CHAN_CONTEXT", "+draft/channel-context");
 define( "RECYCLED_MESSAGE", "dalek/recycled");
+define( "DALEK_VERSION", "0.001-beta");
 
 $tok = explode("/",__DIR__);
 $n = sizeof($tok) - 1;
@@ -664,6 +665,16 @@ function sendnotice(User $user, Client $me = NULL, $mtags = [], ...$notice)
 	$me->notice_with_mtags($mtags, $user->uid, $notice);
 }
 
+function sendmsg(User $user, Client $me = NULL, $mtags = [], ...$msg)
+{
+	global $cf;
+	if (!$me)
+		$me = Client::find($cf['sid']);
+
+	if (!$me) // should not happen under any circumstance
+		die("Critical error: Could not find own server!");
+	$me->privmsg_with_mtags($mtags, $user->uid, $msg);
+}
 /* Dalek's char counting function */
 function dcount_chars($haystack, $needle)
 {
@@ -768,11 +779,11 @@ function glue($array, $delimiter = " ")
 	return trim($string,$delimiter);
 }
 
-function cut_first_from($string, $delimiter)
+function cut_first_from($string, $delimiter = " ")
 {
 	$parv = split($string,":");
 	$parv[0] = NULL;
-	return glue($parv,":");
+	return trim(glue($parv,":"));
 }
 
 class FakeLag {
@@ -852,6 +863,7 @@ function IsRPCCall()
 	die(); // if we can't tell if we're an RPC user or not, what the hell even happened?
 }
 
+/* some basic validation checking */
 function is_valid_hostmask($string)
 {
 	for ($i = 0; isset($string[$i]); $i++)
@@ -859,10 +871,31 @@ function is_valid_hostmask($string)
 			return false;
 	return true;
 }
-
 function is_invalid_hostmask_char($char)
 {
 	if (preg_match('/\d/', $char) || preg_match('/[a-zA-Z]/', $char) || $char == "." || $char == "-" || $char == "_")
 		return true;
 	return false;
+}
+
+/* If we are running in debug mode */
+function IsDebugMode()
+{
+	global $cf;
+	if (isset($cf['debugmode']) && $cf['debugmode'] == "on")
+		return true;
+	return false;
+}
+
+function DebugLog($string, $type = "") : void
+{
+
+	if (!IsDebugMode())
+		return;
+	/* affix a type */
+	global $cf,$serv;
+	$string = "[DEBUG]".trim($type)." ".$string;
+
+	echo $string."\n";
+	log_to_disk($string);
 }

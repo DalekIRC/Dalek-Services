@@ -98,7 +98,8 @@ class umode2 {
 		 * @modes (string)
 		 * @oldmodes (string)
 		 */
-		hook::run(HOOKTYPE_USERMODE, ['nick' => $nick, 'modes' => $u['dest'], 'oldmodes' => $oldmodes]);
+		$arr =['nick' => $nick, 'modes' => $u['dest'], 'oldmodes' => $oldmodes];
+		hook::run(HOOKTYPE_USERMODE, $arr);
 
 		/* You don't HAVE to return, butt-fuck it */
 		return;

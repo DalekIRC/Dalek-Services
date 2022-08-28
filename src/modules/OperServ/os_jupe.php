@@ -124,14 +124,13 @@ class JupeServer {
 		S2S(":".$cf['sid']." SID $this->name 2 $this->sid :$this->description");
 		S2S(":$this->sid SINFO 99999999999 6000 dhiopqrstwxzBDGHIRSTWZ beI,fkL,lH,cdgimnprstzCDGKMNOPQRSTVWZ * DALEK");
 		S2S(":$this->sid EOS");
-
-		hook::run("SID", array(
+		$array = array(
 			"server" => $this->name,
 			"hops" => 1,
 			"sid" => $this->sid,
 			"desc" => $this->description,
-			"intro_by" => $cf['sid'])
-		);
+			"intro_by" => $cf['sid']);
+		hook::run("SID", $array);
 	}
 	function die()
 	{
@@ -147,9 +146,3 @@ class JupeServer {
 		del_sid($this->sid);
 	}
 }
-/*
-[RECV] :736 SID irc.afnet.us 3 114 :AirFire Networks
-[RECV] :114 SINFO 1659060860 6000 dhiopqrstwxzBDGHIRSTWZ beI,fkL,lH,cdgimnprstzCDGKMNOPQRSTVWZ * UnrealIRCd-6.0.4-git
-[RECV] :114 MD client 114 link-security :2
-[RECV] :114 SID irc.afwi.net 4 25B :AirFire Networks
-[RECV] :25B EOS

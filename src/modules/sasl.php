@@ -113,7 +113,8 @@ class SASL {
 					SVSLog(LOG_WARN."User with nick '".$row['nick']."' was logged into account '".$row['account']."', which doesn't exist. They have been logged out.");
 					return;
 				}
-				hook::run("auth", array('uid' => $row['UID'], 'nick' => $row['nick'], 'account' => $row['account']));
+				$array = array('uid' => $row['UID'], 'nick' => $row['nick'], 'account' => $row['account']);
+				hook::run("auth", $array);
 			}
 		}
 	}
@@ -134,7 +135,8 @@ class SASL {
 			
 		}
 		elseif ($nick->nick == $u['account']) {
-			hook::run("auth", ['uid' => $nick->uid,'account' => $u['account'], 'nick' => $u['nick']]);
+			$array = ['uid' => $nick->uid,'account' => $u['account'], 'nick' => $u['nick']];
+			hook::run("auth", $array);
 		}
 	}
 
@@ -269,8 +271,10 @@ class IRC_SASL {
 		/* if they're already connected, run the auth hook */
 		$client = new User($this->uid);
 		if ($client->IsUser)
-			hook::run(HOOKTYPE_AUTHENTICATE, ['uid' => $client->uid, 'account' => $this->account, 'nick' => $client->nick]);
-
+		{
+			$array = ['uid' => $client->uid, 'account' => $this->account, 'nick' => $client->nick];
+			hook::run(HOOKTYPE_AUTHENTICATE, $array);
+		}
 		unset(self::$list[$this->uid]);
 		
 	}

@@ -77,16 +77,19 @@ class topic {
     {
 		$parv = explode(" ",$u['params']);
 		$topic = ($t = explode(" :",$u['params'])) ? str_replace($t[0]." :","",$u['params']) : "";
-		$chan = $parv[0];
-		self::update_topic($chan,$topic);
+		$chan = strtolower($parv[0]);
+		self::update_topic($chan,utf8_encode($topic));
     }
 
 	private static function update_topic($chan,$topic)
 	{
 		$conn = sqlnew();
 		
-		$prep = $conn->prepare("UPDATE dalek_channels SET topic = ? WHERE channel LIKE ?");
+		$prep = $conn->prepare("UPDATE dalek_channels SET topic = ? WHERE lower(channel) = ?");
 		$prep->bind_param("ss",$topic,$chan);
+		$prep->execute();
+		$prep = $conn->prepare("UPDATE dalek_chaninfo SET topic = ? WHERE lower(channel) = ?");
+		$prep->bind_param("ss, $topic,$chan");
 		$prep->execute();
 		$prep->close();
 	}

@@ -42,8 +42,8 @@ class cs_register {
 	/* Destruction: Here's where to clear up your globals or databases or anything */
 	function __destruct()
 	{
-		hook::del("join", 'cs_register::hook_do_join');
-		hook::del("start", 'cs_register::perform_checkup');
+		hook::del(HOOKTYPE_JOIN, 'cs_register::hook_do_join');
+		hook::del(HOOKTYOE_START, 'cs_register::perform_checkup');
 	}
 
 
@@ -68,8 +68,8 @@ class cs_register {
 			$extended_help /* Extended help */
 		)) return false;
 
-		hook::func("join", 'cs_register::hook_do_join');
-		hook::func("start", 'cs_register::perform_checkup');
+		hook::func(HOOKTYPE_JOIN, 'cs_register::hook_do_join');
+		hook::func(HOOKTYPE_START, 'cs_register::perform_checkup');
 		return true;
 	}
 
@@ -150,11 +150,7 @@ class cs_register {
 			$chan = new Channel($row['channel']);
 			if (!$chan->IsChan)
 				continue;
-
-			if (!$chan->HasUser("ChanServ"))
-				Client::find("ChanServ")->join($chan->chan);
-			if (!$chan->HasMode("r") == false)
-				$chan->SetMode("+r");
+			cs_register::hook_do_join(array("chan" => $row['channel']));
 		}
 	}
 	function register_channel($chan,$owner)

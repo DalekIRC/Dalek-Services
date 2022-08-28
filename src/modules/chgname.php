@@ -81,7 +81,7 @@ class chgname {
 	public static function cmd_chgname($u)
 	{
         $parv = explode(" :",$u['params']);
-        $gecos = $parv[1];
+        $gecos = cut_first_from($u['params']);
         $uid = $parv[0];
 		$conn = sqlnew();
 		$prep = $conn->prepare("UPDATE dalek_user SET gecos = ? WHERE UID = ?");
@@ -110,22 +110,33 @@ class chgname {
 			rpc_append_error($reply, "That user is not online", RPC_ERR_INVALID_REQUEST);
 		}
 		
+		/* sigh check if the username already exists */
+
+		$target = new User($params['user']);
+		if ($target->IsUser)
+		{
+			$err++;
+			rpc_append_error($reply, "That username already exists. Sorry!", RPC_ERR_ALREADY_EXISTS);
+		}
+
 		if ($err > 0)
 		{
 			rpc_append_id($reply, $id);
 			rpc_send_reply($id, $reply);
 			return;
 		}
+		
 
 		/* now we can probably pass it back through that thing over there */
-		$u['params'] = [$user->uid, $params['name']];
+		$u['params'] = $user->uid." ".$params['name'];
 		self::cmd_chgname($u);
 
 		/* send it */
 		S2S("CHGNAME $user->uid ".$params['name']);
 
 		/* log it */
-		SVSLog("Changed the 'real name' of $user->nick ($user->name@$user->realhost) to be: ".$params['name'], LOG_RPC);
+
+		SVSLog("Changed the 'real name' of $user->nick ($user->ident@$user->realhost) to be: ".$params['name'], LOG_RPC);
 
 		/* return info about it to the RPC caller */
 		rpc_append_result($reply, "Success");

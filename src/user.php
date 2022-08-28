@@ -101,7 +101,6 @@ class User {
 	}
 	function NewNick($nick)
 	{
-		global $servertime;
 		
 		if (!$this->IsUser)
 		{ 
@@ -111,8 +110,8 @@ class User {
 		{
 			return false;
 		}
-		S2S(" SVSNICK ".$this->nick." $nick $servertime");
-		update_nick($this->uid,$nick,$servertime);
+		S2S(" SVSNICK ".$this->nick." $nick ".servertime());
+		update_nick($this->uid,$nick,servertime());
 		$this->nick = $nick;
 	}
 	function SetMode($mode)

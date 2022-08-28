@@ -92,7 +92,7 @@ class uid {
 		if (!$ip){ $ip = ""; }
 		$tok = explode(" :",$u['params']);
 		$gecos = str_replace($tok[0]." :","",$u['params']);
-		hook::run("UID", array(
+		$array = array(
 			"sid" => $sid,
 			"nick" =>$nick,
 			"timestamp" => $ts,
@@ -103,7 +103,7 @@ class uid {
 			"usermodes" => $usermodes,
 			"cloak" => $cloak,
 			"ip" => $ip ?? $ipb64,
-			"gecos" => $gecos)
-		);
+			"gecos" => $gecos);
+		hook::run("UID", $array);
     }
 }

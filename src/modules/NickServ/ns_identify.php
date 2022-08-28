@@ -121,7 +121,8 @@ class ns_identify {
 		{
 			$ns = Client::find("NickServ");
 			$ns->notice($nick->uid,"That nick is registered. If it's yours, please authenticate for it using SASL.");
-			Events::Add(servertime() + 120, 1, NULL, 'identify_timeout', array($nick->nick), 'ns_identify');
+
+			Events::Add(servertime() + 120, 1, NULL, 'identify_timeout', array($nick->nick), $err = NULL, 'ns_identify');
 		}
 	}
 	public static function identify_timeout($nick)

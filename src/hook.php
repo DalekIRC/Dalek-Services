@@ -23,6 +23,7 @@
 //				
 */
 
+
 /* Hooktype Definitions */
 define('HOOKTYPE_NEW_MESSAGE', 'privmsg'); /* When a new message is sent, regardless of if it's a channel or user message or notice*/
 define('HOOKTYPE_USER_MESSAGE', 'usermsg'); /* When a new message is sent to a pseudoclient on our server */
@@ -52,6 +53,8 @@ define('HOOKTYPE_CHANNEL_DESTROY', 'destroychan'); /* When a channel is destroye
 define('HOOKTYPE_RPC_CALL', 'rpc_call');
 define('HOOKTYPE_USERMODE', 'umode');
 define('HOOKTYPE_METADATA', 'usermeta');
+define('HOOKTYPE_UPDATE_FOUND', 'update_found');
+
 
 
 
@@ -60,10 +63,10 @@ class hook {
 
 	private static $actions = [];
 
-	public static function run($hook, $args = array())
+	public static function run($hook, &$args = array())
 	{
 		if (!empty(self::$actions[$hook]))
-			foreach (self::$actions[$hook] as $f)
+			foreach (self::$actions[$hook] as &$f)
 				$f($args);
 			
 	}

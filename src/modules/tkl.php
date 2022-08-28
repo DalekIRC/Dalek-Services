@@ -96,7 +96,7 @@ class tkl {
 		else
 			self::del_tkl($type,$ut,$mask,$set_by,$expiry,$timestamp,$reason);
 
-		hook::run("TKL", array(
+		$array = array(
 			'add' => $add,
 			'type' => $type,
 			'ut' => $ut,
@@ -105,7 +105,8 @@ class tkl {
 			'expiry' => $expiry,
 			'timestamp' => $timestamp,
 			'reason' => $reason
-		));
+		);
+		hook::run("TKL", $array);
 	}
 	public static function table_init($u)
 	{	

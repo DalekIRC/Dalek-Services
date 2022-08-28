@@ -299,8 +299,36 @@ class SQL {
 			$prep->close();
 		}
 	}
-	function delete_ison($chan,$uid)
+	function delete_ison($chan,$uid,$modes = "")
 	{
+		$sql_modestring = "+"; // what modes to set dem as in de databass
+
+		if (!BadPtr($modes)) // figure out them modes
+		{
+			
+			for ($i = 0; !BadPtr($modes); $i++, $char = $modes[$i])
+			{
+				if (!strcmp($char,"+"))
+					strcat($sql_modestring,"v");
+				
+				elseif (!strcmp($char,"%"))
+					strcat($sql_modestring,"h");
+				
+				elseif (!strcmp($char,"@"))
+					strcat($sql_modestring,"o");
+
+				elseif (!strcmp($char,"~"))
+					strcat($sql_modestring,"a");
+
+				elseif (!strcmp($char,"*"))
+					strcat($sql_modestring,"q");
+
+				elseif (!strcmp($char,"!"))
+					strcat($sql_modestring,"Y");
+			}
+		}
+
+
 		$conn = sqlnew();
 		$prep = $conn->prepare("DELETE FROM dalek_ison WHERE nick = ? AND lower(chan) = ?");
 		$prep->bind_param("ss",$nick->uid,$chan);
@@ -399,14 +427,10 @@ function sqlnew()
 	if ($i >= 15)
 		die(SVSLog("Could not connect to the database for 30 seconds. Shutting down.", LOG_FATAL));
 		
-	if (is_null($cf['sqlsock']))
-		$conn = mysqli_connect($cf['sqlip'],$cf['sqluser'],$cf['sqlpass'],$cf['sqldb'],$cf['sqlport'] = "3306");
-	else
-		$conn = mysqli_connect($cf['sqlip'],$cf['sqluser'],$cf['sqlpass'],$cf['sqldb'],$cf['sqlport'] = "3306",$cf['sqlsock']);
-
-	if (!$conn)
+	$conn = mysqli_connect($cf['sqlip'],$cf['sqluser'],$cf['sqlpass'],$cf['sqldb'], $cf['sqlport'] = "3306");
+	if ($conn->connect_error)
 	{
-		SVSLog("Could not connect to mysql database (".$conn->connect_error.") Trying again in 2 seconds", LOG_WARN);
+		SVSLog("Could not connect to mysql database (".$conn->connect_error.": Error code: ".$conn->connect_errno.") Trying again in 2 seconds", LOG_WARN);
 		sleep(2);
 		$i++;
 		goto beginning;
@@ -426,7 +450,7 @@ hook::func("preconnect", function($u){
 		UID varchar(255) NOT NULL,
 		usermodes varchar(255),
 		cloak varchar(255) NOT NULL,
-		gecos varchar(255) NOT NULL,
+		gecos varchar(255),
 		ip varchar(255) NOT NULL,
 		account varchar(255),
 		secure varchar(1),
@@ -565,13 +589,12 @@ function umeta_add($person,$key = "",$data = "")
 
 
 
-function get_num_online_users()
+function get_num_online_users() : int
 {
-	
-
 	$conn = sqlnew();
 
-	if (!$conn) { return false; }
+	if (!$conn)
+		return 0;
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_user");
 		$prep->execute();
@@ -579,14 +602,15 @@ function get_num_online_users()
 		$count = $result->num_rows;
 		return $count;
 	}
-	return false;
+	return 0;
 }
 
-function get_num_servers()
+function get_num_servers() : int
 {
 	$conn = sqlnew();
 
-	if (!$conn) { return false; }
+	if (!$conn)
+		return 0;
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_server");
 		$prep->execute();
@@ -594,14 +618,15 @@ function get_num_servers()
 		$count = $result->num_rows;
 		return $count;
 	}
-	return false;
+	return 0;
 }
 
-function get_num_channels()
+function get_num_channels() : int
 {
 	$conn = sqlnew();
 
-	if (!$conn) { return false; }
+	if (!$conn)
+		return 0;
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_channels");
 		$prep->execute();
@@ -609,14 +634,15 @@ function get_num_channels()
 		$count = $result->num_rows;
 		return $count;
 	}
-	return false;
+	return 0;
 }
 
-function get_num_swhois()
+function get_num_swhois() : int
 {
 	$conn = sqlnew();
 
-	if (!$conn) { return false; }
+	if (!$conn)
+		return 0;
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_swhois");
 		$prep->execute();
@@ -624,14 +650,15 @@ function get_num_swhois()
 		$count = $result->num_rows;
 		return $count;
 	}
-	return false;
+	return 0;
 }
 
-function get_num_meta()
+function get_num_meta() : int
 {
 	$conn = sqlnew();
 
-	if (!$conn) { return false; }
+	if (!$conn)
+		return 0;
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_user_meta");
 		$prep->execute();
@@ -639,29 +666,32 @@ function get_num_meta()
 		$count = $result->num_rows;
 		return $count;
 	}
-	return false;
+	return 0;
 }
 
 
-function update_last($person)
+function update_last($person) : bool
 {
 	global $servertime;
 	if (!isset($person->IsUser) && is_string($person))
 	{
 		$user = new User($person);
-		if (!$user->IsUser){ return false; }
+		if (!$user->IsUser)
+			return false;
 	}
 	$conn = sqlnew();
-	if (!$conn) { return false; }
+	if (!$conn)
+		return false;
 	else {
 		$prep = $conn->prepare("UPDATE dalek_user SET last = ? WHERE UID = ?");
 		$prep->bind_param("is",$servertime,$user->uid);
 		$prep->execute();
 		$prep->close();
 	}
+	return true;
 }
 
-function is_a_ban($chan,$ban)
+function is_a_ban($chan,$ban) : bool
 {
 	$conn = sqlnew();
 	$prep = $conn->prepare("SELECT * FROM dalek_channel_meta WHERE chan = ? AND meta_value = ?");
@@ -706,26 +736,66 @@ function find_person($person = NULL)
 	}
 }
 
-function update_nick($uid,$nick,$ts)
+function update_nick($uid,$nick,$ts) : bool
 {
-	global $ns;
 	$conn = sqlnew();
-	if (!$conn) { return false; }
+	if (!$conn)
+		return false;
 	else {
 		
-		$person = find_person($uid);
-		$uid = $person['UID'];
+		$person = new User($uid);
+		if (!$person->IsUser)
+			return false;
 		
 		$prep = $conn->prepare("UPDATE dalek_user SET nick = ?, timestamp = ? WHERE UID = ?");
 		$prep->bind_param("sis",$nick,$ts,$uid);
 		$prep->execute();
 		$prep->close();
 	}
+	return true;
 }
-function update_usermode($uid,$new)
+
+function update_host($uid,$host,$ts) : bool
 {
 	$conn = sqlnew();
-	if (!$conn) { return false; }
+	if (!$conn)
+		return false;
+	else {
+		$person = new User($uid);
+		if (!$person->IsUser)
+			return false;
+		$uid = $person->uid;
+		
+		$prep = $conn->prepare("UPDATE dalek_user SET cloak = ?, timestamp = ? WHERE UID = ?");
+		$prep->bind_param("sis",$host,$ts,$uid);
+		$prep->execute();
+		$prep->close();
+	}
+	return true;
+}
+function update_ident($uid,$ident,$ts) : bool
+{
+	$conn = sqlnew();
+	if (!$conn)
+		return false;
+	else {
+		$person = new User($uid);
+		if (!$person->IsUser)
+			return false;
+		$uid = $person->uid;
+		
+		$prep = $conn->prepare("UPDATE dalek_user SET ident = ?, timestamp = ? WHERE UID = ?");
+		$prep->bind_param("sis",$ident,$ts,$uid);
+		$prep->execute();
+		$prep->close();
+	}
+	return true;
+}
+function update_usermode($uid,$new) : bool
+{
+	$conn = sqlnew();
+	if (!$conn)
+		return false;
 	else {
 		
 		$person = find_person($uid);
@@ -736,12 +806,13 @@ function update_usermode($uid,$new)
 		$prep->execute();
 		$prep->close();
 	}
+	return true;
 }
-function find_serv($serv)
+function find_serv($serv) 
 {
-	global $ns;
 	$conn = sqlnew();
-	if (!$conn) { return false; }
+	if (!$conn)
+		return false;
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_server WHERE servername = ?");
 		$prep->bind_param("s",$serv);
@@ -770,7 +841,8 @@ function find_serv($serv)
 function get_ison($uid)
 {
 	$conn = sqlnew();
-	if (!$conn) { return false; }
+	if (!$conn)
+		return false;
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_ison WHERE nick = ?");
 		$prep->bind_param("s",$uid);
@@ -794,7 +866,7 @@ function get_ison($uid)
 	}
 }
 
-function recurse_serv_attach($sid)
+function recurse_serv_attach($sid) : array
 {
 	$squit = array();
 	for ($squit[] = $sid, $i = 0; isset($squit[$i]); $i++)
@@ -806,24 +878,26 @@ function recurse_serv_attach($sid)
 }
 
 
-function del_sid($sid)
+function del_sid($sid) : void
 {
 	global $sql;
 	$sql->delsid($sid);
 }
 
-function serv_num_users($sid)
+function serv_num_users($sid) : int
 {
 	$conn = sqlnew();
 	$prep = $conn->prepare("SELECT * FROM dalek_user WHERE SID = ?");
 	$prep->bind_param("s",$sid);
 	$prep->execute();
 	$result = $prep->get_result();
+	if (!$result || !$result->num_rows)
+		return 0;
 	$return = $result->num_rows;
-	return $return;
+	return (int)$return;
 }
 
-function serv_num_attach($sid)
+function serv_num_attach($sid) : int
 {
 	$conn = sqlnew();
 	$prep = $conn->prepare("SELECT * FROM dalek_server WHERE intro_by = ?");
@@ -835,7 +909,7 @@ function serv_num_attach($sid)
 	if (($numr = $result->num_rows) == 0)
 		return 0;
 	else
-		return $numr;
+		return (int)$numr;
 }
 
 function serv_attach($sid)
@@ -847,7 +921,7 @@ function serv_attach($sid)
 	$prep->execute();
 	$result = $prep->get_result();
 	if (!$result)
-		return 0;
+		return false;
 	while ($row = $result->fetch_assoc())
 		if (!in_array($row['sid'],$return))
 			$return[] = $row['sid'];
@@ -874,7 +948,7 @@ function recurse_serv_users($sid)
 	return $return;
 }
 
-function update_gecos($nick,$gecos)
+function update_gecos($nick,$gecos) : void
 {
 	$conn = sqlnew();
 	$gecos = ircstrip($gecos);

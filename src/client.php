@@ -36,9 +36,9 @@ class Client {
 		$this->uid = $uid = generate_uid($nick);
 		$this->modinfo = $modinfo;
 		$this->cmds = NULL;
+		var_dump($this);
 		S2S("UID $nick 0 $servertime $ident $hostmask $uid 0 +oiqS * * * :$gecos");
-		
-		hook::run("UID", array(
+		$array = array(
 			'nick' => $nick,
 			'timestamp' => $servertime,
 			'ident' => $ident,
@@ -49,8 +49,8 @@ class Client {
 			'ip' => "",
 			'sid' => $cf['sid'],
 			'ipb64' => "",
-			'gecos' => $gecos)
-		);
+			'gecos' => $gecos);
+		hook::run("UID", $array);
 		self::add_to_client_list($this);
 		
 		$this->join($cf['logchan']);
@@ -86,6 +86,42 @@ class Client {
 			S2S(":$this->uid PRIVMSG $dest :$string");
 		
 	}
+	function msg_with_mtags($mtags, $dest, $string)
+	{
+		$new_mtags = generate_new_mtags($this);
+		duplicate_mtags($mtags, $new_mtags);
+
+		Filter::StringArray($this->nick,$mtags,$strings);
+
+		$mtags_to_send = array_to_mtag($mtags);
+
+		foreach($strings as $string)
+		{
+			/* We switched from <lf> to \n, so convert */
+			$string = str_replace("<lf>", "\n",$string);
+
+			$tok = array();
+			if (strpos($string,"\n") !== false)
+				$tok = explode("\n",$string);
+			
+			else
+				$tok[0] = $string;
+
+			for ($i = 0; isset($tok[$i]); $i++)		
+				S2S("$mtags_to_send :$this->uid PRIVMSG $dest :".$tok[$i]);
+		}
+	}
+	function tagmsg($mtags, $dest)
+	{
+		$new_mtags = generate_new_mtags($this);
+		duplicate_mtags($mtags, $new_mtags);
+
+		Filter::StringArray($this->nick,$mtags,$strings);
+
+		$mtags_to_send = array_to_mtag($mtags);
+
+		S2S("$mtags_to_send :$this->uid TAGMSG $dest");
+	}
 	function log($string){
 		global $cf;
 		
@@ -102,7 +138,7 @@ class Client {
 			if ($chan->HasUser($this->uid))
 				return;
 			$timestamp = (isset($chan->timestamp)) ? $chan->timestamp : $servertime;
-			S2S("SJOIN $timestamp $dest :~@".$this->uid);
+			S2S("SJOIN $timestamp $dest $chan->modes :~@".$this->uid);
 			$sql->insert_ison($dest,$this->uid);
 		}
 	}

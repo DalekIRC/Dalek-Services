@@ -82,14 +82,13 @@ class sjoin {
 		$chan = $parv[1];
 		$modes = ($parv[2][0] == ":") ? "" : $parv[2];
 		
-		
-		hook::run("SJOIN", array(
+		$array = array(
 			"sid" => $sid,
 			"timestamp" => $timestamp,
 			"channel" => $chan,
 			"modes" => $modes,
-			"full" => ":$sid SJOIN ".$u['params'])
-		);
+			"full" => ":$sid SJOIN ".$u['params']);
+		hook::run("SJOIN", $array);
     }
 	public static function sjoin_add($u)
 	{
@@ -149,7 +148,9 @@ class sjoin {
 			if (isset($mode))
 			{
 				$sql::insert_ison($chan,$item,$mode);
-				hook::run("join", array('chan' => $chan, 'nick' => $item));
+				$array = array('chan' => $chan, 'nick' => $item);
+
+				hook::run("join", $array);
 			}
 		}
 	}

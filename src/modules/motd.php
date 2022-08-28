@@ -31,7 +31,7 @@ class motd {
 	public $description = "Provides MOTD compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -59,7 +59,7 @@ class motd {
 		 * the function is a string reference to this class, the cmd_elmer method (function)
 		 * The last param is expected parameter count for the command
 		 * (both point to the same function which determines)
-        */
+		*/
 
 		if (!CommandAdd($this->name, 'MOTD', 'motd::cmd_motd', 0))
 			return false;
@@ -74,28 +74,28 @@ class motd {
 	 * $u['nick'] = User object
 	 */
 	public static function cmd_motd($u)
-    {
-        global $cf;
+	{
+		global $cf;
 		$nick = $u['nick'];
 
-        $f = "../../dalek.motd";
-        $motd = (file_exists($f)) ? fopen($f,"r") : false;
-        if (!$motd){
-            S2S("422 $nick->nick :No MOTD found.");
-            return;
-        }
+		$f = "conf/dalek.motd";
+		$motd = (file_exists($f)) ? fopen($f,"r") : false;
+		if (!$motd){
+			S2S("422 $nick->nick :No MOTD found.");
+			return;
+		}
 
-        $sn = $cf['servicesname'];
-        S2S("375 $nick->nick :--------oOo------- MOTD from $sn --------oOo-------");
+		$sn = $cf['servicesname'];
+		S2S("375 $nick->nick :--------oOo------- $sn Message of the Day --------oOo-------");
 
-        while(!feof($motd)){
-            $fg = fgets($motd);
-            if (empty($fg))
-                S2S("372 $nick->nick :- ");
-            else
-                S2S("372 $nick->nick :- $fg");
-        }
-        S2S("376 $nick->nick :--------oOo -------        End of MOTD         --------oOo-------");
-        return;
-    }
+		while(!feof($motd)){
+			$fg = fgets($motd);
+			if (empty($fg))
+				S2S("372 $nick->nick :- ");
+			else
+				S2S("372 $nick->nick :- $fg");
+		}
+		S2S("376 $nick->nick :--------oOo -------		End of MOTD		 --------oOo-------");
+		return;
+	}
 }

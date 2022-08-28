@@ -123,14 +123,15 @@ hook::func("raw", function($u)
 	$parv = explode(" ",$u['string']);
 	if ($parv[0] !== "NETINFO"){ return; }
 	$fsync = true;
-	hook::run("SID", array(
+	$array = array(
 		"server" => $cf['servicesname'],
 		"hops" => "0",
 		"sid" => $cf['sid'],
 		"desc" => $cf['network'],
-		"intro_by" => $us)
-	);
-	hook::run("start", array());
+		"intro_by" => $us);
+	hook::run("SID", $array);
+	$var = [];
+	hook::run("start", $var);
 	
 });
 
@@ -149,13 +150,12 @@ hook::func("raw", function($u)
 	$hops = $parv[3];
 	$sid = $parv[4];
 	$description = mb_substr($u['string'],strlen($parv[0]." ".$parv[1]." ".$parv[2]." ".$parv[3]." ".$parv[4]." ") + 1);
-	
-	hook::run("SID", array(
+	$array = array(
 		"server" => $servername,
 		"hops" => $hops,
 		"sid" => $sid,
 		"desc" => $description,
-		"intro_by" => $us)
-	);
+		"intro_by" => $us);
+	hook::run("SID", $array);
 });
 

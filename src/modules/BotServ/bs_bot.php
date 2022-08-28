@@ -129,7 +129,8 @@ class bs_bot {
 					$bs->notice($nick->uid,"Syntax: BOT ADD <nick> <ident> <host> <realname/GECOS>");
 					return;
 				}
-				if ($lookup = new User($botn) && $lookup->IsUser)
+				$lookup = new User($botn);
+				if ($lookup->IsUser)
 				{
 					$bs->notice($nick->nick,"There is already someone online with that nick.");
 					return;
@@ -138,7 +139,7 @@ class bs_bot {
 				$bot = self::bot_add($botn,$botI,$botH,$botgecos,$nick->nick);
 				$bot->log("$bot->nick reporting for duty!");
 			}
-			elseif ($flag == "del")
+			elseif (!strcasecmp($flag,"edit"))
 			{
 				if (!$botn)
 				{
@@ -156,7 +157,7 @@ class bs_bot {
 				
 				return;
 			}
-			elseif ($flag == "edit")
+			elseif (!strcasecmp($flag,"edit"))
 			{
 				if (!$botn)
 				{
@@ -235,8 +236,16 @@ class bs_bot {
 					S2S(":$bot->uid SETNAME $botgecos");
 				}
 			}
-			elseif ($flag == "list")
+			elseif (!strcasecmp($flag,"list"))
 			{
+				$mtags = generate_new_mtags($bs);
+				sendnotice($nick, $bs, $mtags, "Listing bots available:");
+				$list = Bot::$botlist;
+				if (empty($list))
+				{
+					sendnotice($nick, $bs, $mtags, "No bots of which to speak");
+					return;
+				}
 				foreach(Bot::$botlist as $bot)
 					$bs->notice($nick->uid,"$bot->nick");
 			}

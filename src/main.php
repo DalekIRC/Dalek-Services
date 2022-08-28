@@ -37,16 +37,15 @@ include "languages/en_GB";
 include __DIR__.'/../conf/dalek.conf';
 global $cf,$sql,$server,$port,$serv,$servertime;
 include "misc.php";
-include "rpc.php";
 include "conf.php";
-include "hook.php";
 include "language.php";
+include "hook.php";
+include "rpc.php";
 include "serv.php";
 include "sql.php";
 include "client.php";
 include "user.php";
 include "wordpress/wordpress.php";
-include "timer.php";
 include "channel.php";
 include "cmd.php";
 include "module.php";
@@ -54,8 +53,6 @@ include "filter.php";
 include "servcmd.php";
 include "events.php";
 include "buffer.php";
-
-
 
 //include "plugins/PATHWEB/uplink.php";
 // Server config
@@ -71,7 +68,8 @@ $sqlip = $cf['sqlip'];
 $sqluser = $cf['sqluser'];
 $sqlpass = $cf['sqlpass'];
 $sqldb = $cf['sqldb'];
-$sql = new SQL($sqlip,$sqluser,$sqlpass,$sqldb); hook::run("preconnect", array());
+$arr = [];
+$sql = new SQL($sqlip,$sqluser,$sqlpass,$sqldb); hook::run("preconnect", $arr);
 /* Okay, we've established all the information lmao, let's load the modules */
 
 
@@ -80,8 +78,8 @@ include __DIR__.'/../conf/modules.conf';
 start:
 $serv = new Server($server,$port,$mypass);
 
-if (!$socket)
-	die();
+if (!$socket || !$server)
+	die("oops");
 
 stream_set_blocking($socket, 0);
 
@@ -115,7 +113,8 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 	if ($splittem[0] == 'PING')
 	{
 		/* hook into ping lol */
-		hook::run("ping", array());
+		$arr = [];
+		hook::run("ping", $arr);
 		S2S("PONG ".$splittem[1]); 	// Ping it back
 	}
 	elseif ($splittem[0] == 'ERROR')
@@ -169,7 +168,8 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 			if ($pass !== $cf['serverpassword'])
 				die("Passwords do not match.");
 			
-			hook::run("connect", array());
+			$array = [];
+			hook::run("connect", $array);
 			$isconn = true;
 		}
 		$action = $splittem[1];
@@ -180,16 +180,19 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 
 			$nick = mb_substr($splittem[0],1);
 			$dest = $splittem[2];
-			hook::run("tagmsg", array(
+			$array = array(
 				"nick" => $nick,
 				"dest" => $dest,
-				"mtags" => $tagmsg)
-			);
+				"mtags" => $tagmsg);
+			hook::run("tagmsg",$array);
+			
 		
 		}
 		else
-			hook::run("raw", array('mtags' => $tagmsg, 'string' => $strippem));
-		
+		{
+			$array = array('mtags' => $tagmsg, 'string' => $strippem);
+			hook::run("raw", $array);
+		}
 		
 	}
 }
@@ -217,6 +220,9 @@ function ircstrip($string)
 
 function S2S($string) {
 	global $serv;
+	
+	if (!$string)
+		return;
 	$serv->sendraw($string);
 }
 
@@ -246,4 +252,3 @@ function whitespace(int $n)
 	
 	return $return;
 }
-

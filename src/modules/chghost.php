@@ -136,7 +136,7 @@ class chghost {
 
 		/* log it */
 		SVSLog("Changed the host of $user->nick ($user->ident@$user->realhost) to be: ".$params['host'], LOG_RPC);
-
+		update_host($user->uid, $params['host'], servertime());
 		/* return info about it to the RPC caller */
 		rpc_append_result($reply, "Success");
 		rpc_append_id($reply, $id);
