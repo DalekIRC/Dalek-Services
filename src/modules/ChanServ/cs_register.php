@@ -114,7 +114,7 @@ class cs_register {
 			$cs->notice_with_mtags($mtags, $nick->uid,"You must be on that channel to register it.");
 			return;
 		}
-		if (!$chan->IsOp($nick->uid))
+		if (!$chan->IsOp($nick))
 		{
 			$cs->notice_with_mtags($mtags, $nick->uid,"You must be an operator on that channel to register it.");
 			return;
@@ -211,3 +211,4 @@ class cs_register {
 		}
 	}
 }
+
