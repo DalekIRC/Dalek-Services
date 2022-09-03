@@ -1,5 +1,7 @@
 #!/bin/sh
 
+## Thanks to Wakkymike for help ;)
+
 print_dalek()
 {
 	echo "██████╗░░█████╗░██╗░░░░░███████╗██╗░░██╗  ██╗██████╗░░█████╗░"
@@ -18,8 +20,10 @@ dalek_start()
 	if screen -list | grep dalek-serv ; then
 		echo "Launched!"
 		echo "Connecting..."
+		dalek_rpc_server
 	else
 		echo "Failed"
+		dalek_stop
 	fi
 }
 
@@ -27,9 +31,21 @@ dalek_stop()
 {
 	echo "Dalek IRC Services is stopping..."
 	screen -ls | grep dalek-serv | cut -d. -f1 | awk '{print $1}' | xargs kill
+	screen -ls | grep dalek-rpc-serv | cut -d. -f1 | awk '{print $1}' | xargs kill
 	echo "Stopped"
 }
 
+dalek_rpc_server()
+{
+	echo "Booting RPC Server on 127.0.0.1:1024"
+	screen -S dalek-rpc-serv -d -m php -S 127.0.0.1:1024 -t src/RPC/
+	if screen -ls | grep dalek-rpc-serv ; then
+		echo "RPC Server online"
+	else
+		echo "Failed"
+		dalek_stop
+	fi
+}
 dalek_restart()
 {
 	echo "Dalek IRC Services is restarting..."
@@ -46,15 +62,15 @@ elif [ "$1" = "restart" ] ; then
 
 elif [ "$1" = "stop" ] ; then
 	dalek_stop
+	
+elif [ "$1" = "genlinkblock" ] ; then
+	php scripts/genlinkblock
 
-# i think it's a good idea ,)
-elif [ "$1" = "restop"] ; then
-	dalek_start
-	dalek_stop
-
+elif [ "$1" = "rehash" ] ; then
+	curl -s --insecure -X POST -d '{"jsonrpc": "2.0", "method": "rehash", "params": {"server": "services.valware.uk"}, "id": 123}' http://localhost:1024/api >> /dev/null
 
 else
-	echo "Command syntax: ./dalek start|restart|stop|restop"
+	echo "Command syntax: ./dalek start|restart|stop|rehash"
 fi
 
 

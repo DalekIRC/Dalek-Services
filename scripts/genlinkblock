@@ -1,4 +1,4 @@
-<?php global $cf; include "dalek.conf";
+<?php include "conf/dalek.conf";
 /*
  *	(C) 2021 Dalek IRC Services
  *
@@ -13,7 +13,7 @@
  *	Version: 1
 */
 
-
+global $cf; 
 if ($cf['uplink'] == "127.0.0.1" || $cf['uplink'] == "localhost")
 	$server = "127.0.0.1";
 else

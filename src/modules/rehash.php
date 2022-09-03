@@ -9,9 +9,9 @@
 //				
 \\				
 //				
-\\	Title:		UMODE2
+\\	Title:		REHASH
 //				
-\\	Desc:		UMODE2 compatibility
+\\	Desc:		REHASH compatibility
 \\				
 //				
 \\				
@@ -23,12 +23,12 @@
 */
 
 /* class name needs to be the same name as the file */
-class umode2 {
+class rehash {
 
 	/* Module handle */
 	/* $name needs to be the same name as the class and file lol */
-	public $name = "umode2";
-	public $description = "Provides UMODE2 compatibility";
+	public $name = "rehash";
+	public $description = "Provides REHASH compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
 	public $official = true;
@@ -60,7 +60,7 @@ class umode2 {
 		/* The last param is expected parameter count for the command */
 		/* (both point to the same function which determines) */
 
-		if (!CommandAdd($this->name, 'UMODE2', 'umode2::cmd_umode2', 1))
+		if (!CommandAdd($this->name, 'REHASH', 'rehash::cmd_rehash', 1))
 			return false;
 
 		return true;
@@ -72,27 +72,69 @@ class umode2 {
 	 * information passed along by the caller
 	 * $u['nick'] = User object
 	 */
-	public function cmd_umode2($u)
+	public function cmd_rehash($u)
 	{
-		/* Get the command that called us */
-		$cmd = $u['cmd'];
-
 		/* User object of caller */
 		$nick = $u['nick'];
 
-		/* Tokenise the incoming string into $parv */ 
-		$parv = explode(" ",$u['dest']);
-		
-		/* errors and shit lol */
-		if (count($parv) < $u['parc'])
+		S2S("382 $nick->nick :Rehashing conf/dalek.conf");
+		$errors = "";
+
+		if (!do_rehash($errors))
 		{
-			S2S("461 $nick->nick $cmd :Need more parameters.");
-			return;
+			SVSLog("Could not rehash", LOG_WARN);
+			SVSLog($errors, LOG_WARN);
+
+			sendnotice($nick, NULL, NULL, "Could not rehash; errors occurred:");
+			sendnotice($nick, NULL, NULL, "$errors");
+		
 		}
-
-        $nick->SetMode($u['dest']);
-
+		else
+		{
+			sendnotice($nick, NULL, NULL, "Rehashed successfully");
+			SVSLog("Rehashed successfully");
+		}
 		/* You don't HAVE to return, butt-fuck it */
 		return;
+	}
+}
+
+// if our function doesn't exist, add it uhuhu
+if (!function_exists('do_rehash'))
+{
+	// @param = Memory of empty array that we will fill with errors if there are any
+	function do_rehash(String &$errors) : bool
+	{
+		$oldfile = "conf/dalek.conf";
+		$newfile = $oldfile.".".servertime();
+		
+		// we are essentially going to reload the file with a new name so as to just update the
+		// variables we hold for the config
+		if (!is_file($oldfile))
+		{
+			$errors = "Couldn't find the dalek.conf file";
+			return false;
+		}
+		if (!($file = fopen($newfile, 'c')))
+		{
+			$errors = "Could not open temporary file";
+			return false;
+		}
+		if (!fwrite($file, file_get_contents($oldfile)))
+		{
+			$errors = "Could not write to temporary file";
+			return false;
+		}
+		fclose($file);
+
+		if (!is_file($newfile))
+		{
+			$errors = "Could not find the file we just created. Awkward!";
+			return false;
+		}
+
+		include($newfile);
+		unlink($newfile); // delete the new file lol
+		return true;		
 	}
 }
