@@ -167,12 +167,12 @@ class Client {
 		Filter::StringArray($this->nick,$mtags,$strings);
 
 		$mtags_to_send = array_to_mtag($mtags);
-
+		
 		foreach($strings as $string)
 		{
 			/* We switched from <lf> to \n, so convert */
 			$string = str_replace("<lf>", "\n",$string);
-
+			
 			$tok = array();
 			if (strpos($string,"\n") !== false)
 				$tok = explode("\n",$string);

@@ -1,0 +1,58 @@
+<?php
+include "src/misc.php";
+
+if (count($argv) < 2)
+    die("Parameters: ./dalek module list|load|unload|install|delete [<module>]");
+
+if ($argv[1] == "list")
+{
+    $all = (isset($argv[2]) && !strcasecmp($argv[2],"all")) ? 1 : 0;
+    $str = ($all) ? "all" : "third-party";
+    $json = '{"jsonrpc": "2.0", "method": "module.list", "params": {}, "id": 123}';
+    $response = local_rpc_call($json);
+    if (!$response)
+        die("Module was already loaded");
+
+    echo "Listing $str modules and their information\n";
+    echo "╔═════════════════════╦═════════════════════╦════════════════════════════════════════════════════════\n";
+    echo "║ ".clean_align("Name")."║ ".clean_align("Version")."║ ".clean_align("Description")."\n";
+    echo "╠═════════════════════╬═════════════════════╬════════════════════════════════════════════════════════\n";
+    $i = 0;
+    foreach($response['result'] as $mod)
+    {
+        $mod = (object)$mod;
+        if ($all || !isset($mod->official))
+        {
+            $i++;
+            echo "║ ".clean_align("$mod->name")."║ ".clean_align("$mod->version")."║ ".clean_align("$mod->description")."\n";
+        }
+    }
+    if (!$i)
+        echo "║ ".clean_align("<empty>")."║ ".clean_align("<empty>")."║ ".clean_align("<empty>")."\n";
+    echo "╚═════════════════════╩═════════════════════╩════════════════════════════════════════════════════════\n";
+}
+
+elseif ($argv[1] == "load")
+{
+    $mod = $argv[2];
+    $json = '{"jsonrpc": "2.0", "method": "module.load", "params": {"module": "'.$mod.'"}, "id": 123}';
+    $response = local_rpc_call($json);
+    if (isset($response['result']))
+        echo "Loaded module '$mod' successfully\n";
+
+    else
+        echo "Could not load module: ".$response['error']['message']."\n";
+}
+
+elseif ($argv[1] == "unload")
+{
+    $mod = $argv[2];
+    $json = '{"jsonrpc": "2.0", "method": "module.unload", "params": {"module": "'.$mod.'"}, "id": 123}';
+    $response = local_rpc_call($json);
+    if (isset($response['result']))
+        echo "Unloaded module '$mod' successfully\n";
+
+    else
+        echo "Could not unload module: ".$response['error']['message']."\n";
+}
+

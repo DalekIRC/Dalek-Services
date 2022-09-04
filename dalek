@@ -30,7 +30,7 @@ dalek_start()
 dalek_stop()
 {
 	echo "Dalek IRC Services is stopping..."
-	screen -ls | grep dalek-serv | cut -d. -f1 | awk '{print $1}' | xargs kill
+	screen -ls | grep dalek-serv | cut -d. -f1 | awk '{print $1}' | xargs kill 
 	screen -ls | grep dalek-rpc-serv | cut -d. -f1 | awk '{print $1}' | xargs kill
 	echo "Stopped"
 }
@@ -53,7 +53,21 @@ dalek_restart()
 	dalek_start
 }
 
-if [ "$1" = "start" ] ; then
+dalek_help_display()
+{
+	echo "dalek start		Starts Dalek Services and RPC WebServer"
+	echo "dalek stop		Stops Dalek Services and RPC WebServer"
+	echo "dalek restart		Restarts Dalek Services and RPC WebServer"
+	echo "dalek genconf		Generates an UnrealIRCd link block for unrealircd.conf"
+	echo "dalek module		Parameters: ./dalek module <list|load|unload> [<module>]"
+	echo "dalek help		Shows this list"
+}
+
+if [ "$1" = "help" ] ; then
+	echo "Showing ./dalek help:"
+	dalek_help_display
+
+elif [ "$1" = "start" ] ; then
 	print_dalek
 	dalek_start
 
@@ -63,14 +77,37 @@ elif [ "$1" = "restart" ] ; then
 elif [ "$1" = "stop" ] ; then
 	dalek_stop
 	
-elif [ "$1" = "genlinkblock" ] ; then
+elif [ "$1" = "genconf" ] ; then
 	php scripts/genlinkblock
 
 elif [ "$1" = "rehash" ] ; then
 	curl -s --insecure -X POST -d '{"jsonrpc": "2.0", "method": "rehash", "params": {"server": "services.valware.uk"}, "id": 123}' http://localhost:1024/api >> /dev/null
 
+
+elif [ "$1" = "module" ] ; then
+	
+	if [ "$2" = "list" ] ; then
+		php scripts/module_manager list ${3}
+	
+	elif [ "$2" = "load" ] ; then
+		if [ "$3" ] ; then
+			php scripts/module_manager load ${3}
+		else
+			echo "`./dalek module load`: No module specified"
+		fi
+	elif [ "$2" = "unload" ] ; then
+		if [ "$3" ] ; then
+			php scripts/module_manager unload ${3}
+		else
+			echo "`./dalek module unload`: No module specified"
+		fi
+	
+	fi
+
+
 else
-	echo "Command syntax: ./dalek start|restart|stop|rehash"
+	echo "[ERROR] ./dalek expects at least one parameter:"
+	dalek_help_display
 fi
 
 

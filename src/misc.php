@@ -654,26 +654,32 @@ function BadPtr(&$tok)
  * It forwards to a splat operator which deals
  * with it
  */
+
 function sendnotice(User $user, Client $me = NULL, $mtags = [], ...$notice)
 {
-	global $cf;
-	if (!$me)
-		$me = Client::find($cf['sid']);
+	
+	if ($me)
+		foreach($notice as $n)
+			$me->notice_with_mtags($mtags, $user->uid, $n);
 
-	if (!$me) // should not happen under any circumstance
-		die("Critical error: Could not find own server!");
-	$me->notice_with_mtags($mtags, $user->uid, $notice);
+	else 
+	{
+		foreach($notice as $n)
+			S2S(array_to_mtag($mtags)."NOTICE $user->uid :$n");
+	}
 }
 
 function sendmsg(User $user, Client $me = NULL, $mtags = [], ...$msg)
 {
-	global $cf;
-	if (!$me)
-		$me = Client::find($cf['sid']);
+	if ($me)
+		foreach($msg as $n)
+			$me->msg_with_mtags($mtags, $user->uid, $n);
 
-	if (!$me) // should not happen under any circumstance
-		die("Critical error: Could not find own server!");
-	$me->privmsg_with_mtags($mtags, $user->uid, $msg);
+	else 
+	{
+		foreach($msg as $n)
+			S2S(array_to_mtag($mtags)."PRIVMSG $user->uid :$n");
+	}
 }
 /* Dalek's char counting function */
 function dcount_chars($haystack, $needle)
@@ -898,4 +904,84 @@ function DebugLog($string, $type = "") : void
 
 	echo $string."\n";
 	log_to_disk($string);
+}
+
+function LogChan()
+{
+	global $cf;
+	if (isset($cf['logchan']))
+		return $cf['logchan'];
+	else
+		return "#services";
+}
+
+
+
+function get_string_between($string,$start, $end)
+{
+	$string = ' ' . $string;
+	$ini = strpos($string, $start);
+	if ($ini == 0) return '';
+	$ini += strlen($start);
+	$len = strpos($string, $end, $ini) - $ini;
+	return substr($string, $ini, $len);
+}
+
+function ircstrip($string)
+{
+	$_ircstrip = str_replace(array(
+                chr(10),
+                chr(13),
+				chr(2),
+            ), '', $string);
+	return $_ircstrip;
+}
+
+function S2S($string) {
+	global $serv;
+	
+	if (!$string)
+		return;
+	$serv->sendraw($string);
+}
+
+function color($c,$string)
+{
+	return  chr(3).$c.$string.chr(3);
+}
+
+
+function clean_align($str)
+{
+	$len = strlen($str);
+	$rem = 20 - $len;
+	$whitespace = whitespace($rem);
+	
+	return "$str"."$whitespace";
+}
+function whitespace(int $n)
+{
+	if ($n < 1)
+		return "";
+	
+	$return = "";
+	
+	for ($i = 1; $i <= $n; $i++)
+		$return .= " ";
+	
+	return $return;
+}
+
+function local_rpc_call($json)
+{
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL,"http://localhost:1024/api/");
+	curl_setopt($ch, CURLOPT_POST, 1);
+	curl_setopt($ch, CURLOPT_POSTFIELDS,
+				$json);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$server_output = curl_exec($ch);
+	curl_close ($ch);
+	$json = json_decode($server_output, true);
+	return $json;
 }
