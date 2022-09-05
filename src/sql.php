@@ -505,12 +505,25 @@ hook::func("preconnect", function($u){
 		meta_data varchar(255),
 		PRIMARY KEY(id)
 	);
+	CREATE TABLE IF NOT EXISTS dalek_tkldb (
+		id int AUTO_INCREMENT NOT NULL,
+		type varchar(2) NOT NULL,
+		ut varchar(255) NOT NULL,
+		mask varchar(255) NOT NULL,
+		set_by varchar(255) NOT NULL,
+		expiry int NOT NULL,
+		timestamp int NOT NULL,
+		reason varchar(255),
+		PRIMARY KEY(id)
+	);
+
 	TRUNCATE TABLE dalek_user;
 	TRUNCATE TABLE dalek_channels;
 	TRUNCATE TABLE dalek_server;
 	TRUNCATE TABLE dalek_swhois;
 	TRUNCATE TABLE dalek_ison;
-	TRUNCATE TABLE dalek_user_meta;");
+	TRUNCATE TABLE dalek_user_meta;
+	TRUNCATE TABLE dalek_tkldb;");
 	$conn->close();
 });
 
