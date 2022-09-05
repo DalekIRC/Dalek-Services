@@ -20,7 +20,7 @@
 //				
 */
 
-requires_module("rehash");
+require_module("rehash");
 class os_rehash {
 
 	/* Module handle */

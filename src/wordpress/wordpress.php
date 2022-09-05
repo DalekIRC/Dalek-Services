@@ -73,6 +73,7 @@ hook::func("preconnect", function($u)
 			'extended_info' => true,
 			'can_swhois' => true,
 			'can_forcelogin' => true,
+			'can_rehash' => true,
 		];
 		$roles["irc_admin"] = $admin_array;
 		$admin_array = NULL;
@@ -529,7 +530,19 @@ function WPNewUser(array $user) : bool
 	return true;
 }
 
+function wp_user_list()
+{
+	global $wpconfig;
+	$table = $wpconfig['dbprefix']."users";
+	$users = [];
+	$conn = sqlnew();
+	if (!($result = $conn->query("SELECT * FROM $table")))
+		return false;
+	while ($row = $result->fetch_assoc())
+		$users[] = new WPUser($row['user_login']);
 
+	return $users;
+}
 
 function activation_code()
 {

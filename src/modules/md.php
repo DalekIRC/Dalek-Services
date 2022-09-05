@@ -73,6 +73,17 @@ class md {
 		return true;
 	}
 
+	public static function send_md_client(User $user, $key, $value)
+	{
+		self::add($user->nick, $key, $value);
+		S2S("MD client $user->uid $key :$value");
+	}
+	public static function send_md_channel(Channel $chan, $key, $value)
+	{
+		self::add($chan->name, $key, $value);
+		S2S("MD channel $chan->name $key :$value");
+	}
+	
 
 	/* The public command function that we are calling with CommandAdd in __init.
 	 * In this example (and throughout the source), $u contains an array with
