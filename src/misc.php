@@ -732,8 +732,54 @@ function svslogin($uid, $account, $by = NULL)
 
 	$by = ($by) ? $by->uid : $cf['sid'];
 	S2S(":$by SVSLOGIN * $uid $account");
+	
 }
 
+/* must be logged in
+ * placeholders:
+ * %n = network
+ * %a = account
+ * %r = rank
+ * 
+ * example:
+ * "%n/%r/%a" (default) would equivelate to:
+ * "Chatsite/staff/Bob" or
+ * "Chatsite/user/Alice"
+*/
+function DoCloak($uid,$account)
+{
+	$u = new WPUser($account);
+	
+	global $cf;
+	$clk = (isset($cf['cloak_users'])) ? $cf['cloak_users'] : false;
+
+	if (!$clk) // if we are not cloaking the user
+		return;
+	$cloak = "";
+	$rank = cloak_rank($u);
+	if ($clk == true) //de folt
+		$cloak = $cf['network']."/".$rank."/".$account;
+	
+	else // they doing a custom one
+	{
+		$cloak = str_replace("%r",$rank,$clk);
+		$cloak = str_replace("%a",$account,$clk);
+		$cloak = str_replace("%n",$cf['network'],$clk);
+	}
+
+	/* actually set the cloak */
+	$send = "CHGHOST $uid :$cloak";
+	S2S($send); // send it out
+	Buffer::add_to_buffer($send); // we also need to process it, this is the quickest way	
+}
+
+// for quick check with the function above
+function cloak_rank(WPUser $u)
+{
+	$rank = ($u->IsAdmin) ? "staff" : "user"; // staff or user?
+	$rank = (isset($u->user_meta->robot) && strstr($u->user_meta->robot,"IRC Bot")) ? "bot" : $rank; // but wait? what if bot?
+	return $rank;
+}
 function send_numeric($target, $numeric, ...$string)
 {
 	foreach($string as $str)
