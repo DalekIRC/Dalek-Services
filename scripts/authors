@@ -1,0 +1,7 @@
+<?php
+
+require_once("src/conf.php");
+
+echo "Using version ".DALEK_VERSION."\n";
+echo "Licence: GPLv3 or later\n";
+echo "Author: Valware (https://github.com/Valware)\n\n";

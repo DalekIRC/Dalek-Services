@@ -6,7 +6,6 @@ define( "LOG_FATAL","[04FATAL] ");
 define( "LOG_RPC", "[RPC] ");
 define( "CHAN_CONTEXT", "+draft/channel-context");
 define( "RECYCLED_MESSAGE", "dalek/recycled");
-define( "DALEK_VERSION", "0.001-beta");
 
 $tok = explode("/",__DIR__);
 $n = sizeof($tok) - 1;

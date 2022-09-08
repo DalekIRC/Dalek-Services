@@ -19,7 +19,7 @@
 \\	Author:		Valware
 //				
 */
-
+define("DALEK_VERSION", "Dalek-Services-0.1-git");
 define("CONF_SYMBOL", "[CONFIG] ");
 
 class Conf
@@ -103,7 +103,6 @@ class Conf
 			
 			$r .= " ";
 		}
-		var_dump((array)$r);
 		if (BadPtr($r))
 			config_fail("Invalid configuration. Is it empty?", $by);
 
