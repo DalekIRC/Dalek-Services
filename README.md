@@ -1,24 +1,28 @@
 
+
 [![CodeBabes](https://forthebadge.com/images/badges/built-by-codebabes.svg)]()
 [![SpagYetti](https://forthebadge.com/images/badges/contains-tasty-spaghetti-code.svg)]()
 [![catsuwu](https://forthebadge.com/images/badges/contains-cat-gifs.svg)]()
-
+  <img width="50" height="35" src="https://i.imgur.com/w6cScKo.png">
+  
 [![Version](https://img.shields.io/badge/Extermin-8-red.svg)]()
 [![Version](https://img.shields.io/badge/Beta-0.1-blue.svg)]()
 [![Version](https://img.shields.io/badge/Status-Work%20In%20Progress-cyan.svg)]()
 [![Maintained](https://img.shields.io/badge/Maintained-yes-green.svg)]()
 [![Maintainer](https://img.shields.io/badge/Maintainer-Valware-purple.svg)](https://github.com/ValwareIRC/)
-[![Unreal](https://img.shields.io/badge/UnrealIRCd-6.0+-green.svg)]()
-[![Unreal](https://img.shields.io/badge/WordPress-6.0+-green.svg)]()
+[![Unreal](https://img.shields.io/badge/UnrealIRCd-6.0+-green.svg)](https://unrealircd.org)
+[![WP](https://img.shields.io/badge/WordPress-6.0+-green.svg)](https://wordpress.com)
+
 # Dalek IRC Services
+
 Dalek IRC Services with WordPress integration tailored to you.
 
-### Overview ###
-* Dalek is a set of IRC Services with the best WordPress integration on the market.
+
+### Why do I need Dalek? ###
+* Dalek is a set of IRC Services with the best WordPress integration AND the best UnrealIRCd integration on the market.
 * [WordPress](https://github.com/wordpress/wordpress) is an open-source Content Management System (CMS) [which makes up 43% of all websites](https://w3techs.com/technologies/details/cm-wordpress)
 * [UnrealIRCd](https://github.com/unrealircd/unrealircd) is the most widely deployed Internet Relay Chat daemon (IRCd), [with a market share of 38.6% as of December 2021.](https://www.ircstats.org/servers)
 
-### Why do I need Dalek? ###
 With WordPress + Dalek + UnrealIRCd, you have more creative control over things such as:
   * How your users register and manage their profile:
     - Works with [Ultimate Member](https://ultimatemember.com/), customise how your profiles look
