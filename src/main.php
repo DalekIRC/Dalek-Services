@@ -114,7 +114,7 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 	{
 		/* hook into ping lol */
 		$arr = [];
-		hook::run("ping", $arr);
+		hook::run(HOOKTYPE_PING, $arr);
 		S2S("PONG ".$splittem[1]); 	// Ping it back
 	}
 	elseif ($splittem[0] == 'ERROR')
@@ -125,6 +125,7 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 			$serv->hear("Uh-oh, we've been throttled! Waiting 40 seconds and starting again.");
 			sleep(40);
 			$serv->shout("Reconnecting...");
+			$serv = NULL;
 			goto start;
 		}
 		elseif (strpos($input,'Timeout') !== false)
@@ -133,6 +134,7 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 			{
 				$serv->hear("Connection issue. Trying again in 30 seconds");
 				sleep(30);
+				$serv = NULL;
 				goto start;
 			}
 			else
@@ -145,6 +147,7 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 		{
 			$serv->hear("Unknown exit issue! Waiting 40 seconds and restarting");
 			usleep(400000);
+			$serv = NULL;
 			goto start;
 		}
 	}
@@ -169,7 +172,7 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 				die("Passwords do not match.");
 			
 			$array = [];
-			hook::run("connect", $array);
+			hook::run(HOOKTYPE_CONNECT, $array);
 			$isconn = true;
 		}
 		$action = $splittem[1];
@@ -184,14 +187,14 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 				"nick" => $nick,
 				"dest" => $dest,
 				"mtags" => $tagmsg);
-			hook::run("tagmsg",$array);
+			hook::run(HOOKTYPE_TAGMSG,$array);
 			
 		
 		}
 		else
 		{
 			$array = array('mtags' => $tagmsg, 'string' => $strippem);
-			hook::run("raw", $array);
+			hook::run(HOOKTYPE_RAW, $array);
 		}
 		
 	}

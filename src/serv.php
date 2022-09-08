@@ -116,13 +116,12 @@ class Server
 	}
 }
 
-hook::func("raw", function($u)
+hook::func(HOOKTYPE_RAW, function($u)
 {
-	global $fsync,$cf;
+	global $cf;
 	$us = $cf['sid'];
 	$parv = explode(" ",$u['string']);
 	if ($parv[0] !== "NETINFO"){ return; }
-	$fsync = true;
 	$array = array(
 		"server" => $cf['servicesname'],
 		"hops" => "0",
@@ -137,7 +136,7 @@ hook::func("raw", function($u)
 
 
 /* SID */
-hook::func("raw", function($u)
+hook::func(HOOKTYPE_RAW, function($u)
 {
 	global $cf;
 	$parv = explode(" ",$u['string']);

@@ -25,10 +25,12 @@
 
 
 class SQL {
-	function __construct($ip,$user,$pass,$db){
+	function __construct($ip,$user,$pass,$db)
+	{
 		global $ip,$user,$pass,$db;
 	}
-	function query($query){
+	function query($query)
+	{
 		global $cf;
 		$conn = sqlnew();
 		if (!$conn) { return false; }
@@ -37,7 +39,8 @@ class SQL {
 			return $result;
 		}
 	}
-	function user_insert($u){
+	function user_insert($u)
+	{
 		global $cf;
 		$conn = sqlnew();
 		$user = new User($u['nick']);
@@ -116,7 +119,8 @@ class SQL {
 				update_gecos($u['nick'],$u['gecos']);
 		}
 	}
-	function user_delete($u){
+	function user_delete($u)
+	{
 		global $cf;
 		$conn = sqlnew();
 		if (!$conn) { return false; }
@@ -138,7 +142,8 @@ class SQL {
 			$prep->close();
 		}
 	}
-	function sid($u){
+	function sid($u)
+	{
 		global $cf;
 		$conn = sqlnew();
 		if (!$conn) { return false; }
@@ -165,7 +170,8 @@ class SQL {
 			$prep->close();
 		}
 	}
-	function delsid($sid){
+	function delsid($sid)
+	{
 		global $sql;
 		$conn = sqlnew();
 
@@ -241,7 +247,8 @@ class SQL {
 			$prep->close();
 		}
 	}
-	function del_userchmode($chan,$user,$mode){
+	function del_userchmode($chan,$user,$mode)
+	{
 		$conn = sqlnew();
 		if (!$conn) { return false; }
 		else {
@@ -278,7 +285,8 @@ class SQL {
 			$prep->close();
 		}
 	}
-	function insert_ison($chan,$uid,$mode = ""){
+	function insert_ison($chan,$uid,$mode = "")
+	{
 		global $cf;
 		$conn = sqlnew();
 		if (!$conn) { return false; }
@@ -387,15 +395,18 @@ function find_channel($channel)
 {
 	$conn = sqlnew();
 	$return = [];
-	if (!$conn) { return false; }
+	if (!$conn)
+		return false;
 	else {
 		$prep = $conn->prepare("SELECT * FROM dalek_channels WHERE channel = ?");
 		$prep->bind_param("s",$channel);
 		$prep->execute();
 		$result = $prep->get_result();
 		
-		if (!$result){ return false; }
-		if ($result->num_rows == 0){ return false; }
+		if (!$result)
+			return false;
+		if ($result->num_rows == 0)
+			return false;
 		$return = $result->fetch_assoc();
 
 		$prep = $conn->prepare("SELECT * FROM dalek_chaninfo WHERE channel = ?");
@@ -438,7 +449,8 @@ function sqlnew()
 	return $conn;
 }			
 
-hook::func("preconnect", function($u){
+hook::func(HOOKTYPE_PRE_CONNECT, function($u)
+{
 	$conn = sqlnew();
 	
 	$conn->multi_query("CREATE TABLE IF NOT EXISTS dalek_user (
@@ -529,49 +541,39 @@ hook::func("preconnect", function($u){
 
 
 
-hook::func("UID", function($u)
+hook::func(HOOKTYPE_WELCOME, function($u)
 {
-	global $sql,$narray,$fsync;
+	global $sql,$fsync;
 	
+	$sql::user_insert($u);
+	update_last($u['nick']);
+
 	if (isset($fsync))
-	{
-		$sql::user_insert($u);
-		update_last($u['nick']);
-	}
-	if (!$narray)
-		$narray = array();
-	
-	$narray[] = $u;
-	
-	if ($fsync)
 		SVSLog($u['nick']." (".$u['ident']."@".$u['realhost'].") [".$u['ip']."] connected to the network (".$u['sid'].")");
 });
 
-hook::func("raw", function($u){
-
-	global $narray,$sql;
-	
-	$parv = explode(" ",$u['string']);
-	if ($parv[1] !== "EOS")
-		return;
-
-	$sql::user_insert_by_serv($narray);
-	unset($narray);		
-});
 
 
-hook::func("SID", function($u){
+hook::func(HOOKTYPE_SERVER_CONNECT, function($u)
+{
 	global $sql;
 	
 	$sql::sid($u);
 	
 });
 
-hook::func("SJOIN", function($u){
+hook::func(HOOKTYPE_SJOIN, function($u)
+{
 	global $sql;
 	
 	$sql::sjoin($u);
 });
+
+/* Adds user meta to the database
+ * $person = nick or uid
+ * $key = meta key
+ * $data = meta value
+*/
 function umeta_add($person,$key = "",$data = "")
 {
 	$user = new User($person);
@@ -720,17 +722,20 @@ function find_person($person = NULL)
 {
 	if (!$person or $person == "")
 		return;
-	$ns = Client::find("NickServ");
+
 	$conn = sqlnew();
 	if (!$conn) { return false; }
-	else {
+	else
+	{
 		$prep = $conn->prepare("SELECT * FROM dalek_user WHERE nick = ?");
 		$prep->bind_param("s",$person);
 		$prep->execute();
 		$result = $prep->get_result();
 		
-		if (!$result){ goto uidcheck; }
-		if ($result->num_rows == 0){ goto uidcheck; }
+		if (!$result)
+			goto uidcheck;
+		if ($result->num_rows == 0)
+			goto uidcheck;
 		$row = $result->fetch_assoc();
 		return $row;
 		
@@ -741,8 +746,10 @@ function find_person($person = NULL)
 		$prep->execute();
 		$result = $prep->get_result();
 		
-		if (!$result){ return; }
-		if ($result->num_rows == 0){ return false; }
+		if (!$result)
+			return false;
+		if ($result->num_rows == 0)
+			return false;
 		$row = $result->fetch_assoc();
 		$prep->close();
 		return $row;
@@ -832,8 +839,10 @@ function find_serv($serv)
 		$prep->execute();
 		$result = $prep->get_result();
 		
-		if (!$result){ goto sidcheck; }
-		if ($result->num_rows == 0){ goto sidcheck; }
+		if (!$result)
+{ goto sidcheck; }
+		if ($result->num_rows == 0)
+{ goto sidcheck; }
 		$row = $result->fetch_assoc();
 		return $row;
 		
@@ -844,8 +853,10 @@ function find_serv($serv)
 		$prep->execute();
 		$result = $prep->get_result();
 		
-		if (!$result){ return false; }
-		if ($result->num_rows == 0){ return false; }
+		if (!$result)
+{ return false; }
+		if ($result->num_rows == 0)
+{ return false; }
 		$row = $result->fetch_assoc();
 		$prep->close();
 		return $row;
@@ -868,7 +879,8 @@ function get_ison($uid)
 		}
 		$list = array();
 		$mode = array();
-		while ($row = $result->fetch_assoc()){
+		while ($row = $result->fetch_assoc())
+{
 			$list[] = $row['chan'];
 			$mode[] = $row['mode'];
 		}
