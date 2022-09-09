@@ -37,8 +37,18 @@ class protoctl {
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
 	function __construct()
 	{
-	
-		hook::del("preconnect", 'cmd_protoctl::table_init');
+		$conn = sqlnew();
+		$conn->multi_query(
+			"CREATE TABLE IF NOT EXISTS dalek_protoctl_meta (
+				id int AUTO_INCREMENT NOT NULL,
+				meta_key varchar(255) NOT NULL,
+				meta_value varchar(255) NOT NULL,
+				PRIMARY KEY(id)
+			);
+
+			TRUNCATE TABLE dalek_protoctl_meta;
+		);");
+		
 	}
 
 	/* To run when the class is destroyed/when the module is unloaded */
@@ -64,7 +74,6 @@ class protoctl {
 		if (!CommandAdd($this->name, 'PROTOCTL', 'protoctl::cmd_protoctl', 1))
 			return false;
 
-		hook::func("preconnect", 'protoctl::table_init');
 		return true;
 	}
 
@@ -133,17 +142,6 @@ class protoctl {
 	}
 	public static function table_init($u)
 	{	
-		$conn = sqlnew();
-		$conn->multi_query(
-			"CREATE TABLE IF NOT EXISTS dalek_protoctl_meta (
-				id int AUTO_INCREMENT NOT NULL,
-				meta_key varchar(255) NOT NULL,
-				meta_value varchar(255) NOT NULL,
-				PRIMARY KEY(id)
-			);
-
-			TRUNCATE TABLE dalek_protoctl_meta;
-		);");
 	}
 }
 
