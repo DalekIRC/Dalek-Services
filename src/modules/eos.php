@@ -75,9 +75,9 @@ class eos {
 	 */
 	public static function cmd_func($u)
 	{
+		
 		global $fsync;
 		$fsync = true;
-		$server = new User($u['uid']);
-		hook::run(HOOKTYPE_EOS, $server);
+		hook::run(HOOKTYPE_EOS, $u['nick']);
 	}
 }
