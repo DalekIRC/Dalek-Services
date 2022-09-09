@@ -159,8 +159,10 @@ class cs_ban {
 			elseif ($c == "c")
 				$newflags .= "~country:";
 			elseif (is_numeric($dupflags) && !strpos($dupflags,"."))
+			{
 				$newflags = "~time:$dupflags:".$newflags;
-
+				break;
+			}
 			else // uh oh! something we didn't recognise. syntax error I guess
 			{
 				$cs->notice_with_mtags
@@ -210,11 +212,8 @@ class cs_ban {
 						$targmask = "*!$victim->ident@*";
 				}
 				else $targmask = "*!*@$victim->cloak";
-				if (!strstr($flags,"q") && !strstr($flags,"j"))
-				{
+				if (!strstr($flags,"q") && !strstr($flags,"j") && !strstr($flags,"n"))
 					$toKick[] = $victim;
-				}
-
 			}
 			else $targmask = "$targ!*@*";
 			if (is_a_ban($chan,$targmask))
