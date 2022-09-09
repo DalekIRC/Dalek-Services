@@ -42,11 +42,14 @@ class SQL {
 	function user_insert($u)
 	{
 		global $cf;
+		$gecos = NULL; // empty gecos to fix a weird error
 		$conn = sqlnew();
 		$user = new User($u['nick']);
 		if ($user->IsUser)
 			return;
 		if (!$conn) { return false; }
+
+		
 		else {
 			$prep = $conn->prepare("INSERT INTO dalek_user (
 				
@@ -59,8 +62,10 @@ class SQL {
 				usermodes,
 				cloak,
 				ip,
-				SID
+				SID,
+				gecos
 			) VALUES (
+				?,
 				?,
 				?,
 				?,
@@ -72,7 +77,7 @@ class SQL {
 				?,
 				?
 			)");
-			$prep->bind_param("ssssssssss",$u['nick'],$u['timestamp'],$u['ident'],$u['realhost'],$u['account'],$u['uid'],$u['usermodes'],$u['cloak'],$u['ip'],$u['sid']);
+			$prep->bind_param("sssssssssss",$u['nick'],$u['timestamp'],$u['ident'],$u['realhost'],$u['account'],$u['uid'],$u['usermodes'],$u['cloak'],$u['ip'],$u['sid'], $gecos);
 			$prep->execute();
 			$prep->close();
 			update_gecos($u['nick'],$u['gecos']);
@@ -105,15 +110,17 @@ class SQL {
 				?,
 				?,
 				?,
+				?,
 				?
 			)");
 		
 		foreach ($ar as $u)
 		{
+				$gecos = NULL;
 				$user = new User($u['nick']);
 				if ($user->IsUser)
 					continue;
-				$prep->bind_param("ssssssssss",$u['nick'],$u['timestamp'],$u['ident'],$u['realhost'],$u['account'],$u['uid'],$u['usermodes'],$u['cloak'],$u['ip'],$u['sid']);
+				$prep->bind_param("sssssssssss",$u['nick'],$u['timestamp'],$u['ident'],$u['realhost'],$u['account'],$u['uid'],$u['usermodes'],$u['cloak'],$u['ip'],$u['sid'], $gecos);
 				$prep->execute();
 				update_last($u['nick']);
 				update_gecos($u['nick'],$u['gecos']);
