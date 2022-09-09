@@ -99,7 +99,8 @@ class SQL {
 				usermodes,
 				cloak,
 				ip,
-				SID
+				SID,
+				gecos
 			) VALUES (
 				?,
 				?,
