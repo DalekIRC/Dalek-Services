@@ -1,6 +1,6 @@
 <?php
 global $wpconfig;
-include "wordpress.conf";
+include DALEK_CONF_DIR . "/wordpress.conf";
 include "wp-phpass.php";
 
 if (!isset($wpconfig['siteurl']) || empty($wpconfig['siteurl']))
