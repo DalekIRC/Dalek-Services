@@ -49,7 +49,8 @@ class botserv {
 		)";
 		/* @param1 String $sql_query
 		 */
-		SQL::query($query);
+		$conn = sqlnew();
+		$conn->query($query);
 	}
 
 	/* To run when the class is destroyed/when the module is unloaded */
