@@ -75,7 +75,6 @@ class eos {
 	 */
 	public static function cmd_func($u)
 	{
-		
 		global $fsync;
 		$fsync = true;
 		hook::run(HOOKTYPE_EOS, $u['nick']);
