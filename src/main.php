@@ -34,7 +34,10 @@
 include "languages/en_GB";
 //include "languages/tr_TR";
 
-include __DIR__.'/../conf/dalek.conf';
+define("DALEK_CONF_DIR", getenv("DALEK_CONF_DIR") ?: __DIR__."/../conf");
+define("DALEK_LOG_DIR", getenv("DALEK_LOG_DIR") ?: __DIR__."/../logs");
+
+include DALEK_CONF_DIR . '/dalek.conf';
 global $cf,$sql,$server,$port,$serv,$servertime;
 include "misc.php";
 include "conf.php";
@@ -73,7 +76,7 @@ $sql = new SQL($sqlip,$sqluser,$sqlpass,$sqldb); hook::run("preconnect", $arr);
 /* Okay, we've established all the information lmao, let's load the modules */
 
 
-include __DIR__.'/../conf/modules.conf';
+include DALEK_CONF_DIR . '/modules.conf';
 
 start:
 $serv = new Server($server,$port,$mypass);

@@ -30,7 +30,7 @@ class Conf
 	static function run($by = "SSH Admin") // to run on startup
 	{
 		global $cf;
-		$confile = "conf/dalek.conf";
+		$confile = DALEK_CONF_DIR . "/dalek.conf";
 
 		/* empty the list first */
 		self::$arrae = [];
