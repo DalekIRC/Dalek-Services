@@ -105,7 +105,7 @@ if (!function_exists('do_rehash'))
 	// @param = Memory of empty array that we will fill with errors if there are any
 	function do_rehash(String &$errors) : bool
 	{
-		$oldfile = "conf/dalek.conf";
+		$oldfile = DALEK_CONF_DIR . "/dalek.conf";
 		$newfile = $oldfile.".".servertime();
 		
 		// we are essentially going to reload the file with a new name so as to just update the

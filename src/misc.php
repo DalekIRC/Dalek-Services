@@ -7,14 +7,6 @@ define( "LOG_RPC", "[RPC] ");
 define( "CHAN_CONTEXT", "+draft/channel-context");
 define( "RECYCLED_MESSAGE", "dalek/recycled");
 
-$tok = explode("/",__DIR__);
-$n = sizeof($tok) - 1;
-$tok[$n] = NULL;
-unset($tok[$n]);
-$ddir = implode("/",$tok);
-
-define( "__DALEK__", $ddir);
-
 /* Returns unix time */
 function servertime()
 {
@@ -393,10 +385,10 @@ function SVSLog($string, $type = "") : void
 */
 function log_to_disk($str) : void
 {
-	if (!is_dir(__DALEK__."/logs/"))
-		mkdir(__DALEK__."/logs/");
+	if (!is_dir(DALEK_LOG_DIR))
+		mkdir(DALEK_LOG_DIR);
 	
-	$lfile = __DALEK__."/logs/dalek.".date("d-m-Y").".log";
+	$lfile = DALEK_LOG_DIR . "/dalek.".date("d-m-Y").".log";
 	$logfile = fopen($lfile, "a") or die("Unable to log to disk. Please check directory permissions.");
 	fwrite($logfile,$str."\n");
 	fclose($logfile);
