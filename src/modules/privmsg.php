@@ -69,31 +69,39 @@ class privmsg {
 	/* The public command function that we are calling with CommandAdd in __init.
 	 * In this example (and throughout the source), $u contains an array with
 	 * information passed along by the caller
-	 * $u['nick'] = User object
+	 * $nick = User object
 	 */
 	public static function cmd_privmsg($u)
 	{
 
-		/* if they're fakelagged */
-		if ($u['nick']->IsUser && !$u['nick']->IsService && !IsOper($u['nick']))
+		if (!isset($u['nick']->nick))
+			return;
+		$nick = $u['nick'];
+		/* if we've got the module loaded for fakelag and
+			if they're fakelagged */ 
+		if (module_exists("fakelag") && $nick->IsUser && !$nick->IsService && !IsOper($nick))
 		{
-			if (FakeLag::find($u['nick']))
+			if (IsFakeLag($nick))
 			{
 				if (!isset($u['mtags'][RECYCLED_MESSAGE]))
-					add_fake_lag($u['nick'], 1);
-
+				{
+					add_fake_lag($nick, 1);
+				}
+				if (!$nick)
+					return;
 				add_mtag($u['mtags'], RECYCLED_MESSAGE, "true"); // let future us know it's a recycled message lol
 				Buffer::add_to_buffer(array_to_mtag($u['mtags'])." ".$u['raw']); // recycle it to the buffer
 				return;
 			}
-			else add_fake_lag($u['nick'], 1);
+			else add_fake_lag($nick, 1);
 		}
 
-		/* User may have been killed from fake lag, make sure we're here */
-		if (!isset($u['nick']->uid) || !(new User($u['nick']->uid))->IsUser)
+		/* User may have been killed from fake lag so $nick now has the potential to be NULL,
+		   so lets just make sure we're still here */
+		if (!$nick)
 			return;
 		
-		update_last($u['nick']->nick);
+		update_last($nick->nick);
 
 		/* Check if they have addressed us as nick@host */
 		if (strpos($u['dest'],"@") !== false)
@@ -139,8 +147,6 @@ class privmsg {
 			$parv[$i] = (isset($parv[$i + 1])) ? $parv[$i + 1] : NULL;
 		$u['params'] = implode(" ",$parv);
 		
-		/* User object of caller */
-		$nick = $u['nick'];
 		
 		if (!$nick->uid) // bug
 		{
@@ -259,14 +265,6 @@ class privmsg {
 							bold("/msg $client->nick HELP"));
 		}
 	}
-    private static function update_away(User $nick, $away, $msg)
-    {
-        $away = ($away) ? "Y" : NULL;
-        $conn = sqlnew();
-        $prep = $conn->prepare("UPDATE dalek_user SET away = ?, awaymsg = ? WHERE UID = ?");
-        $prep->bind_param("sss", $away, $msg, $nick->uid);
-        $prep->execute();
-    }
 }
 
 

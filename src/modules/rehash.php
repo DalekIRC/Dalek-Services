@@ -135,6 +135,8 @@ if (!function_exists('do_rehash'))
 
 		include($newfile);
 		unlink($newfile); // delete the new file lol
+		$empty = [];
+		hook::run(HOOKTYPE_REHASH, $empty);
 		return true;		
 	}
 }

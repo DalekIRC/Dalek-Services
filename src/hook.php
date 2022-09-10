@@ -62,6 +62,7 @@ define('HOOKTYPE_USERMODE', 'umode'); // for usermode changes
 define('HOOKTYPE_METADATA', 'usermeta'); // metadata hook
 define('HOOKTYPE_UPDATE_FOUND', 'update_found'); // for dalek updates
 define('HOOKTYPE_EOS', 'eos'); // end of sync
+define('HOOKTYPE_REHASH', 'rehash'); // when Dalek has been rehashed
 
 
 

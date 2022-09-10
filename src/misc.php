@@ -829,68 +829,7 @@ function cut_first_from($string, $delimiter = " ")
 	return trim(glue($parv,":"));
 }
 
-class FakeLag {
 
-	public static $list = [];
-
-	function __construct(User $nick, int $seconds)
-	{
-		$this->uid = $nick->uid;
-		$this->lag_until = servertime() + $seconds;
-		self::$list[] = $this;
-	}
-	static function find(User $nick)
-	{
-		self::cleanup();
-		foreach (self::$list as &$user)
-			if ($user && $user->uid == $nick->uid)
-				return $user;
-		return false;
-	}
-	static function cleanup()
-	{
-		global $cf;
-		foreach(self::$list as $key => $item)
-		{
-			if ($item->lag_until <= servertime())
-				unset(self::$list[$key]);
-			elseif ($item->lag_until - servertime() >= 10)
-			{
-				$qmsg = "Your connection has been exterminated: Flood";
-				S2S("KILL $item->uid :$qmsg");
-				$user = new User($item->uid);
-				quit::cmd_quit(array("nick" => $user, "params" => $qmsg));
-			}
-		}
-		
-	}
-	static function add_fake_lag(User $nick, int $seconds)
-	{
-		$found = 0;
-		foreach(self::$list as &$user)
-		{
-			if ($user && $user->uid = $nick->uid)
-			{
-				$found++;
-				$user->lag_until += $seconds;
-			}
-		}
-		if (!$found)
-			new FakeLag($nick,$seconds);
-
-		self::$list = array_values(self::$list);
-	}
-}
-
-function IsFakeLag(User $nick)
-{
-	return (FakeLag::find($nick)) ? 1 : 0;
-}
-
-function add_fake_lag(User $nick, int $seconds)
-{
-	FakeLag::add_fake_lag($nick,$seconds);
-}
 
 function IsRPCCall()
 {
