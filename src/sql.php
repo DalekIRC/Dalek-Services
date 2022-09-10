@@ -347,7 +347,7 @@ class SQL {
 
 		$conn = sqlnew();
 		$prep = $conn->prepare("DELETE FROM dalek_ison WHERE nick = ? AND lower(chan) = ?");
-		$prep->bind_param("ss",$nick->uid,$chan);
+		$prep->bind_param("ss",$uid,$chan);
 		$prep->execute();
 
 		/* cleanup any non-permanent empty channel */
@@ -538,6 +538,13 @@ hook::func(HOOKTYPE_PRE_CONNECT, function($u)
 		expiry int NOT NULL,
 		timestamp int NOT NULL,
 		reason varchar(255),
+		PRIMARY KEY(id)
+	);
+	CREATE TABLE IF NOT EXISTS dalek_invite (
+		id int AUTO_INCREMENT NOT NULL,
+		code varchar(255) NOT NULL,
+		timestamp varchar(255) NOT NULL,
+		realtime int NOT NULL,
 		PRIMARY KEY(id)
 	);
 
