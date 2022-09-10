@@ -150,7 +150,7 @@ class sjoin {
 				$sql::insert_ison($chan,$item,$mode);
 				$array = array('chan' => $chan, 'nick' => $item);
 
-				hook::run("join", $array);
+				hook::run(HOOKTYPE_JOIN, $array);
 			}
 		}
 	}
