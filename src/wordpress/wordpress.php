@@ -181,6 +181,7 @@ class WPUser {
 
 	function __construct($account = "", $searchType = NULL)
 	{
+		global $wpconfig;
 		/* if we're doing a specific lookup */
 		if ($searchType)
 		{
@@ -208,6 +209,7 @@ class WPUser {
 
 		if ($this->IsUser)
 		{
+			$caps = $wpconfig['dbprefix']."capabilities";
 			$this->user_id = intval($nick['ID']);
 			$this->user_login = $nick['user_login'];
 			$this->user_nicename = $nick['user_nicename'];
@@ -219,7 +221,7 @@ class WPUser {
 			$this->display_name = $nick['display_name'];
 			$this->confirmed = (!strlen($nick['user_activation_key'])) ? true : false;
 			$this->user_meta = new WPUserMeta($this);
-			$uns = isset($this->user_meta->wp_capabilities) ? unserialize($this->user_meta->wp_capabilities) : [];
+			$uns = isset($this->user_meta->$caps) ? unserialize($this->user_meta->$caps) : [];
 			$this->role_array = array();
 			foreach ($uns as $key => $value)
 				if ($value)
