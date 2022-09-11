@@ -251,7 +251,7 @@ class whois {
 	/* for server linking */
 	public static function server($u)
 	{
-		global $_LINK;
+		global $_LINK, $sql;
 	
 		$parv = explode(" ",$u['string']);
 		if ($parv[0] !== "SERVER")
@@ -264,7 +264,7 @@ class whois {
 		$hops = $parv[2];
 		$desc = str_replace("$parv[0] $parv[1] $parv[2] $parv[3] ","",$u['string']);
 		
-		sql::sid(array('server' => $name,'hops' => $hops,'sid' => $sid,'desc' => $desc));
+		$sql->sid(array('server' => $name,'hops' => $hops,'sid' => $sid,'desc' => $desc));
 	}
 
 	/* return a nice buffer of channels */
