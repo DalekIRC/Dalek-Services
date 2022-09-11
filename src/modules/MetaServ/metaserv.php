@@ -103,7 +103,7 @@ class metaserv {
 	}
 
 	/* Method to actually spawn our client */
-	function spawn_client()
+	static function spawn_client()
 	{
 		global $metaserv; /* Our global array of metaserv.conf options */
 			

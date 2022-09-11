@@ -103,7 +103,7 @@ class chanserv {
 	}
 
 	/* Method to actually spawn our client */
-	function spawn_client()
+	static function spawn_client()
 	{
 		global $chanserv; /* Our global array of chanserv.conf options */
 			

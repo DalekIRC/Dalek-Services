@@ -62,7 +62,7 @@ class BugServ {
 		return true;
 	}
 
-	function spawn_client()
+	static function spawn_client()
 	{
 		global $BugServ,$cf;
 		/* spawn client with $bbs
