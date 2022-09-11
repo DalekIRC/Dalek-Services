@@ -51,7 +51,7 @@ class SQL {
 
 		
 		else {
-			$prep = $conn->prepare("INSERT INTO dalek_user (
+			$prep = $conn->prepare("INSERT INTO ".sqlprefix()."user (
 				
 				nick,
 				timestamp,
@@ -88,7 +88,7 @@ class SQL {
 		if (!$ar)
 			return;
 		$conn = sqlnew();
-		$prep = $conn->prepare("INSERT INTO dalek_user (
+		$prep = $conn->prepare("INSERT INTO ".sqlprefix()."user (
 				
 				nick,
 				timestamp,
@@ -135,16 +135,16 @@ class SQL {
 		if (!$u)
 			return;
 		else {
-			$prep = $conn->prepare("DELETE FROM dalek_user WHERE UID = ?");
+			$prep = $conn->prepare("DELETE FROM ".sqlprefix()."user WHERE UID = ?");
 			$prep->bind_param("s",$u);
 			$prep->execute();
-			$prep = $conn->prepare("DELETE FROM dalek_user_meta WHERE UID = ?");
+			$prep = $conn->prepare("DELETE FROM ".sqlprefix()."user_meta WHERE UID = ?");
 			$prep->bind_param("s",$u);
 			$prep->execute();
-			$prep = $conn->prepare("DELETE FROM dalek_swhois WHERE UID = ?");
+			$prep = $conn->prepare("DELETE FROM ".sqlprefix()."swhois WHERE UID = ?");
 			$prep->bind_param("s",$u);
 			$prep->execute();
-			$prep = $conn->prepare("DELETE FROM dalek_ison WHERE nick = ?");
+			$prep = $conn->prepare("DELETE FROM ".sqlprefix()."ison WHERE nick = ?");
 			$prep->bind_param("s",$u);
 			$prep->execute();
 			$prep->close();
@@ -156,7 +156,7 @@ class SQL {
 		$conn = sqlnew();
 		if (!$conn) { return false; }
 		else {
-			$prep = $conn->prepare("INSERT INTO dalek_server (
+			$prep = $conn->prepare("INSERT INTO ".sqlprefix()."server (
 				servername,
 				hops,
 				sid,
@@ -183,13 +183,13 @@ class SQL {
 		global $sql;
 		$conn = sqlnew();
 
-		$prep = $conn->prepare("SELECT * FROM dalek_user WHERE SID = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user WHERE SID = ?");
 		$prep->bind_param("s",$sid);
 		$prep->execute();
 		$result = $prep->get_result();
 		while($row = $result->fetch_assoc())
 			$sql::user_delete($row['UID']);
-		$prep = $conn->prepare("DELETE FROM dalek_server WHERE SID = ?");
+		$prep = $conn->prepare("DELETE FROM ".sqlprefix()."server WHERE SID = ?");
 		$prep->bind_param("s",$sid);
 		$prep->execute();
 	}
@@ -202,7 +202,7 @@ class SQL {
 			return;
 		else {
 
-			$prep = $conn->prepare("INSERT INTO dalek_channels (
+			$prep = $conn->prepare("INSERT INTO ".sqlprefix()."channels (
 				timestamp,
 				channel,
 				modes
@@ -226,7 +226,7 @@ class SQL {
 			if (!($u = new User($user))->IsUser)
 				return false;
 			$uid = $u->uid;
-			$prep = $conn->prepare("SELECT mode FROM dalek_ison WHERE nick = ? AND chan = ?");
+			$prep = $conn->prepare("SELECT mode FROM ".sqlprefix()."ison WHERE nick = ? AND chan = ?");
 			
 			$prep->bind_param("ss",$uid,$chan);
 			$prep->execute();
@@ -248,7 +248,7 @@ class SQL {
 				return false;
 				
 
-			$prep = $conn->prepare("UPDATE dalek_ison SET mode = ? WHERE nick = ? AND chan = ?");
+			$prep = $conn->prepare("UPDATE ".sqlprefix()."ison SET mode = ? WHERE nick = ? AND chan = ?");
 			
 			$prep->bind_param("sss",$mode,$u->uid,$chan);
 			$prep->execute();
@@ -263,7 +263,7 @@ class SQL {
 			$mode = str_replace($mode,"",$this->get_userchmode($chan,$user));
 			if (!($u = new User($user))->IsUser)
 				return false;
-			$prep = $conn->prepare("UPDATE dalek_ison SET mode = ? WHERE nick = ? AND chan = ?");
+			$prep = $conn->prepare("UPDATE ".sqlprefix()."ison SET mode = ? WHERE nick = ? AND chan = ?");
 			
 			$prep->bind_param("sss",$mode,$u->uid,$chan);
 			$prep->execute();
@@ -276,7 +276,7 @@ class SQL {
 		$conn = sqlnew();
 		if (!$conn) { return false; }
 		else {
-			$prep = $conn->prepare("UPDATE dalek_channels SET modes = ? WHERE channel = ?");
+			$prep = $conn->prepare("UPDATE ".sqlprefix()."channels SET modes = ? WHERE channel = ?");
 			$modes = get_chmode($chan);
 			if ($switch == "+")
 			{
@@ -300,7 +300,7 @@ class SQL {
 		if (!$conn) { return false; }
 		else {
 
-			$prep = $conn->prepare("INSERT INTO dalek_ison (
+			$prep = $conn->prepare("INSERT INTO ".sqlprefix()."ison (
 				chan,
 				nick,
 				mode
@@ -346,13 +346,13 @@ class SQL {
 
 
 		$conn = sqlnew();
-		$prep = $conn->prepare("DELETE FROM dalek_ison WHERE nick = ? AND lower(chan) = ?");
+		$prep = $conn->prepare("DELETE FROM ".sqlprefix()."ison WHERE nick = ? AND lower(chan) = ?");
 		$prep->bind_param("ss",$uid,$chan);
 		$prep->execute();
 
 		/* cleanup any non-permanent empty channel */
 
-		$prep = $conn->prepare("SELECT * FROM dalek_ison WHERE lower(chan) = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."ison WHERE lower(chan) = ?");
 		$prep->bind_param("s",$chan);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -362,7 +362,7 @@ class SQL {
 			$lookup = find_channel($chan);
 			if (strpos($lookup['modes'],"P") == false)
 			{
-				$prep = $conn->prepare("DELETE FROM dalek_channels WHERE channel = ?");
+				$prep = $conn->prepare("DELETE FROM ".sqlprefix()."channels WHERE channel = ?");
 				$prep->bind_param("s",$lookup['channel']);
 				$prep->execute();
 			}
@@ -375,13 +375,13 @@ class SQL {
 function do_part($chan,$nick)
 {
 	$conn = sqlnew();
-	$prep = $conn->prepare("DELETE FROM dalek_ison WHERE nick = ? AND lower(chan) = ?");
+	$prep = $conn->prepare("DELETE FROM ".sqlprefix()."ison WHERE nick = ? AND lower(chan) = ?");
 	$prep->bind_param("ss",$nick->uid,$chan);
 	$prep->execute();
 
 	/* cleanup any non-permanent empty channel */
 	
-	$prep = $conn->prepare("SELECT * FROM dalek_ison WHERE lower(chan) = ?");
+	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."ison WHERE lower(chan) = ?");
 	$prep->bind_param("s",$chan);
 	$prep->execute();
 	$result = $prep->get_result();
@@ -391,7 +391,7 @@ function do_part($chan,$nick)
 		$lookup = find_channel($chan);
 		if (strpos($lookup['modes'],"P") == false)
 		{
-			$prep = $conn->prepare("DELETE FROM dalek_channels WHERE channel = ?");
+			$prep = $conn->prepare("DELETE FROM ".sqlprefix()."channels WHERE channel = ?");
 			$prep->bind_param("s",$lookup['channel']);
 			$prep->execute();
 		}
@@ -406,7 +406,7 @@ function find_channel($channel)
 	if (!$conn)
 		return false;
 	else {
-		$prep = $conn->prepare("SELECT * FROM dalek_channels WHERE channel = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."channels WHERE channel = ?");
 		$prep->bind_param("s",$channel);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -417,7 +417,7 @@ function find_channel($channel)
 			return false;
 		$return = $result->fetch_assoc();
 
-		$prep = $conn->prepare("SELECT * FROM dalek_chaninfo WHERE channel = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."chaninfo WHERE channel = ?");
 		$prep->bind_param("s",$channel);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -461,11 +461,17 @@ function sqlnew()
 	return $conn;
 }			
 
+function sqlprefix()
+{
+    global $cf;
+    return (isset($cf['sqlprefix'])) ? $cf['sqlprefix'] : 'dalek_';
+}
+
 hook::func(HOOKTYPE_PRE_CONNECT, function($u)
 {
 	$conn = sqlnew();
 	
-	$conn->multi_query("CREATE TABLE IF NOT EXISTS dalek_user (
+	$conn->multi_query("CREATE TABLE IF NOT EXISTS ".sqlprefix()."user (
 		id int NOT NULL AUTO_INCREMENT,
 		nick varchar(255) NOT NULL,
 		timestamp int NOT NULL,
@@ -487,7 +493,7 @@ hook::func(HOOKTYPE_PRE_CONNECT, function($u)
 		last int,
 		PRIMARY KEY (id)
 	);
-	CREATE TABLE IF NOT EXISTS dalek_server (
+	CREATE TABLE IF NOT EXISTS ".sqlprefix()."server (
 		id int NOT NULL AUTO_INCREMENT,
 		servername varchar(255),
 		sid varchar(3) NOT NULL,
@@ -499,7 +505,7 @@ hook::func(HOOKTYPE_PRE_CONNECT, function($u)
 		intro_by varchar(255),
 		PRIMARY KEY (id)
 	);
-	CREATE TABLE IF NOT EXISTS dalek_channels (
+	CREATE TABLE IF NOT EXISTS ".sqlprefix()."channels (
 		id int NOT NULL AUTO_INCREMENT,
 		timestamp int NOT NULL,
 		channel varchar(255),
@@ -507,7 +513,7 @@ hook::func(HOOKTYPE_PRE_CONNECT, function($u)
 		topic varchar(255),
 		PRIMARY KEY (id)
 	);
-	CREATE TABLE IF NOT EXISTS dalek_swhois (
+	CREATE TABLE IF NOT EXISTS ".sqlprefix()."swhois (
 		id int AUTO_INCREMENT NOT NULL,
 		tag varchar(255),
 		uid varchar(255),
@@ -515,21 +521,21 @@ hook::func(HOOKTYPE_PRE_CONNECT, function($u)
 		swhois varchar(255),
 		PRIMARY KEY(id)
 	);
-	CREATE TABLE IF NOT EXISTS dalek_ison (
+	CREATE TABLE IF NOT EXISTS ".sqlprefix()."ison (
 		id int AUTO_INCREMENT NOT NULL,
 		chan varchar(255),
 		nick varchar(255),
 		mode varchar(255),
 		PRIMARY KEY(id)
 	);
-	CREATE TABLE IF NOT EXISTS dalek_user_meta (
+	CREATE TABLE IF NOT EXISTS ".sqlprefix()."user_meta (
 		id int AUTO_INCREMENT NOT NULL,
 		UID varchar(10),
 		meta_key varchar(255),
 		meta_data varchar(255),
 		PRIMARY KEY(id)
 	);
-	CREATE TABLE IF NOT EXISTS dalek_tkldb (
+	CREATE TABLE IF NOT EXISTS ".sqlprefix()."tkldb (
 		id int AUTO_INCREMENT NOT NULL,
 		type varchar(2) NOT NULL,
 		ut varchar(255) NOT NULL,
@@ -540,7 +546,7 @@ hook::func(HOOKTYPE_PRE_CONNECT, function($u)
 		reason varchar(255),
 		PRIMARY KEY(id)
 	);
-	CREATE TABLE IF NOT EXISTS dalek_invite (
+	CREATE TABLE IF NOT EXISTS ".sqlprefix()."invite (
 		id int AUTO_INCREMENT NOT NULL,
 		code varchar(255) NOT NULL,
 		timestamp varchar(255) NOT NULL,
@@ -548,13 +554,13 @@ hook::func(HOOKTYPE_PRE_CONNECT, function($u)
 		PRIMARY KEY(id)
 	);
 
-	TRUNCATE TABLE dalek_user;
-	TRUNCATE TABLE dalek_channels;
-	TRUNCATE TABLE dalek_server;
-	TRUNCATE TABLE dalek_swhois;
-	TRUNCATE TABLE dalek_ison;
-	TRUNCATE TABLE dalek_user_meta;
-	TRUNCATE TABLE dalek_tkldb;");
+	TRUNCATE TABLE ".sqlprefix()."user;
+	TRUNCATE TABLE ".sqlprefix()."channels;
+	TRUNCATE TABLE ".sqlprefix()."server;
+	TRUNCATE TABLE ".sqlprefix()."swhois;
+	TRUNCATE TABLE ".sqlprefix()."ison;
+	TRUNCATE TABLE ".sqlprefix()."user_meta;
+	TRUNCATE TABLE ".sqlprefix()."tkldb;");
 	$conn->close();
 });
 
@@ -604,7 +610,7 @@ function umeta_add($person,$key = "",$data = "")
 	if (!$conn) { return false; }
 	
 	else {
-		$prep = $conn->prepare("INSERT INTO dalek_user_meta (UID, meta_key, meta_data) VALUES (?, ?, ?)");
+		$prep = $conn->prepare("INSERT INTO ".sqlprefix()."user_meta (UID, meta_key, meta_data) VALUES (?, ?, ?)");
 
 		$tag = explode(";",mb_substr($data,1));
 		for ($i = 0; isset($tag[$i]); $i++)
@@ -630,7 +636,7 @@ function get_num_online_users() : int
 	if (!$conn)
 		return 0;
 	else {
-		$prep = $conn->prepare("SELECT * FROM dalek_user");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user");
 		$prep->execute();
 		$result = $prep->get_result();
 		$count = $result->num_rows;
@@ -646,7 +652,7 @@ function get_num_servers() : int
 	if (!$conn)
 		return 0;
 	else {
-		$prep = $conn->prepare("SELECT * FROM dalek_server");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."server");
 		$prep->execute();
 		$result = $prep->get_result();
 		$count = $result->num_rows;
@@ -662,7 +668,7 @@ function get_num_channels() : int
 	if (!$conn)
 		return 0;
 	else {
-		$prep = $conn->prepare("SELECT * FROM dalek_channels");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."channels");
 		$prep->execute();
 		$result = $prep->get_result();
 		$count = $result->num_rows;
@@ -678,7 +684,7 @@ function get_num_swhois() : int
 	if (!$conn)
 		return 0;
 	else {
-		$prep = $conn->prepare("SELECT * FROM dalek_swhois");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."swhois");
 		$prep->execute();
 		$result = $prep->get_result();
 		$count = $result->num_rows;
@@ -694,7 +700,7 @@ function get_num_meta() : int
 	if (!$conn)
 		return 0;
 	else {
-		$prep = $conn->prepare("SELECT * FROM dalek_user_meta");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user_meta");
 		$prep->execute();
 		$result = $prep->get_result();
 		$count = $result->num_rows;
@@ -717,7 +723,7 @@ function update_last($person) : bool
 	if (!$conn)
 		return false;
 	else {
-		$prep = $conn->prepare("UPDATE dalek_user SET last = ? WHERE UID = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET last = ? WHERE UID = ?");
 		$prep->bind_param("is",$servertime,$user->uid);
 		$prep->execute();
 		$prep->close();
@@ -728,7 +734,7 @@ function update_last($person) : bool
 function is_a_ban($chan,$ban) : bool
 {
 	$conn = sqlnew();
-	$prep = $conn->prepare("SELECT * FROM dalek_channel_meta WHERE chan = ? AND meta_value = ?");
+	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."channel_meta WHERE chan = ? AND meta_value = ?");
 	$prep->bind_param("ss",$chan->chan,$ban);
 	$prep->execute();
 	$result = $prep->get_result();
@@ -746,7 +752,7 @@ function find_person($person = NULL)
 	if (!$conn) { return false; }
 	else
 	{
-		$prep = $conn->prepare("SELECT * FROM dalek_user WHERE nick = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user WHERE nick = ?");
 		$prep->bind_param("s",$person);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -760,7 +766,7 @@ function find_person($person = NULL)
 		
 		uidcheck:
 		
-		$prep = $conn->prepare("SELECT * FROM dalek_user WHERE UID = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user WHERE UID = ?");
 		$prep->bind_param("s",$person);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -786,7 +792,7 @@ function update_nick($uid,$nick,$ts) : bool
 		if (!$person->IsUser)
 			return false;
 		
-		$prep = $conn->prepare("UPDATE dalek_user SET nick = ?, timestamp = ? WHERE UID = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET nick = ?, timestamp = ? WHERE UID = ?");
 		$prep->bind_param("sis",$nick,$ts,$uid);
 		$prep->execute();
 		$prep->close();
@@ -805,7 +811,7 @@ function update_host($uid,$host,$ts) : bool
 			return false;
 		$uid = $person->uid;
 		
-		$prep = $conn->prepare("UPDATE dalek_user SET cloak = ?, timestamp = ? WHERE UID = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET cloak = ?, timestamp = ? WHERE UID = ?");
 		$prep->bind_param("sis",$host,$ts,$uid);
 		$prep->execute();
 		$prep->close();
@@ -823,7 +829,7 @@ function update_ident($uid,$ident,$ts) : bool
 			return false;
 		$uid = $person->uid;
 		
-		$prep = $conn->prepare("UPDATE dalek_user SET ident = ?, timestamp = ? WHERE UID = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET ident = ?, timestamp = ? WHERE UID = ?");
 		$prep->bind_param("sis",$ident,$ts,$uid);
 		$prep->execute();
 		$prep->close();
@@ -840,7 +846,7 @@ function update_usermode($uid,$new) : bool
 		$person = find_person($uid);
 		$uid = $person['UID'];
 		
-		$prep = $conn->prepare("UPDATE dalek_user SET usermodes = ? WHERE UID = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET usermodes = ? WHERE UID = ?");
 		$prep->bind_param("ss",$new,$uid);
 		$prep->execute();
 		$prep->close();
@@ -853,7 +859,7 @@ function find_serv($serv)
 	if (!$conn)
 		return false;
 	else {
-		$prep = $conn->prepare("SELECT * FROM dalek_server WHERE servername = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."server WHERE servername = ?");
 		$prep->bind_param("s",$serv);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -867,7 +873,7 @@ function find_serv($serv)
 		
 		sidcheck:
 		
-		$prep = $conn->prepare("SELECT * FROM dalek_server WHERE sid = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."server WHERE sid = ?");
 		$prep->bind_param("s",$serv);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -887,7 +893,7 @@ function get_ison($uid)
 	if (!$conn)
 		return false;
 	else {
-		$prep = $conn->prepare("SELECT * FROM dalek_ison WHERE nick = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."ison WHERE nick = ?");
 		$prep->bind_param("s",$uid);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -931,7 +937,7 @@ function del_sid($sid) : void
 function serv_num_users($sid) : int
 {
 	$conn = sqlnew();
-	$prep = $conn->prepare("SELECT * FROM dalek_user WHERE SID = ?");
+	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user WHERE SID = ?");
 	$prep->bind_param("s",$sid);
 	$prep->execute();
 	$result = $prep->get_result();
@@ -944,7 +950,7 @@ function serv_num_users($sid) : int
 function serv_num_attach($sid) : int
 {
 	$conn = sqlnew();
-	$prep = $conn->prepare("SELECT * FROM dalek_server WHERE intro_by = ?");
+	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."server WHERE intro_by = ?");
 	$prep->bind_param("s",$sid);
 	$prep->execute();
 	$result = $prep->get_result();
@@ -960,7 +966,7 @@ function serv_attach($sid)
 {
 	$return = array();
 	$conn = sqlnew();
-	$prep = $conn->prepare("SELECT * FROM dalek_server WHERE intro_by = ?");
+	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."server WHERE intro_by = ?");
 	$prep->bind_param("s",$sid);
 	$prep->execute();
 	$result = $prep->get_result();
@@ -977,7 +983,7 @@ function recurse_serv_users($sid)
 {
 	$return = array();
 	$conn = sqlnew();
-	$prep = $conn->prepare("SELECT * FROM dalek_user WHERE SID = ?");
+	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user WHERE SID = ?");
 	foreach (recurse_serv_attach($sid) as $s)
 	{
 		$prep->bind_param("s",$s);
@@ -996,7 +1002,7 @@ function update_gecos($nick,$gecos) : void
 {
 	$conn = sqlnew();
 	$gecos = ircstrip($gecos);
-	$prep = $conn->prepare("UPDATE dalek_user SET gecos = ? WHERE nick = ?");
+	$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET gecos = ? WHERE nick = ?");
 	$prep->bind_param("ss",$gecos,$nick);
 	$prep->execute();
 }

@@ -20,7 +20,7 @@ hook::func("start", function()
 	if (!$conn)
 		return;
 	
-	$result = $conn->query("SELECT * FROM dalek_chaninfo");
+	$result = $conn->query("SELECT * FROM ".sqlprefix()."chaninfo");
 	if (!$result)
 		return;
 	if ($result->num_rows == 0)
@@ -106,12 +106,12 @@ function register_channel($chan,$owner)
 	if (!$conn)
 		return false;
 	$chatlink = "/chat/?channel=".$chan;
-	$prep = $conn->prepare("INSERT INTO dalek_chaninfo (channel, owner, regdate, chatlink) VALUES (?, ?, ?, ?)");
+	$prep = $conn->prepare("INSERT INTO ".sqlprefix()."chaninfo (channel, owner, regdate, chatlink) VALUES (?, ?, ?, ?)");
 	$prep->bind_param("ssss",$chan,$owner,$servertime,$chatlink);
 	$prep->execute();
 	
 	$permission = "owner";
-	$prep = $conn->prepare("INSERT INTO dalek_chanaccess (channel, nick, access) VALUES (?, ?, ?)");
+	$prep = $conn->prepare("INSERT INTO ".sqlprefix()."chanaccess (channel, nick, access) VALUES (?, ?, ?)");
 	$prep->bind_param("sss",$chan,$owner,$permission);
 	$prep->execute();
 	return true;
@@ -121,7 +121,7 @@ hook::func("preconnect", function()
 {
 	global $sql;
 	
-	$query = "CREATE TABLE IF NOT EXISTS dalek_chaninfo (
+	$query = "CREATE TABLE IF NOT EXISTS ".sqlprefix()."chaninfo (
 				id int AUTO_INCREMENT NOT NULL,
 				channel varchar(255) NOT NULL,
 				owner varchar(255) NOT NULL,
@@ -133,7 +133,7 @@ hook::func("preconnect", function()
 			)";
 	$sql::query($query);
 	
-	$query = "CREATE TABLE IF NOT EXISTS dalek_chanaccess (
+	$query = "CREATE TABLE IF NOT EXISTS ".sqlprefix()."chanaccess (
 				id int AUTO_INCREMENT NOT NULL,
 				channel varchar(255) NOT NULL,
 				nick varchar(255) NOT NULL,

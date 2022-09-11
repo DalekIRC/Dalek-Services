@@ -39,7 +39,7 @@ class registration {
 	{
 		/* Validation codes table */
 		$conn = sqlnew();
-		$conn->query("CREATE TABLE IF NOT EXISTS dalek_verification (
+		$conn->query("CREATE TABLE IF NOT EXISTS ".sqlprefix()."verification (
 						id int AUTO_INCREMENT NOT NULL,
 						account varchar(50) NOT NULL,
 						timestamp bigint NOT NULL,
@@ -164,7 +164,7 @@ class registration {
 		$time = servertime();
 		$code = rand(112233,998877);
 		$p = md5(md5($account.$password.$time));
-		$prep = $conn->prepare("INSERT INTO dalek_verification (account, timestamp, visitor_code, verify_code) VALUES (?,?,?,?)");
+		$prep = $conn->prepare("INSERT INTO ".sqlprefix()."verification (account, timestamp, visitor_code, verify_code) VALUES (?,?,?,?)");
 		$prep->bind_param("siss",$account,$time,$p,$code);
 		$prep->execute();
 

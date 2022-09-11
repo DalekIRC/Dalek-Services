@@ -118,7 +118,7 @@ function ShowSocial($account,$option)
 	if (!$conn) { return false; }
 	else
 	{
-		$prep = $conn->prepare("SELECT setting_value FROM dalek_account_settings WHERE account = ? AND setting_key = 'showsocial'");
+		$prep = $conn->prepare("SELECT setting_value FROM ".sqlprefix()."account_settings WHERE account = ? AND setting_key = 'showsocial'");
 		$prep->bind_param("s",$account);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -126,7 +126,7 @@ function ShowSocial($account,$option)
 		if ($result->num_rows == 0)
 		{
 		
-			$prep = $conn->prepare("INSERT INTO dalek_account_settings (account, setting_key, setting_value) VALUES (?, ?, ?)");
+			$prep = $conn->prepare("INSERT INTO ".sqlprefix()."account_settings (account, setting_key, setting_value) VALUES (?, ?, ?)");
 			$prep->bind_param("sss", $account, $opt, $option);
 			$prep->execute();
 			$return = true;
@@ -142,7 +142,7 @@ function ShowSocial($account,$option)
 				if (($switch == "on" && $option == "on") || ($switch == "off" && $option == "off")){ $return = false; }
 				else
 				{
-					$prep = $conn->prepare("UPDATE dalek_account_settings SET setting_value = ? WHERE account = ? AND setting_key = ?");
+					$prep = $conn->prepare("UPDATE ".sqlprefix()."account_settings SET setting_value = ? WHERE account = ? AND setting_key = ?");
 					$prep->bind_param("sss", $option, $account, $opt);
 					$prep->execute();
 					$return = true;
@@ -159,7 +159,7 @@ function IsShowSocial($account)
 	if (!$conn) { return false; }
 	else
 	{
-		$prep = $conn->prepare("SELECT setting_value FROM dalek_account_settings WHERE account = ? AND setting_key = 'showsocial'");
+		$prep = $conn->prepare("SELECT setting_value FROM ".sqlprefix()."account_settings WHERE account = ? AND setting_key = 'showsocial'");
 		$prep->bind_param("s", $account);
 		$prep->execute();
 		$result = $prep->get_result();

@@ -85,7 +85,7 @@ class chgident {
 		$uid = $parv[0];
         $ident = $parv[1];
 		$conn = sqlnew();
-		$prep = $conn->prepare("UPDATE dalek_user SET ident = ? WHERE UID = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET ident = ? WHERE UID = ?");
 		$prep->bind_param("ss",$ident,$uid);
 		$prep->execute();
 		return;

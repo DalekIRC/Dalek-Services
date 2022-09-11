@@ -39,14 +39,14 @@ class protoctl {
 	{
 		$conn = sqlnew();
 		$conn->multi_query(
-			"CREATE TABLE IF NOT EXISTS dalek_protoctl_meta (
+			"CREATE TABLE IF NOT EXISTS ".sqlprefix()."protoctl_meta (
 				id int AUTO_INCREMENT NOT NULL,
 				meta_key varchar(255) NOT NULL,
 				meta_value varchar(255) NOT NULL,
 				PRIMARY KEY(id)
 			);
 
-			TRUNCATE TABLE dalek_protoctl_meta;
+			TRUNCATE TABLE ".sqlprefix()."protoctl_meta;
 		);");
 		
 	}
@@ -100,7 +100,7 @@ class protoctl {
 			$key = $tok[0];
 			$val = $tok[1] ?? false;
 			
-			$prep = $conn->prepare("INSERT INTO dalek_protoctl_meta (meta_key, meta_value) VALUES (?, ?)");
+			$prep = $conn->prepare("INSERT INTO ".sqlprefix()."protoctl_meta (meta_key, meta_value) VALUES (?, ?)");
 			
 			/* Remembering which type each CHANMODE is  according to https://modern.ircdocs.horse/#mode-message */
 			if ($key == "CHANMODES")

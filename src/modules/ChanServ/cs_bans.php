@@ -51,7 +51,7 @@ chanserv::func("privmsg", function($u)
 	}
 	
 	$conn = sqlnew();
-	$prep = $conn->prepare("SELECT * FROM dalek_channel_meta WHERE chan = ? and meta_key = ?");
+	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."channel_meta WHERE chan = ? and meta_key = ?");
 	$meta_key = "ban";
 	$prep->bind_param("ss",$chan->chan,$meta_key);
 	$prep->execute();

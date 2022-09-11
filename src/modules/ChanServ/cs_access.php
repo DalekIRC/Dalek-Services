@@ -137,7 +137,7 @@ class cs_access {
 		if (!$conn)
 			return;
 		
-		$result = $conn->query("SELECT * FROM dalek_chaninfo");
+		$result = $conn->query("SELECT * FROM ".sqlprefix()."chaninfo");
 		if (!$result)
 			return;
 		if ($result->num_rows == 0)
@@ -161,12 +161,12 @@ class cs_access {
 		$conn = sqlnew();
 		if (!$conn)
 			return false;
-		$prep = $conn->prepare("INSERT INTO dalek_chaninfo (channel, owner, regdate) VALUES (?, ?, ?)");
+		$prep = $conn->prepare("INSERT INTO ".sqlprefix()."chaninfo (channel, owner, regdate) VALUES (?, ?, ?)");
 		$prep->bind_param("sss",$chan,$owner,$servertime);
 		$prep->execute();
 		
 		$permission = "owner";
-		$prep = $conn->prepare("INSERT INTO dalek_chanaccess (channel, nick, access) VALUES (?, ?, ?)");
+		$prep = $conn->prepare("INSERT INTO ".sqlprefix()."chanaccess (channel, nick, access) VALUES (?, ?, ?)");
 		$prep->bind_param("sss",$chan,$owner,$permission);
 		$prep->execute();
 		return true;
@@ -176,7 +176,7 @@ class cs_access {
 	{
 		$conn = sqlnew();
 	
-		$query = "CREATE TABLE IF NOT EXISTS dalek_chaninfo (
+		$query = "CREATE TABLE IF NOT EXISTS ".sqlprefix()."chaninfo (
 					id int AUTO_INCREMENT NOT NULL,
 					channel varchar(255) NOT NULL,
 					owner varchar(255) NOT NULL,
@@ -188,7 +188,7 @@ class cs_access {
 				)";
 		$conn->query($query);
 		
-		$query = "CREATE TABLE IF NOT EXISTS dalek_chanaccess (
+		$query = "CREATE TABLE IF NOT EXISTS ".sqlprefix()."chanaccess (
 					id int AUTO_INCREMENT NOT NULL,
 					channel varchar(255) NOT NULL,
 					nick varchar(255) NOT NULL,

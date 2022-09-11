@@ -123,7 +123,7 @@ class ns_certfp {
 		}
 		elseif (strtolower($parv[1]) == "list")
 		{
-			$table = 'dalek_fingerprints_external';
+			$table = sqlprefix().'fingerprints_external';
 			$conn = sqlnew();
 			$prep = $conn->prepare("SELECT * FROM $table WHERE account = ?");
 			$prep->bind_param("s",$nick->account);
@@ -144,7 +144,7 @@ class ns_certfp {
 
 	function is_certfp_already($ip, $account, $fp) : bool
 	{
-		$table = 'dalek_fingerprints_external';
+		$table = sqlprefix().'fingerprints_external';
 		$conn = sqlnew();
 		$prep = $conn->prepare("SELECT * FROM $table WHERE ip = ? AND account = ? and fingerprint = ? LIMIT 1");
 		$prep->bind_param("sss",$ip,$account,$fp);
@@ -169,7 +169,7 @@ class ns_certfp {
 		if (!$fp || !strlen($fp))
 			return "Failed to save certificate fingerprint. Please contact staff.";
 		/* put to the table */
-		$table = 'dalek_fingerprints_external';
+		$table = sqlprefix().'fingerprints_external';
 		$conn = sqlnew();
 		$prep = $conn->prepare("INSERT INTO $table (account, ip, fingerprint) VALUES (?, ?, ?)");
 		$prep->bind_param("sss", $account, $ip, $fp);
@@ -190,7 +190,7 @@ class ns_certfp {
 			return "Couldn't find saved certfp: $fp";
 
 		/* delete from the table */
-		$table = 'dalek_fingerprints_external';
+		$table = sqlprefix().'fingerprints_external';
 		$conn = sqlnew();
 		$prep = $conn->prepare("DELETE FROM $table WHERE account = ? AND ip = ? AND  fingerprint = ?");
 		$prep->bind_param("sss", $account, $ip, $fp);

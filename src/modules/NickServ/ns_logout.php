@@ -82,7 +82,7 @@ class ns_logout {
 		$ns = Client::find("NickServ");
 		$conn = sqlnew();
 		
-		$prep = $conn->prepare("UPDATE dalek_user SET account=NULL WHERE UID=?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET account=NULL WHERE UID=?");
 		foreach($nicks as $nick)
 		{	$prep->bind_param("s",$nick->uid);
 			$prep->execute();

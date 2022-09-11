@@ -112,7 +112,7 @@ class tkl {
 	{	
 		$conn = sqlnew();
 		$conn->multi_query(
-			"CREATE TABLE IF NOT EXISTS dalek_tkldb (
+			"CREATE TABLE IF NOT EXISTS ".sqlprefix()."tkldb (
 				id int AUTO_INCREMENT NOT NULL,
 				type varchar(2) NOT NULL,
 				ut varchar(100) NOT NULL,
@@ -124,7 +124,7 @@ class tkl {
 				PRIMARY KEY(id)
 			);
 
-			TRUNCATE TABLE dalek_tkldb"
+			TRUNCATE TABLE ".sqlprefix()."tkldb"
 		);
 	}
 
@@ -132,7 +132,7 @@ class tkl {
 	{
 		$conn = sqlnew();
 		$prep = $conn->prepare("
-			INSERT INTO dalek_tkldb (
+			INSERT INTO ".sqlprefix()."tkldb (
 				type,
 				ut,
 				mask,
@@ -151,7 +151,7 @@ class tkl {
 	{
 		$conn = sqlnew();
 		$prep = $conn->prepare("
-			DELETE FROM dalek_tkldb WHERE
+			DELETE FROM ".sqlprefix()."tkldb WHERE
 				type = ? AND
 				ut = ? AND
 				mask = ?"
@@ -166,7 +166,7 @@ class tkl {
 function get_tkl($type,$mask,$ut = "*")
 {
 	$conn = sqlnew();
-	$prep = $conn->prepare("SELECT * FROM dalek_tkldb WHERE type = ? AND ut = ? AND mask = ?");
+	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."tkldb WHERE type = ? AND ut = ? AND mask = ?");
 	$prep->bind_param("sss",$type,$ut,$mask);
 	$prep->execute();
 	$result = $prep->get_result();

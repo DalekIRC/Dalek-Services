@@ -97,7 +97,7 @@ class away {
     {
         $away = ($away) ? "Y" : NULL;
         $conn = sqlnew();
-        $prep = $conn->prepare("UPDATE dalek_user SET away = ?, awaymsg = ? WHERE UID = ?");
+        $prep = $conn->prepare("UPDATE ".sqlprefix()."user SET away = ?, awaymsg = ? WHERE UID = ?");
         $prep->bind_param("sss", $away, $msg, $nick->uid);
         $prep->execute();
     }

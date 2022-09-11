@@ -85,10 +85,10 @@ class topic {
 	{
 		$conn = sqlnew();
 		
-		$prep = $conn->prepare("UPDATE dalek_channels SET topic = ? WHERE lower(channel) = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."channels SET topic = ? WHERE lower(channel) = ?");
 		$prep->bind_param("ss",$topic,$chan);
 		$prep->execute();
-		$prep = $conn->prepare("UPDATE dalek_chaninfo SET topic = ? WHERE lower(channel) = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."chaninfo SET topic = ? WHERE lower(channel) = ?");
 		$prep->bind_param("ss, $topic,$chan");
 		$prep->execute();
 		$prep->close();

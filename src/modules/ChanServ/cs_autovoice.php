@@ -118,7 +118,7 @@ function can_autovoice($nick,Channel $channel)
 function is_autovoice(WPUser $nick,$chan)
 {
 	$conn = sqlnew();
-	$prep = $conn->prepare("SELECT * FROM dalek_account_settings WHERE account = ?");
+	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."account_settings WHERE account = ?");
 	$prep->bind_param("s",$nick->login);
 	$prep->execute();
 	$return = false;
@@ -144,13 +144,13 @@ function autovoice_toggle(WPUser $nick,$chan,$toggle)
 	$setting_key = "autovoice_$chan";
 	if (is_autovoice($nick,$chan) == 0)
 	{
-		$prep = $conn->prepare("INSERT INTO dalek_account_settings (account, setting_key, setting_value) VALUES (?, ?, ?)");
+		$prep = $conn->prepare("INSERT INTO ".sqlprefix()."account_settings (account, setting_key, setting_value) VALUES (?, ?, ?)");
 		$prep->bind_param("sss",$nick->login,$setting_key,$toggle);
 		$prep->execute();
 	}
 	else
 	{
-		$prep = $conn->prepare("UPDATE dalek_account_settings SET setting_key = ?, setting_value = ? WHERE account = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."account_settings SET setting_key = ?, setting_value = ? WHERE account = ?");
 		$prep->bind_param("sss",$setting_key,$toggle,$nick->login);
 		$prep->execute();
 	}

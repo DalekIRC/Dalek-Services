@@ -82,7 +82,7 @@ class sethost {
 		$host = $u['dest'];
 		$conn = sqlnew();
 		$nick = $u['nick'];
-		$prep = $conn->prepare("UPDATE dalek_user SET cloak = ? WHERE UID = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET cloak = ? WHERE UID = ?");
 		$prep->bind_param("ss",$host,$nick->uid);
 		$prep->execute();
 		return;
