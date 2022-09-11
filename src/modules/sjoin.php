@@ -147,7 +147,7 @@ class sjoin {
 			
 			if (isset($mode))
 			{
-				$sql::insert_ison($chan,$item,$mode);
+				$sql->insert_ison($chan,$item,$mode);
 				$array = array('chan' => $chan, 'nick' => $item);
 
 				hook::run(HOOKTYPE_JOIN, $array);

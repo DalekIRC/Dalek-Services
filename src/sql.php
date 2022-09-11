@@ -188,7 +188,7 @@ class SQL {
 		$prep->execute();
 		$result = $prep->get_result();
 		while($row = $result->fetch_assoc())
-			$sql::user_delete($row['UID']);
+			$sql->user_delete($row['UID']);
 		$prep = $conn->prepare("DELETE FROM ".sqlprefix()."server WHERE SID = ?");
 		$prep->bind_param("s",$sid);
 		$prep->execute();
@@ -570,7 +570,7 @@ hook::func(HOOKTYPE_WELCOME, function($u)
 {
 	global $sql,$fsync;
 	
-	$sql::user_insert($u);
+	$sql->user_insert($u);
 	update_last($u['nick']);
 
 	if (isset($fsync))
@@ -583,7 +583,7 @@ hook::func(HOOKTYPE_SERVER_CONNECT, function($u)
 {
 	global $sql;
 	
-	$sql::sid($u);
+	$sql->sid($u);
 	
 });
 
@@ -591,7 +591,7 @@ hook::func(HOOKTYPE_SJOIN, function($u)
 {
 	global $sql;
 	
-	$sql::sjoin($u);
+	$sql->sjoin($u);
 });
 
 /* Adds user meta to the database
