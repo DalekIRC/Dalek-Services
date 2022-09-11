@@ -196,7 +196,7 @@ class cs_register {
 		$conn->query($query);
 	}
 
-	function hook_do_join($u)
+	public static function hook_do_join($u)
 	{
 		$chan = new Channel($u['chan']);
 		$cs = Client::find("ChanServ");

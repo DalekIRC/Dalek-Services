@@ -190,7 +190,7 @@ class cs_autoop {
 		}
 	}
 	
-	function hook_join($u)
+	public static function hook_join($u)
 	{
 		$cs = Client::find("ChanServ");
 		$nick = new User($u['nick']);
@@ -210,7 +210,7 @@ class cs_autoop {
 		}
 	}
 	
-	function hook_auth($u)
+	public static function hook_auth($u)
 	{
 		$cs = Client::find("ChanServ");
 		

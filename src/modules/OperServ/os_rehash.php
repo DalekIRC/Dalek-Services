@@ -71,7 +71,7 @@ class os_rehash {
 		return true;
 	}
 	
-	function cmd_rehash($u)
+	public static function cmd_rehash($u)
 	{
 		$parv = explode(" ",$u['msg']);
 

@@ -118,7 +118,7 @@ class SASL {
 			}
 		}
 	}
-	function hook_uid($u)
+	public static function hook_uid($u)
 	{
 		$ns = Client::find("NickServ");
 		if (!$ns)
@@ -141,7 +141,7 @@ class SASL {
 	}
 
 
-	function cmd_sasl($u)
+	public static function cmd_sasl($u)
 	{
 		$parv = explode(" ",$u['params']);
 		

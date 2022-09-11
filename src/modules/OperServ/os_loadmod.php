@@ -85,7 +85,7 @@ class os_loadmod {
 		return true;
 	}
 	
-	function cmd_loadmod($u)
+	public static function cmd_loadmod($u)
 	{
 		$parv = explode(" ",$u['msg']);
 
@@ -102,7 +102,7 @@ class os_loadmod {
 			loadmodule($parv[1]);
 		}
 	}
-	function cmd_unloadmod($u)
+	public static function cmd_unloadmod($u)
 	{
 		$parv = explode(" ",$u['msg']);
 
