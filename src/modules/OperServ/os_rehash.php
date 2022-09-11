@@ -78,7 +78,7 @@ class os_rehash {
 		$nick = $u['nick'];
 		if (!ValidatePermissionsForPath("can_rehash", $nick))
 		{
-			sendnotice($nick->uid, $u['target'], NULL, "Permission denied!");
+			sendnotice($nick, $u['target'], NULL, "Permission denied!");
 			SVSLog("$nick->nick ($nick->ident@$nick->realhost) attempted to use a restricted command REHASH");
 			return;
 		}
