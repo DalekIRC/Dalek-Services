@@ -108,7 +108,7 @@ function bie($chan,$item)
 	
 	$conn = sqlnew();
 	
-	$prep = $conn->prepare("INSERT INTO dalek_channel_meta (chan, meta_key, meta_value, meta_setby, meta_timestamp) VALUES (?, ?, ?, ?, ?)");
+	$prep = $conn->prepare("INSERT INTO ".sqlprefix()."channel_meta (chan, meta_key, meta_value, meta_setby, meta_timestamp) VALUES (?, ?, ?, ?, ?)");
 	
 	switch($type)
 	{
@@ -415,9 +415,9 @@ function is_invite($one, $two) : bool
 	/* quickly clear up any expired invitations (12hrs) */
 
 	$exptime = $servertime - 43200;
-	$result  = $conn->query("DELETE FROM dalek_invite WHERE realtime < $exptime");
+	$result  = $conn->query("DELETE FROM ".sqlprefix()."invite WHERE realtime < $exptime");
 	/* check their credentials */ 
-	$prep = $conn->prepare("SELECT * FROM dalek_invite WHERE timestamp = ?");
+	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."invite WHERE timestamp = ?");
 	$prep->bind_param("s",$one);
 	$prep->execute();
 	$result = $prep->get_result();
@@ -432,7 +432,7 @@ function is_invite($one, $two) : bool
 
 	if ($return)
 	{
-		$prep = $conn->prepare("DELETE FROM dalek_invite WHERE code = ?");
+		$prep = $conn->prepare("DELETE FROM ".sqlprefix()."invite WHERE code = ?");
 		$prep->bind_param("s",$two);
 		$prep->execute();
 	}	
@@ -456,7 +456,7 @@ function already_invited($invitee) : bool
 {
 	$conn = sqlnew();
 	$ts = $invitee;
-	$prep = $conn->prepare("SELECT * FROM dalek_invite WHERE timestamp = ?");
+	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."invite WHERE timestamp = ?");
 	$prep->bind_param("s",$invitee);
 	$prep->execute();
 	$result = $prep->get_result();
@@ -495,7 +495,7 @@ function generate_invite_code($invitee)
 	$hash = hash("sha512",$invite);
 
 	/* put to table */
-	$prep = $conn->prepare("INSERT INTO dalek_invite (code,timestamp,realtime) VALUES (?,?,?)");
+	$prep = $conn->prepare("INSERT INTO ".sqlprefix()."invite (code,timestamp,realtime) VALUES (?,?,?)");
 	$prep->bind_param("ssi",$hash,$ts,$servertime);
 	$prep->execute();
 
@@ -519,7 +519,7 @@ function list_users_by_account($account)
 	else $account = strtoupper($account);
 	$users = [];
 	$conn = sqlnew();
-	$prep = $conn->prepare("SELECT UID FROM dalek_user WHERE UPPER(account) = ?");
+	$prep = $conn->prepare("SELECT UID FROM ".sqlprefix()."user WHERE UPPER(account) = ?");
 	$prep->bind_param("s",$account);
 	$prep->execute();
 	$result = $prep->get_result();

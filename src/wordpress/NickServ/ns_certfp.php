@@ -44,7 +44,7 @@ nickserv::func("privmsg", function($u)
 	}
 	elseif (strtolower($parv[1]) == "list")
 	{
-		$table = 'dalek_fingerprints_external';
+		$table = sqlprefix().'fingerprints_external';
 		$conn = sqlnew();
 		$prep = $conn->prepare("SELECT * FROM $table WHERE account = ?");
 		$prep->bind_param("s",$nick->account);
@@ -65,7 +65,7 @@ nickserv::func("privmsg", function($u)
 
 function is_certfp_already($ip, $account, $fp) : bool
 {
-	$table = 'dalek_fingerprints_external';
+	$table = sqlprefix().'fingerprints_external';
 	$conn = sqlnew();
 	$prep = $conn->prepare("SELECT * FROM $table WHERE ip = ? AND account = ? and fingerprint = ? LIMIT 1");
 	$prep->bind_param("sss",$ip,$account,$fp);
@@ -88,7 +88,7 @@ function add_certfp($ip, $account, $fp) : string
 		return "You already have that certfp saved.";
 
 	/* put to the table */
-	$table = 'dalek_fingerprints_external';
+	$table = sqlprefix().'fingerprints_external';
 	$conn = sqlnew();
 	$prep = $conn->prepare("INSERT INTO $table (account, ip, fingerprint) VALUES (?, ?, ?)");
 	$prep->bind_param("sss", $account, $ip, $fp);
@@ -109,7 +109,7 @@ function del_certfp($ip, $account, $fp) : string
 		return "Couldn't find saved certfp: $fp";
 
 	/* delete from the table */
-	$table = 'dalek_fingerprints_external';
+	$table = sqlprefix().'fingerprints_external';
 	$conn = sqlnew();
 	$prep = $conn->prepare("DELETE FROM $table WHERE account = ? AND ip = ? AND  fingerprint = ?");
 	$prep->bind_param("sss", $account, $ip, $fp);

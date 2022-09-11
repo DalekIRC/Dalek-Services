@@ -64,7 +64,7 @@ class Channel
 	{
 		$userlist = [];
 		$conn = sqlnew();
-		$result = $conn->query("SELECT * FROM dalek_ison WHERE chan = lower('$this->chan')");
+		$result = $conn->query("SELECT * FROM ".sqlprefix()."ison WHERE chan = lower('$this->chan')");
 		if (!$result)
 			return $userlist;
 		while($row = $result->fetch_assoc())
@@ -204,7 +204,7 @@ class Channel
 							break;
 					}
 					$conn = sqlnew();
-					$prep = $conn->prepare("DELETE FROM dalek_channel_meta WHERE chan = ? AND meta_key = ? AND meta_value = ?");
+					$prep = $conn->prepare("DELETE FROM ".sqlprefix()."channel_meta WHERE chan = ? AND meta_key = ? AND meta_value = ?");
 					$prep->bind_param("sss",$this->chan,$type,$param);
 					$prep->execute();
 					$prep->close();
@@ -222,7 +222,7 @@ class Channel
 		$conn = sqlnew();
 		if (!$conn) { return false; }
 		
-		$prep = $conn->prepare("SELECT * FROM dalek_chaninfo WHERE channel = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."chaninfo WHERE channel = ?");
 		$prep->bind_param("s",$this->chan);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -240,7 +240,7 @@ class Channel
 				$this->email = $row['email'] ?? false;
 			}
 		}
-		$prep = $conn->prepare("SELECT * FROM dalek_chanaccess WHERE channel = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."chanaccess WHERE channel = ?");
 		$prep->bind_param("s",$this->chan);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -255,7 +255,7 @@ class Channel
 	{
 		if (!($conn = sqlnew()))
 			return;
-		$prep = $conn->prepare("SELECT * FROM dalek_ison WHERE chan = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."ison WHERE chan = ?");
 		$prep->bind_param("s",$this->chan);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -276,7 +276,7 @@ function cmode_type($chr)
 	
 	$type = NULL;
 	
-	$result = $conn->query("SELECT * FROM dalek_protoctl_meta WHERE meta_key LIKE 'CHANMODES_TYPE%'");
+	$result = $conn->query("SELECT * FROM ".sqlprefix()."protoctl_meta WHERE meta_key LIKE 'CHANMODES_TYPE%'");
 	
 	while ($row = $result->fetch_assoc())
 	{
@@ -301,7 +301,7 @@ function cmode_type($chr)
 function channel_list() : array
 {
 	$conn = sqlnew();
-	$result = $conn->query("SELECT * FROM dalek_channels");
+	$result = $conn->query("SELECT * FROM ".sqlprefix()."channels");
 	if (!$result)
 		return [];
 	

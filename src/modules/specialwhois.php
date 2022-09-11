@@ -113,7 +113,7 @@ class specialwhois {
             if (!$conn) { return false; }
             else
             {
-                $prep = $conn->prepare("INSERT INTO dalek_swhois (tag, uid, priority, swhois) VALUES (?, ?, ?, ?)");
+                $prep = $conn->prepare("INSERT INTO ".sqlprefix()."swhois (tag, uid, priority, swhois) VALUES (?, ?, ?, ?)");
                 $prep->bind_param("ssss",$tag,$user,$priority,$whois);
                 $prep->execute();
                 $prep->close();
@@ -127,12 +127,12 @@ class specialwhois {
             {
                 if ($whois == "*")
                 {
-                    $prep = $conn->prepare("DELETE FROM dalek_swhois WHERE uid = ? AND tag = ?");
+                    $prep = $conn->prepare("DELETE FROM ".sqlprefix()."swhois WHERE uid = ? AND tag = ?");
                     $prep->bind_param("ss",$user,$tag);
                 }
                 else
                 {
-                    $prep = $conn->prepare("DELETE FROM dalek_swhois WHERE uid = ? AND tag = ? AND swhois = ?");
+                    $prep = $conn->prepare("DELETE FROM ".sqlprefix()."swhois WHERE uid = ? AND tag = ? AND swhois = ?");
                     $prep->bind_param("sss",$user,$tag,$whois);
                 }
                 $prep->execute();
@@ -162,12 +162,12 @@ class specialwhois {
 		$conn = sqlnew();
 		if (!$tag || $tag == "*")
 		{
-			$prep = $conn->prepare("SELECT * FROM dalek_swhois WHERE uid = ?");
+			$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."swhois WHERE uid = ?");
 			$prep->bind_param("s",$user->nick);
 		}
 		else
 		{
-			$prep = $conn->prepare("SELECT * FROM dalek_swhois WHERE uid = ? AND tag = ?");
+			$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."swhois WHERE uid = ? AND tag = ?");
 			$prep->bind_param("ss",$user->nick,$tag);
 		}
 		$prep->execute();
@@ -184,7 +184,7 @@ class specialwhois {
     static function is_swhois($nick,$tag)
     {
         $conn = sqlnew();
-        $prep = $conn->prepare("SELECT * FROM dalek_swhois WHERE uid = ? AND tag = ?");
+        $prep = $conn->prepare("SELECT * FROM ".sqlprefix()."swhois WHERE uid = ? AND tag = ?");
         $prep->bind_param("ss",$nick,$tag);
         $prep->execute();
 		$result = $prep->get_result();

@@ -313,7 +313,7 @@ class whois {
 		else
 		{
 			$conn = sqlnew();
-			$prep = $conn->prepare("SELECT * FROM dalek_swhois WHERE uid = ? ORDER BY priority ASC");
+			$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."swhois WHERE uid = ? ORDER BY priority ASC");
 			$prep->bind_param("s", $uid);
 			$prep->execute();
 			$result = $prep->get_result();

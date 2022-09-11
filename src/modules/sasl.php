@@ -72,7 +72,7 @@ class SASL {
 	{
 		$conn = sqlnew();
 
-		$table = "dalek_fingerprints_external";	
+		$table = sqlprefix()."fingerprints_external";	
 		
 		$conn->query("CREATE TABLE IF NOT EXISTS $table (
 			id int NOT NULL AUTO_INCREMENT,
@@ -87,7 +87,7 @@ class SASL {
 	function on_connect($u)
 	{
 		$conn = sqlnew();
-		$query = "SELECT * FROM dalek_user";
+		$query = "SELECT * FROM ".sqlprefix()."user";
 		$prep = $conn->prepare($query);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -252,8 +252,6 @@ class IRC_SASL {
 	private function success(int $i, $source = NULL)
 	{
 
-		
-
 		if ($i)
 		{
 			SVSLog("[".self::$list[$this->uid]['host']."|".self::$list[$this->uid]['ip']."] $this->uid identified using SASL for account: $this->account $this->reason");
@@ -261,7 +259,7 @@ class IRC_SASL {
 		}
 
 		$conn = sqlnew();
-		$prep = $conn->prepare("UPDATE dalek_user SET account = ? WHERE UID = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET account = ? WHERE UID = ?");
 		$prep->bind_param("ss",$this->account,$this->uid);
 		$prep->execute();
 		$conn->close();
@@ -357,8 +355,8 @@ class IRC_SASL {
 	}
 	function check_fingerprint($fp)
 	{
-		
-		$table = "dalek_fingerprints_external";	
+
+		$table = sqlprefix()."fingerprints_external";	
 		$conn = sqlnew();
 		$prep = $conn->prepare("SELECT * FROM $table WHERE fingerprint = ? LIMIT 1");
 		$prep->bind_param("s", self::$list[$this->uid]["key"]);

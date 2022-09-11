@@ -107,18 +107,18 @@ class md {
 			return false;
 
 
-		$prep = $conn->prepare("SELECT * FROM dalek_user_meta WHERE UID = ? AND meta_key = ? AND meta_data = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user_meta WHERE UID = ? AND meta_key = ? AND meta_data = ?");
 		$prep->bind_param("sss",$person,$key,$value);
 		$prep->execute();
 		$result = $prep->get_result();
 		if (!$result || !$result->num_rows)
 		{
-			$prep = $conn->prepare("INSERT INTO dalek_user_meta (UID, meta_key, meta_data) VALUES (?, ?, ?)");
+			$prep = $conn->prepare("INSERT INTO ".sqlprefix()."user_meta (UID, meta_key, meta_data) VALUES (?, ?, ?)");
 			$prep->bind_param("sss",$person,$key,$value);
 		}
 		else
 		{
-			$prep = $conn->prepare("UPDATE dalek_user_meta SET meta_key = ?, meta_data = ? WHERE UID = ?");
+			$prep = $conn->prepare("UPDATE ".sqlprefix()."user_meta SET meta_key = ?, meta_data = ? WHERE UID = ?");
 			$prep->bind_param("sss",$key,$value,$person);
 		}
 
@@ -139,7 +139,7 @@ class md {
 		
 		if (!BadPtr($key))
 		{
-			$prep = $conn->prepare("SELECT * FROM dalek_user_meta WHERE UID = ? AND meta_key = ?");
+			$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user_meta WHERE UID = ? AND meta_key = ?");
 			$prep->bind_param("ss", $u->uid, $key);
 			$prep->execute();
 			$result = $prep->get_result();
@@ -151,7 +151,7 @@ class md {
 		}
 		else
 		{
-			$prep = $conn->prepare("SELECT * FROM dalek_user_meta WHERE UID = ?");
+			$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user_meta WHERE UID = ?");
 			$prep->bind_param("s", $u->uid);
 			$prep->execute();
 			$result = $prep->get_result();

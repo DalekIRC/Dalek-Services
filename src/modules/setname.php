@@ -82,7 +82,7 @@ class setname {
 		$gecos = $u['params'];
 		$conn = sqlnew();
 		$nick = $u['nick'];
-		$prep = $conn->prepare("UPDATE dalek_user SET gecos = ? WHERE UID = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET gecos = ? WHERE UID = ?");
 		$prep->bind_param("ss",$gecos,$nick->uid);
 		$prep->execute();
 		return;

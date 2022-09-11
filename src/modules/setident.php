@@ -78,10 +78,12 @@ class setident {
      * $u['cmd'] = calling command if needed
 	 */
 	public static function cmd_setident($u)
-	{   $ident = $u['params'];
+    {
+
+        $ident = $u['params'];
 		$conn = sqlnew();
 		$nick = $u['nick'];
-		$prep = $conn->prepare("UPDATE dalek_user SET ident = ? WHERE UID = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET ident = ? WHERE UID = ?");
 		$prep->bind_param("ss",$ident,$nick->uid);
 		$prep->execute();
 		return;

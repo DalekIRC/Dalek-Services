@@ -36,7 +36,7 @@ class meta_host {
 	public function __construct()
 	{
 		$conn = sqlnew();
-		$conn->query("CREATE TABLE IF NOT EXISTS dalek_meta_hosts (
+		$conn->query("CREATE TABLE IF NOT EXISTS ".sqlprefix()."meta_hosts (
 			id INT AUTO_INCREMENT NOT NULL,
 			account VARCHAR(255) NOT NULL,
 			approved INT NOT NULL,
@@ -113,7 +113,7 @@ class meta_host {
 	public function new_meta_host($account, $vhost, $auto_approve = 0) : void
 	{
 		$conn = sqlnew();
-		$prep = $conn->prepare("INSERT INTO dalek_meta_hosts (account, vhost, approved, auto) VALUES (?, ?, ?, ?)");
+		$prep = $conn->prepare("INSERT INTO ".sqlprefix()."meta_hosts (account, vhost, approved, auto) VALUES (?, ?, ?, ?)");
 		$prep->bind_param("ssii", $account, $vhost, $auto_approve, $auto_approve);
 		$prep->execute();
 
@@ -126,7 +126,7 @@ class meta_host {
 	{
 		$conn = sqlnew();
 		$approved = 1;
-		$prep = $conn->prepare("SELECT * FROM dalek_meta_hosts WHERE account = ? AND approved = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."meta_hosts WHERE account = ? AND approved = ?");
 		$prep->bind_param("si", $account, $approved);
 		$prep->execute();
 		$result = $prep->get_result();

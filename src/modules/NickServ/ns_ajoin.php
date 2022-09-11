@@ -38,7 +38,7 @@ class ns_ajoin {
 	function __construct()
 	{
 		$conn = sqlnew();
-		$conn->query("CREATE TABLE IF NOT EXISTS dalek_ajoin (
+		$conn->query("CREATE TABLE IF NOT EXISTS ".sqlprefix()."ajoin (
 			id INT AUTO_INCREMENT NOT NULL,
 			account VARCHAR(255) NOT NULL,
 			channel VARCHAR(255) NOT NULL,
@@ -153,7 +153,7 @@ class ns_ajoin {
 		$conn = sqlnew();
 		if (!$conn) { return false; }
 		else {
-			$prep = $conn->prepare("SELECT channel FROM dalek_ajoin WHERE account = ?");
+			$prep = $conn->prepare("SELECT channel FROM ".sqlprefix()."ajoin WHERE account = ?");
 			$prep->bind_param("s",$account);
 			$prep->execute();
 			$sResult = $prep->get_result();
@@ -177,7 +177,7 @@ class ns_ajoin {
 			return "That channel is already on your list.";
 		
 		else {
-			$prep = $conn->prepare("INSERT INTO dalek_ajoin (account, channel) VALUES (?, ?)");
+			$prep = $conn->prepare("INSERT INTO ".sqlprefix()."ajoin (account, channel) VALUES (?, ?)");
 			$prep->bind_param("ss",$account,$channel);
 			$prep->execute();
 			return "$channel has been added to your autojoin list";
@@ -191,7 +191,7 @@ class ns_ajoin {
 		if (!ns_ajoin::IsAjoin($account,$channel)){ return "That channel is not on your list."; return; }
 		
 		else {
-			$prep = $conn->prepare("DELETE FROM dalek_ajoin WHERE account = ? AND channel = ?");
+			$prep = $conn->prepare("DELETE FROM ".sqlprefix()."ajoin WHERE account = ? AND channel = ?");
 			$prep->bind_param("ss",$account,$channel);
 			$prep->execute();
 			return "$channel has been deleted from your autojoin list";

@@ -90,7 +90,7 @@ class chghost {
 		$target->SetMode("+xt");
 
 		$conn = sqlnew();
-		$prep = $conn->prepare("UPDATE dalek_user SET cloak = ? WHERE UID = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET cloak = ? WHERE UID = ?");
 		$prep->bind_param("ss",$host,$uid);
 		$prep->execute();
 		return;

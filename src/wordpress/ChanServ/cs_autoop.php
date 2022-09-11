@@ -117,7 +117,7 @@ function can_autoop($nick,Channel $channel)
 function is_autoop(WPUser $nick,$chan)
 {
 	$conn = sqlnew();
-	$prep = $conn->prepare("SELECT * FROM dalek_account_settings WHERE account = ?");
+	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."account_settings WHERE account = ?");
 	$prep->bind_param("s",$nick->user_login);
 	$prep->execute();
 	$return = false;
@@ -143,13 +143,13 @@ function autoop_toggle(WPUser $nick,$chan,$toggle)
 	$setting_key = "autoop_$chan";
 	if (!is_autoop($nick,$chan))
 	{
-		$prep = $conn->prepare("INSERT INTO dalek_account_settings (account, setting_key, setting_value) VALUES (?, ?, ?)");
+		$prep = $conn->prepare("INSERT INTO ".sqlprefix()."account_settings (account, setting_key, setting_value) VALUES (?, ?, ?)");
 		$prep->bind_param("sss",$nick->user_login,$setting_key,$toggle);
 		$prep->execute();
 	}
 	else
 	{
-		$prep = $conn->prepare("UPDATE dalek_account_settings SET setting_key = ?, setting_value = ? WHERE account = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."account_settings SET setting_key = ?, setting_value = ? WHERE account = ?");
 		$prep->bind_param("sss",$setting_key,$toggle,$nick->user_login);
 		$prep->execute();
 	}

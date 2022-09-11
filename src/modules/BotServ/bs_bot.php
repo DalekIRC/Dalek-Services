@@ -38,7 +38,7 @@ class bs_bot {
 	function __construct()
 	{
 		$conn = sqlnew();
-		$conn->query("CREATE TABLE IF NOT EXISTS dalek_botlist (
+		$conn->query("CREATE TABLE IF NOT EXISTS ".sqlprefix()."botlist (
 			id INT AUTO_INCREMENT NOT NULL,
 			bot_nick VARCHAR(255) NOT NULL,
 			bot_ident VARCHAR(50) NOT NULL,
@@ -184,10 +184,10 @@ class bs_bot {
 				$conn = sqlnew();
 				if ($bot_new !== $botn)
 				{
-					$prep = $conn->prepare("UPDATE dalek_botlist SET bot_nick = ? WHERE bot_nick = ?");
+					$prep = $conn->prepare("UPDATE ".sqlprefix()."botlist SET bot_nick = ? WHERE bot_nick = ?");
 					$prep->bind_param("ss",$bot_new,$botn);
 					$prep->execute();
-					$prep = $conn->prepare("UPDATE dalek_user SET nick = ? WHERE nick = ?");
+					$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET nick = ? WHERE nick = ?");
 					$prep->bind_param("ss",$bot_new,$botn);
 					$prep->execute();
 					S2S(":$bot->uid NICK $bot_new");
@@ -201,10 +201,10 @@ class bs_bot {
 
 				if ($botI)
 				{
-					$prep = $conn->prepare("UPDATE dalek_botlist SET bot_ident = ? WHERE bot_nick = ?");
+					$prep = $conn->prepare("UPDATE ".sqlprefix()."botlist SET bot_ident = ? WHERE bot_nick = ?");
 					$prep->bind_param("ss",$botI,$botn);
 					$prep->execute();
-					$prep = $conn->prepare("UPDATE dalek_user SET ident = ? WHERE nick = ?");
+					$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET ident = ? WHERE nick = ?");
 					$prep->bind_param("ss",$botI,$botn);
 					$prep->execute();
 					$newstr .= "$botI@";
@@ -213,10 +213,10 @@ class bs_bot {
 				else $newstr .= "$bot->ident@";
 				if ($botH)
 				{
-					$prep = $conn->prepare("UPDATE dalek_botlist SET bot_host = ? WHERE bot_nick = ?");
+					$prep = $conn->prepare("UPDATE ".sqlprefix()."botlist SET bot_host = ? WHERE bot_nick = ?");
 					$prep->bind_param("ss",$botH,$botn);
 					$prep->execute();
-					$prep = $conn->prepare("UPDATE dalek_user SET realhost = ? WHERE nick = ?");
+					$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET realhost = ? WHERE nick = ?");
 					$prep->bind_param("ss",$botH,$botn);
 					$prep->execute();
 					$newstr .= "$botH";
@@ -226,10 +226,10 @@ class bs_bot {
 
 				if ($botgecos)
 				{
-					$prep = $conn->prepare("UPDATE dalek_botlist SET bot_gecos = ? WHERE bot_nick = ?");
+					$prep = $conn->prepare("UPDATE ".sqlprefix()."botlist SET bot_gecos = ? WHERE bot_nick = ?");
 					$prep->bind_param("ss",$botgecos,$botn);
 					$prep->execute();
-					$prep = $conn->prepare("UPDATE dalek_user SET gecos = ? WHERE nick = ?");
+					$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET gecos = ? WHERE nick = ?");
 					$prep->bind_param("ss",$botgecos,$botn);
 					$prep->execute();
 					$newstr .= "$botgecos";
@@ -260,7 +260,7 @@ class bs_bot {
 	public static function spawnbots()
 	{
 		$conn = sqlnew();
-		$result = $conn->query("SELECT * FROM dalek_botlist");
+		$result = $conn->query("SELECT * FROM ".sqlprefix()."botlist");
 		if (!$result || !$result->num_rows)
 			return; // no bots to spawn
 
@@ -275,7 +275,7 @@ class bs_bot {
 
 		else {
 			$servertime = servertime();
-			$prep = $conn->prepare("INSERT INTO dalek_botlist (bot_nick,bot_ident,bot_host,bot_gecos,bot_created_by,bot_created_on) VALUES (?, ?, ?, ?, ?, ?)");
+			$prep = $conn->prepare("INSERT INTO ".sqlprefix()."botlist (bot_nick,bot_ident,bot_host,bot_gecos,bot_created_by,bot_created_on) VALUES (?, ?, ?, ?, ?, ?)");
 			$prep->bind_param("ssssss",$nick,$ident,$host,$gecos,$from,$servertime);
 			$prep->execute();
 		}
@@ -287,7 +287,7 @@ class bs_bot {
 		$conn = sqlnew();
 		if (!$conn) { return false; }
 		else {
-			$prep = $conn->prepare("DELETE FROM dalek_botlist WHERE bot_nick = ?");
+			$prep = $conn->prepare("DELETE FROM ".sqlprefix()."botlist WHERE bot_nick = ?");
 			$prep->bind_param("s",$botn);
 			$prep->execute();
 		}

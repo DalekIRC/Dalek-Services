@@ -103,25 +103,25 @@ function user_meta_autoprivate(User $nick, String $meta, bool $setting) : bool
 {
 	$setting = ($setting) ? "on" : "off";
 	$conn = sqlnew();
-	$prep = $conn->prepare("SELECT * FROM dalek_account_settings WHERE account = ? AND setting_key = ?");
+	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."account_settings WHERE account = ? AND setting_key = ?");
 	$prep->bind_param("ss",$nick->account,$meta);
 	$prep->execute();
 
 	$result = $prep->get_result();
 	if ($result->num_rows > 0)
 	{
-		$prep = $conn->prepare("UPDATE dalek_account_settings SET setting_value = ? WHERE account = ? AND setting_key = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."account_settings SET setting_value = ? WHERE account = ? AND setting_key = ?");
 		$prep->bind_param("sss",$setting,$nick->account,$meta);
 		$prep->execute();
 	}
 	else
 	{
-		$prep = $conn->prepare("INSERT INTO dalek_account_settings (account, setting_key, setting_value) VALUES (?, ?, ?)");
+		$prep = $conn->prepare("INSERT INTO ".sqlprefix()."account_settings (account, setting_key, setting_value) VALUES (?, ?, ?)");
 		$prep->bind_param("sss",$nick->account,$meta,$setting);
 		$prep->execute();
 	}
 
-	$prep = $prep = $conn->prepare("SELECT * FROM dalek_account_settings WHERE account = ? AND setting_key = ? AND setting_value = ?");
+	$prep = $prep = $conn->prepare("SELECT * FROM ".sqlprefix()."account_settings WHERE account = ? AND setting_key = ? AND setting_value = ?");
 	$prep->bind_param("sss",$nick->account,$meta,$setting);
 	$prep->execute();
 
@@ -136,7 +136,7 @@ function is_meta_private($account)
 	$conn = sqlnew();
 	$key = "autoprivate";
 	$value = "on";
-	$prep = $conn->prepare("SELECT * FROM dalek_account_settings WHERE account = ? AND setting_key = ? AND setting_value = ?");
+	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."account_settings WHERE account = ? AND setting_key = ? AND setting_value = ?");
 	$prep->bind_param("sss",$account,$key,$value);
 	$prep->execute();
 

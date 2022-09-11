@@ -40,7 +40,7 @@ class botserv {
 	function __construct()
 	{
 		/* Creating out tables for account settings which apply to IRC. */
-		$query = "CREATE TABLE IF NOT EXISTS dalek_account_settings (
+		$query = "CREATE TABLE IF NOT EXISTS ".sqlprefix()."account_settings (
 			id int NOT NULL AUTO_INCREMENT,
 			account varchar(255) NOT NULL,
 			setting_key varchar(255) NOT NULL,

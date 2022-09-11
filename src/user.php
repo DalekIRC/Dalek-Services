@@ -172,7 +172,7 @@ class User {
 		$meta = array();
 
 		$conn = sqlnew();
-		$prep = $conn->prepare("SELECT * FROM dalek_user_meta WHERE UID = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user_meta WHERE UID = ?");
 		$prep->bind_param("s",$this->uid);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -199,7 +199,7 @@ function user_list()
 {
 	$users = [];
 	$conn = sqlnew();
-	if (!($result = $conn->query("SELECT * FROM dalek_user")))
+	if (!($result = $conn->query("SELECT * FROM ".sqlprefix()."user")))
 		return false;
 	while ($row = $result->fetch_assoc())
 	{
@@ -213,9 +213,8 @@ class UserMeta {
 
 	function __construct(User $nick)
 	{
-
 		$conn = sqlnew();
-		$prep = $conn->prepare("SELECT * FROM dalek_user_meta WHERE UID = ?");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user_meta WHERE UID = ?");
 		$prep->bind_param("s",$nick->uid);
 		$prep->execute();
 		$result = $prep->get_result();

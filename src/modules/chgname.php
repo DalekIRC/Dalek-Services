@@ -80,11 +80,12 @@ class chgname {
 	 */
 	public static function cmd_chgname($u)
 	{
+
         $parv = explode(" :",$u['params']);
         $gecos = cut_first_from($u['params']);
         $uid = $parv[0];
 		$conn = sqlnew();
-		$prep = $conn->prepare("UPDATE dalek_user SET gecos = ? WHERE UID = ?");
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET gecos = ? WHERE UID = ?");
 		$prep->bind_param("ss",$gecos,$uid);
 		$prep->execute();
     }

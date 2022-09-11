@@ -36,7 +36,7 @@ class bbs_new_post {
 	function __construct()
 	{
 		$conn = sqlnew();
-		$conn->query("CREATE TABLE IF NOT EXISTS dalek_bbserv_postmeta (
+		$conn->query("CREATE TABLE IF NOT EXISTS ".sqlprefix()."bbserv_postmeta (
 				id int AUTO_INCREMENT NOT NULL,
 				post_meta varchar(255) NOT NULL,
 				post_value varchar(255) NOT NULL,
@@ -96,14 +96,14 @@ class bbs_new_post {
 	{
 		$conn = sqlnew();
 		if (bbs_new_post::get_last() == false)
-			$conn->query("INSERT INTO dalek_bbserv_postmeta (post_meta, post_value) VALUES ('last_id', $id)");
+			$conn->query("INSERT INTO ".sqlprefix()."bbserv_postmeta (post_meta, post_value) VALUES ('last_id', $id)");
 		else
-			$conn->query("UPDATE dalek_bbserv_postmeta SET post_value=$id WHERE post_meta = 'last_id'");
+			$conn->query("UPDATE ".sqlprefix()."bbserv_postmeta SET post_value=$id WHERE post_meta = 'last_id'");
 	}
 	static function get_last()
 	{
 		$conn = sqlnew();
-		$result = $conn->query("SELECT * FROM dalek_bbserv_postmeta WHERE post_meta = 'last_id'");
+		$result = $conn->query("SELECT * FROM ".sqlprefix()."bbserv_postmeta WHERE post_meta = 'last_id'");
 		if (!$result || $result->num_rows < 1)
 			return false;
 

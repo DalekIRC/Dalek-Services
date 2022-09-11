@@ -100,7 +100,7 @@ function channel_owner_list($nick)
 	global $cs;
 		
 	$conn = sqlnew();
-	$table = "dalek_chaninfo";
+	$table = sqlprefix()."chaninfo";
 	$prep = $conn->prepare("SELECT * FROM $table WHERE owner = ?");
 	$prep->bind_param("s",$nick);
 	$prep->execute();
