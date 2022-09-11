@@ -68,7 +68,7 @@ class SASL {
 		hook::func(HOOKTYPE_START, 'SASL::on_connect');
 	}
 
-	function create_table($u)
+	static function create_table($u)
 	{
 		$conn = sqlnew();
 
