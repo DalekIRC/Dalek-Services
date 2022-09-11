@@ -72,7 +72,7 @@ class rehash {
 	 * information passed along by the caller
 	 * $u['nick'] = User object
 	 */
-	public public static function cmd_rehash($u)
+	public static function cmd_rehash($u)
 	{
 		/* User object of caller */
 		$nick = $u['nick'];
