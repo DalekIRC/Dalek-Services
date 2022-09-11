@@ -43,7 +43,7 @@ class cs_register {
 	function __destruct()
 	{
 		hook::del(HOOKTYPE_JOIN, 'cs_register::hook_do_join');
-		hook::del(HOOKTYOE_START, 'cs_register::perform_checkup');
+		hook::del(HOOKTYPE_START, 'cs_register::perform_checkup');
 	}
 
 
