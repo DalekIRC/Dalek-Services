@@ -31,7 +31,7 @@ class md {
 	public $description = "Provides MD compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
-	public $official = true;
+    public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -59,7 +59,7 @@ class md {
 		 * the function is a string reference to this class, the cmd_elmer method (function)
 		 * The last param is expected parameter count for the command
 		 * (both point to the same function which determines)
-		*/
+        */
 
 		if (!CommandAdd($this->name, 'MD', 'md::cmd_md', 0))
 			return false;
@@ -91,15 +91,51 @@ class md {
 	 * $u['nick'] = User object
 	 */
 	public static function cmd_md($u)
-	{
+    {
+		global $cf;
 		$parv = split($u['params']);
-		$user = $parv[1];
+		$target = $parv[1];
 		$key = $parv[2];
 		$t = explode(" :",$u['params']);
 		$value = (isset($t[1])) ? $t[1] : "";
-		
-		md::add($user,$key,$value);
-	}
+
+		/** Return values for this, which aren't returned, just stored in the $return variable
+		 * Default = 1;
+		 * 1 = Allow
+		 * 0 = Deny internally
+		 * -1 = Deny and send a request back to nullify the MD
+		 * 
+		 * When sending a request to nullify the MD, ensure the MD you are trying to null is remote-writeable first.
+		 * You can find this in the unrealircd module itself by searching for "mreq.remote_write". If it's there,
+		 * you can nullify it ;)
+		 */
+		$return = 1;
+		$md = []; // prepare some information to be passed in the hook by memory
+		$md["target"] = &$target;
+		$md["key"] = &$key;
+		$md["value"] = &$value;
+		$u["md"] = &$md;
+		$u["return"] = &$return;
+
+		$targ = new User($target);
+		$isChan = ($targ->IsUser || $targ->IsServer) ? 0 : 1;
+
+		if ($isChan)
+			hook::run(HOOKTYPE_CHANNEL_MD, $u);
+
+		else
+			hook::run(HOOKTYPE_USER_MD, $u);
+		if ($return == 0)
+			return;
+
+		if ($return == -1)
+		{
+			S2S(":".$cf['servicesname']." MD ".($isChan) ? "channel" : "client"." ".$parv[2]." :0");
+			return;	
+		}
+		if ($return == 1)
+			md::add($target,$key,$value);
+    }
 	public static function add($person,$key,$value)
 	{
 		$conn = sqlnew();
@@ -177,7 +213,6 @@ class md {
 			return;
 		}
 		$err = 0;
-		var_dump($params);
 		$user = new User($params['user']);
 		if (!$user->IsUser)
 		{
@@ -198,4 +233,3 @@ class md {
 		rpc_send_reply($id, $reply);
 	}
 }
-

@@ -63,6 +63,8 @@ define('HOOKTYPE_METADATA', 'usermeta'); // metadata hook
 define('HOOKTYPE_UPDATE_FOUND', 'update_found'); // for dalek updates
 define('HOOKTYPE_EOS', 'eos'); // end of sync
 define('HOOKTYPE_REHASH', 'rehash'); // when Dalek has been rehashed
+define('HOOKTYPE_USER_MD', 'usermd');
+define('HOOKTYPE_CHANNEL_MD', 'chanmd');
 
 
 
