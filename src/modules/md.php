@@ -31,7 +31,7 @@ class md {
 	public $description = "Provides MD compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -59,7 +59,7 @@ class md {
 		 * the function is a string reference to this class, the cmd_elmer method (function)
 		 * The last param is expected parameter count for the command
 		 * (both point to the same function which determines)
-        */
+		*/
 
 		if (!CommandAdd($this->name, 'MD', 'md::cmd_md', 0))
 			return false;
@@ -91,7 +91,7 @@ class md {
 	 * $u['nick'] = User object
 	 */
 	public static function cmd_md($u)
-    {
+	{
 		$parv = split($u['params']);
 		$user = $parv[1];
 		$key = $parv[2];
@@ -99,7 +99,7 @@ class md {
 		$value = (isset($t[1])) ? $t[1] : "";
 		
 		md::add($user,$key,$value);
-    }
+	}
 	public static function add($person,$key,$value)
 	{
 		$conn = sqlnew();
@@ -107,8 +107,8 @@ class md {
 			return false;
 
 
-		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user_meta WHERE UID = ? AND meta_key = ? AND meta_data = ?");
-		$prep->bind_param("sss",$person,$key,$value);
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user_meta WHERE UID = ? AND meta_key");
+		$prep->bind_param("ss",$person,$key);
 		$prep->execute();
 		$result = $prep->get_result();
 		if (!$result || !$result->num_rows)
@@ -198,3 +198,4 @@ class md {
 		rpc_send_reply($id, $reply);
 	}
 }
+
