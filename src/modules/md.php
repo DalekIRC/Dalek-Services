@@ -133,6 +133,9 @@ class md {
 			S2S(":".$cf['servicesname']." MD ".($isChan) ? "channel" : "client"." ".$parv[2]." :0");
 			return;	
 		}
+
+		if ($key == "creationtime" && $value == 0)
+			$value = servertime();
 		if ($return == 1)
 			md::add($target,$key,$value);
     }
