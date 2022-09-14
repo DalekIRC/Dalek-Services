@@ -88,7 +88,7 @@ class cs_access {
 			return;
 		}
 
-		if (!BadPtr($parv[4]))
+		if (BadPtr($parv[3]))
 		{
 			$cs->notice($nick->uid,"Syntax: /msg $cs->nick ACCESS <channel> <add|del|list> [<account|nick>]");
 			return;
@@ -115,8 +115,8 @@ class cs_access {
 		}
 
 		$control = $parv[2];
-
-		if (!($acount = new WPUser($parv[3]))->IsUser) // couldn't find the account. search for a nick with an account
+		$lvl = (isset($parv[4])) ? $parv[4] : NULL;
+		if (!($account = new WPUser($parv[3]))->IsUser) // couldn't find the account. search for a nick with an account
 		{
 			if (!($account = new User($parv[3]))->IsUser)
 			{
@@ -124,68 +124,67 @@ class cs_access {
 				return;
 			}
 		}
-		$account = new WPUser($account->account);
-
-
-		
-
-	}
-
-	function ACCESS_channel($chan,$owner)
-	{
-		$servertime = servertime();
-		$conn = sqlnew();
-		if (!$conn)
-			return false;
-		$prep = $conn->prepare("INSERT INTO ".sqlprefix()."chaninfo (channel, owner, regdate) VALUES (?, ?, ?)");
-		$prep->bind_param("sss",$chan,$owner,$servertime);
-		$prep->execute();
-		
-		$permission = "owner";
-		$prep = $conn->prepare("INSERT INTO ".sqlprefix()."chanaccess (channel, nick, access) VALUES (?, ?, ?)");
-		$prep->bind_param("sss",$chan,$owner,$permission);
-		$prep->execute();
-		return true;
-	}
-
-	function init_db()
-	{
-		$conn = sqlnew();
-	
-		$query = "CREATE TABLE IF NOT EXISTS ".sqlprefix()."chaninfo (
-					id int AUTO_INCREMENT NOT NULL,
-					channel varchar(255) NOT NULL,
-					owner varchar(255) NOT NULL,
-					regdate varchar(15) NOT NULL,
-					url varchar(255),
-					email varchar(255),
-					topic varchar(255),
-					PRIMARY KEY(id)
-				)";
-		$conn->query($query);
-		
-		$query = "CREATE TABLE IF NOT EXISTS ".sqlprefix()."chanaccess (
-					id int AUTO_INCREMENT NOT NULL,
-					channel varchar(255) NOT NULL,
-					nick varchar(255) NOT NULL,
-					access varchar(20) NOT NULL,
-					PRIMARY KEY(id)
-				)";
-		$conn->query($query);
-	}
-
-	public static function hook_do_join($u)
-	{
-		$chan = new Channel($u['chan']);
-		$cs = Client::find("ChanServ");
-		if ($chan->IsReg)
+		$account = ($account instanceof WPUser) ? $account : $account->wp;
+		if (strcasecmp($control,"add") && strcasecmp($control,"del") && strcasecmp($control,"list"))
 		{
-			if (!$chan->HasUser($cs->nick))
-				$cs->join($chan->chan);
-				
-			if (!$chan->HasMode("r"))
-				$cs->mode($chan->chan,"+r");
-			
+			sendnotice($nick, $cs, $mtags, "Invalid subcommand \"$control\"");
+			return;
 		}
+
+		if (!strcasecmp($control,"add") && strcasecmp($lvl,"owner") && strcasecmp($lvl,"admin") && strcasecmp($lvl,"op") && strcasecmp($lvl,"halfop") && strcasecmp($lvl,"voice"))
+		{
+			sendnotice($nick, $cs, $mtags, "Invalid access level: \"$lvl\"");
+			return;
+		}
+
+		if (!strcasecmp($control,"add"))
+		{
+			self::add_access($chan, $account->user_login, $lvl);
+			$cs->notice($nick->uid, "You have added permissions of $lvl to $account->user_login in $chan->chan");
+			foreach ($chan->userlist as $user)
+				if (isset($user->account) && !strcasecmp($user->account,$account->user_login))
+					$cs->up($chan, $user);
+		}
+		if (!strcasecmp($control,"del"))
+		{
+			foreach ($chan->userlist as $user)
+				if (isset($user->account) && !strcasecmp($user->account,$account->user_login))
+					$cs->down($chan,$user);
+			self::del_access($chan, $account->user_login);
+
+			$cs->notice($nick->uid, "You have removed permissions $account->user_login in $chan->chan");
+		}
+	}
+
+	public static function add_access(Channel $chan, $account_name, $level)
+	{
+		$conn = sqlnew();
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."chanaccess WHERE nick = ? and channel = ?");
+		$prep->bind_param("ss", $account_name, $chan->chan);
+		$prep->execute();
+
+		if (!($result = $prep->get_result()) || !$result->num_rows)
+		{
+			$prep = $conn->prepare("INSERT INTO ".sqlprefix()."chanaccess (channel, nick, access) VALUES (?, ?, ?)");
+			$prep->bind_param("sss", $chan->chan, $account_name, $level);
+			$prep->execute();
+		}
+
+		else
+		{
+			$prep = $conn->prepare("UPDATE ".sqlprefix()."chanaccess SET access = ? WHERE channel = ? AND nick = ?");
+			$prep->bind_param("sss",$level, $chan->chan, $account_name);
+			$prep->execute();
+		}
+		$prep->close();
+	}
+	public static function del_access(Channel $chan, $account_name)
+	{
+		$conn = sqlnew();
+		$prep = $conn->prepare("DELETE FROM ".sqlprefix()."chanaccess WHERE nick = ? AND lower(channel) = ?");
+		$prep->bind_param("ss", $account_name, strtolower($chan->chan));
+		$prep->execute();
+
+		$prep->close();
 	}
 }
