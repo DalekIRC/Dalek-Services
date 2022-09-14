@@ -89,7 +89,7 @@ class topic {
 		$prep->bind_param("ss",$topic,$chan);
 		$prep->execute();
 		$prep = $conn->prepare("UPDATE ".sqlprefix()."chaninfo SET topic = ? WHERE lower(channel) = ?");
-		$prep->bind_param("ss, $topic,$chan");
+		$prep->bind_param("ss", $topic,$chan);
 		$prep->execute();
 		$prep->close();
 	}
