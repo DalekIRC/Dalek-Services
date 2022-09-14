@@ -88,7 +88,7 @@ class um_meta_profilepic {
 			if (!($pic = um_meta_profilepic::check_for_irccloud($u)))
 				$pic = um_meta_profilepic::check_for_gravatar($u);
 		}
-		ns_metadata::send_usermeta(NULL, $u['nick'], 'avatar', $pic);
+		metadata::send_usermeta(NULL, $u['nick'], 'avatar', $pic);
 	
 		return true;
 	}
