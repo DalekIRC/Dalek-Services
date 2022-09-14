@@ -2,14 +2,13 @@
 
 [![CodeBabes](https://forthebadge.com/images/badges/built-by-codebabes.svg)]()
 [![SpagYetti](https://forthebadge.com/images/badges/contains-tasty-spaghetti-code.svg)]()
-[![catsuwu](https://forthebadge.com/images/badges/contains-cat-gifs.svg)]()
   <img width="50" height="35" src="https://i.imgur.com/w6cScKo.png">
   
 [![Version](https://img.shields.io/badge/Extermin-8-red.svg)]()
 [![Version](https://img.shields.io/badge/Beta-0.1-blue.svg)]()
 [![Version](https://img.shields.io/badge/Status-Work%20In%20Progress-cyan.svg)]()
 [![Maintained](https://img.shields.io/badge/Maintained-yes-green.svg)]()
-[![Maintainer](https://img.shields.io/badge/Maintainer-Valware-purple.svg)](https://github.com/ValwareIRC/)
+[![Maintainer](https://img.shields.io/badge/Developer-Valware-purple.svg)](https://github.com/ValwareIRC/)
 [![Unreal](https://img.shields.io/badge/UnrealIRCd-6.0+-green.svg)](https://unrealircd.org)
 [![WP](https://img.shields.io/badge/WordPress-6.0+-green.svg)](https://wordpress.com)
 
