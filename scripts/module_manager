@@ -7,12 +7,28 @@ if (count($argv) < 2)
 if ($argv[1] == "list")
 {
     $all = (isset($argv[2]) && !strcasecmp($argv[2],"all")) ? 1 : 0;
+    $repo = (isset($argv[2]) && !strcasecmp($argv[2],"repo")) ? 1 : 0;
     $str = ($all) ? "all" : "third-party";
-    $json = '{"jsonrpc": "2.0", "method": "module.list", "params": {}, "id": 123}';
-    $response = local_rpc_call($json);
-    if (!$response)
-        die("Module was already loaded");
+    $str = ($repo) ? "installable" : $str;
 
+    $response = [];
+    if ($repo)
+    {
+        $json = json_decode(file_get_contents("https://raw.githubusercontent.com/DalekIRC/Dalek-Contrib/main/modules.list"), true);
+        $response['result'] = $json['modules'];
+        
+    }
+
+    else
+    {
+        $json = '{"jsonrpc": "2.0", "method": "module.list", "params": {}, "id": 123}';
+        $response = local_rpc_call($json);
+    }
+    if (!isset($response) || !$response || empty($response))
+    {
+        echo("Module was already loaded");
+        die();
+    }
     echo "Listing $str modules and their information\n";
     echo "╔═════════════════════╦═════════════════════╦════════════════════════════════════════════════════════\n";
     echo "║ ".clean_align("Name")."║ ".clean_align("Version")."║ ".clean_align("Description")."\n";

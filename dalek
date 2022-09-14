@@ -13,8 +13,25 @@ print_dalek()
 	php scripts/authors
 }
 
+dalek_module_install()
+{
+	FILE=${1}.php
+	rm -rf Dalek-Contrib/
+	git clone https://github.com/DalekIRC/Dalek-Contrib
+	cd Dalek-Contrib
+	if [ -f "$FILE" ] ; then
+		mv $FILE ../src/modules/third/
+		cd ..
+		./dalek module load third/$1
+	else
+		echo "Could not find module $1"
+	fi
+	rm -rf Dalek-Contrib/
+
+}
 dalek_start()
 {
+
 	echo "Dalek IRC Services is booting"
 	screen -S dalek-serv -d -m php src/dalek
 	echo "Launching services...";
@@ -83,7 +100,7 @@ elif [ "$1" = "genconf" ] ; then
 
 elif [ "$1" = "rehash" ] ; then
 	curl -s --insecure -X POST -d '{"jsonrpc": "2.0", "method": "rehash", "params": {"server": "services.valware.uk"}, "id": 123}' http://localhost:1024/api >> /dev/null
-
+	echo "Sent signal to REHASH"
 
 elif [ "$1" = "module" ] ; then
 	
@@ -102,7 +119,8 @@ elif [ "$1" = "module" ] ; then
 		else
 			echo "`./dalek module unload`: No module specified"
 		fi
-	
+	elif [ "$2" = "install" ] ; then
+		dalek_module_install $3
 	fi
 
 
@@ -110,5 +128,4 @@ else
 	echo "[ERROR] ./dalek expects at least one parameter:"
 	dalek_help_display
 fi
-
 
