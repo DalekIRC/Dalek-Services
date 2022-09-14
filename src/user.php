@@ -190,7 +190,7 @@ class User {
 	function exit()
 	{
 		global $sql;
-		$sql::user_delete($this->uid);
+		$sql->user_delete($this->uid);
 	}
 		
 }

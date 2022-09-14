@@ -72,7 +72,7 @@ class modules {
 	 * information passed along by the caller
 	 * $u['nick'] = User object
 	 */
-	public function cmd_module($u)
+	public static function cmd_module($u)
 	{
         global $cf;
 		/* Get the command that called us */

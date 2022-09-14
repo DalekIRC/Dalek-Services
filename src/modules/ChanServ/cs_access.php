@@ -131,30 +131,6 @@ class cs_access {
 
 	}
 
-	function perform_checkup()
-	{
-		$conn = sqlnew();
-		if (!$conn)
-			return;
-		
-		$result = $conn->query("SELECT * FROM ".sqlprefix()."chaninfo");
-		if (!$result)
-			return;
-		if ($result->num_rows == 0)
-			return;
-		
-		while ($row = $result->fetch_assoc())
-		{
-			$chan = new Channel($row['channel']);
-			if (!$chan->IsChan)
-				continue;
-
-			if (!$chan->HasUser("ChanServ"))
-				Client::find("ChanServ")->join($chan->chan);
-			if (!$chan->HasMode("r") == false)
-				$chan->SetMode("+r");
-		}
-	}
 	function ACCESS_channel($chan,$owner)
 	{
 		$servertime = servertime();
@@ -198,7 +174,7 @@ class cs_access {
 		$conn->query($query);
 	}
 
-	function hook_do_join($u)
+	public static function hook_do_join($u)
 	{
 		$chan = new Channel($u['chan']);
 		$cs = Client::find("ChanServ");

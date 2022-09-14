@@ -53,7 +53,7 @@ class os_autooper {
 		return true;
 	}
 	
-	function auth($u)
+	public static function auth($u)
 	{
 		global $cf;
 

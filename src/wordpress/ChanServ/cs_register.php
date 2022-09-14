@@ -131,7 +131,7 @@ hook::func("preconnect", function()
 				chatlink varchar(255),
 				PRIMARY KEY(id)
 			)";
-	$sql::query($query);
+	$sql->query($query);
 	
 	$query = "CREATE TABLE IF NOT EXISTS ".sqlprefix()."chanaccess (
 				id int AUTO_INCREMENT NOT NULL,
@@ -140,7 +140,7 @@ hook::func("preconnect", function()
 				access varchar(20) NOT NULL,
 				PRIMARY KEY(id)
 			)";
-	$sql::query($query);
+	$sql->query($query);
 });
 
 

@@ -114,7 +114,7 @@ class operserv {
 	}
 
 	/* Method to actually spawn our client */
-	function spawn_client()
+	static function spawn_client()
 	{
 		global $operserv; /* Our global array of operserv.conf options */
 			
