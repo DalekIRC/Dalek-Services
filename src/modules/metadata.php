@@ -25,15 +25,15 @@
 \\	Author:	Valware
 //				
 */
-class ns_metadata {
+class metadata {
 
 	/* Module handle */
 	/* $name needs to be the same name as the class and file lol */
-	public $name = "ns_metadata";
+	public $name = "metadata";
 	public $description = "IRCv3 METADATA functionality";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -57,7 +57,7 @@ class ns_metadata {
 	*/
 	function __init()
 	{
-		if (!CommandAdd($this->name, "METADATA", 'ns_metadata::usermeta', 0))
+		if (!CommandAdd($this->name, "METADATA", 'metadata::usermeta', 0))
 			return false;
 
 		return true;
