@@ -2,7 +2,6 @@
 
 [![CodeBabes](https://forthebadge.com/images/badges/built-by-codebabes.svg)]()
 [![SpagYetti](https://forthebadge.com/images/badges/contains-tasty-spaghetti-code.svg)]()
-[![catsuwu](https://forthebadge.com/images/badges/contains-cat-gifs.svg)]()
   <img width="50" height="35" src="https://i.imgur.com/w6cScKo.png">
   
 [![Version](https://img.shields.io/badge/Extermin-8-red.svg)]()
