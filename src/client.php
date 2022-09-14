@@ -36,7 +36,6 @@ class Client {
 		$this->uid = $uid = generate_uid($nick);
 		$this->modinfo = $modinfo;
 		$this->cmds = NULL;
-		var_dump($this);
 		S2S("UID $nick 0 $servertime $ident $hostmask $uid 0 +oiqS * * * :$gecos");
 		$array = array(
 			'nick' => $nick,
@@ -218,6 +217,8 @@ class Client {
 	}
 	function up(Channel $chan, User $user)
 	{
+		$user = new User($user->uid);
+		$chan = new Channel($chan->chan);
 		$access = ChanAccessAsInt($chan,$user);
 		if (!$access)
 			return false;
