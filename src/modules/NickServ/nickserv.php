@@ -114,7 +114,7 @@ class nickserv {
 	}
 
 	/* Method to actually spawn our client */
-	function spawn_client()
+	static function spawn_client()
 	{
 		global $nickserv; /* Our global array of nickserv.conf options */
 			

@@ -72,7 +72,7 @@ class umode2 {
 	 * information passed along by the caller
 	 * $u['nick'] = User object
 	 */
-	public function cmd_umode2($u)
+	public static function cmd_umode2($u)
 	{
 		/* Get the command that called us */
 		$cmd = $u['cmd'];

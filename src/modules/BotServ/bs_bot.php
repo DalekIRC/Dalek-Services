@@ -308,7 +308,7 @@ class Bot extends Client
 	function quit($reason = "Connection closed")
 	{
 		self::del_from_bot_list($this);
-		Client::quit($reason);
+		parent::quit($reason);
 	}
 	static function add_to_bot_list($client)
 	{

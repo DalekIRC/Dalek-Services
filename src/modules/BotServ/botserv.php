@@ -114,7 +114,7 @@ class botserv {
 	}
 
 	/* Method to actually spawn our client */
-	function spawn_client()
+	static function spawn_client()
 	{
 		global $botserv; /* Our global array of botserv.conf options */
 			

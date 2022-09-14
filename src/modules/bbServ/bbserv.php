@@ -61,7 +61,7 @@ class bbserv {
 		return true;
 	}
 
-	function spawn_client()
+	static function spawn_client()
 	{
 		global $bbserv,$bbs,$cf;
 			

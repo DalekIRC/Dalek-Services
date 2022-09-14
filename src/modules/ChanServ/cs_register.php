@@ -133,7 +133,7 @@ class cs_register {
 		
 	}
 
-	function perform_checkup()
+	static function perform_checkup()
 	{
 		$conn = sqlnew();
 		if (!$conn)
@@ -153,7 +153,7 @@ class cs_register {
 			cs_register::hook_do_join(array("chan" => $row['channel']));
 		}
 	}
-	function register_channel($chan,$owner)
+	static function register_channel($chan,$owner)
 	{
 		$servertime = servertime();
 		$conn = sqlnew();
@@ -196,7 +196,7 @@ class cs_register {
 		$conn->query($query);
 	}
 
-	function hook_do_join($u)
+	public static function hook_do_join($u)
 	{
 		$chan = new Channel($u['chan']);
 		$cs = Client::find("ChanServ");

@@ -62,7 +62,7 @@ class Dictionary {
 		return true;
 	}
 
-	function spawn_client()
+	static function spawn_client()
 	{
 		global $Dictionary,$cf;
 		/* spawn client with $bbs

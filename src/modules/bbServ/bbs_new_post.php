@@ -63,7 +63,7 @@ class bbs_new_post {
 		return true;
 	}
 
-	function check_for_new_post($u)
+	static function check_for_new_post($u)
 	{
 		global $wpconfig;
 
