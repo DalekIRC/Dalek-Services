@@ -547,6 +547,23 @@ function split($str, $delimiter = " ") : array
 	return explode($delimiter,$str);
 }
 
+function mtag_to_array($mtags) : array
+{
+	$mtag = array();
+
+	$tags = explode(";",mb_substr($mtags,1));
+	foreach($tags as $tag)
+	{
+		$tok = explode("=",$tag);
+
+		$key = $tok[0];
+		$value = mb_substr($tag,strlen($tok[0]) + 1);
+
+		$mtag[$key] = $value;
+	}
+	return $mtag;
+}
+
 /* Create a new full set of outgoing message tags
  * for our clients
  * 

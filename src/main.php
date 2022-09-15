@@ -116,7 +116,7 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 	if ($splittem[0] == 'PING')
 	{
 		/* hook into ping lol */
-		$arr = [];
+		$arr = ['token' => $splittem[1]];
 		hook::run(HOOKTYPE_PING, $arr);
 		S2S("PONG ".$splittem[1]); 	// Ping it back
 	}
@@ -189,8 +189,8 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 			$array = array(
 				"nick" => $nick,
 				"dest" => $dest,
-				"mtags" => $tagmsg);
-			hook::run(HOOKTYPE_TAGMSG,$array);
+				"mtags" => mtag_to_array($tagmsg));
+			hook::run(HOOKTYPE_TAGMSG, $array);
 			
 		
 		}

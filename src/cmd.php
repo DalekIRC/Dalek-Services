@@ -64,21 +64,8 @@ hook::func("raw", function($u)
 	
 	
 	if (strlen($u['mtags']))
-	{
-		$mtags = $u['mtags'];
-		$mtag = array();
-
-		$tags = explode(";",mb_substr($mtags,1));
-		foreach($tags as $tag)
-		{
-			$tok = explode("=",$tag);
-
-			$key = $tok[0];
-			$value = mb_substr($tag,strlen($tok[0]) + 1);
-
-			$mtag[$key] = $value;
-		}
-	}
+			$mtags = mtag_to_array($u['mtags']);
+		
 	/* one of those commands without a 'sender', spoof it as our uplink */
 	if ($parv[0][0] !== ":")
 	{
