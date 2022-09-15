@@ -94,7 +94,7 @@ class cs_info {
 		}
 		if (!$chan)
 		{
-			$cs->notice($nick,"Invalid parameters");
+			$cs->notice($nick->uid,"Invalid parameters");
 			return;
 		}
 	
