@@ -1,7 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
 ## Thanks to Wakkymike for help ;)
+TERMINAL=$(tty)
 
+# Duplicate (make a backup copy of) file descriptor 1 
+# on descriptor 3
+exec 3>&1
 print_dalek()
 {
 	echo "██████╗░░█████╗░██╗░░░░░███████╗██╗░░██╗  ██╗██████╗░░█████╗░"
@@ -12,7 +16,6 @@ print_dalek()
 	echo "╚═════╝░╚═╝░░╚═╝╚══════╝╚══════╝╚═╝░░╚═╝  ╚═╝╚═╝░░╚═╝░╚════╝░"
 	php scripts/authors
 }
-
 dalek_module_install()
 {
 	FILE=${1}.php
@@ -29,6 +32,7 @@ dalek_module_install()
 	rm -rf Dalek-Contrib/
 
 }
+
 dalek_start()
 {
 
@@ -73,16 +77,27 @@ dalek_restart()
 
 dalek_help_display()
 {
+	echo "******** DALEK HELP *******"
+	echo " "
 	echo "dalek start		Starts Dalek Services and RPC WebServer"
 	echo "dalek stop		Stops Dalek Services and RPC WebServer"
 	echo "dalek restart		Restarts Dalek Services and RPC WebServer"
 	echo "dalek genconf		Generates an UnrealIRCd link block for unrealircd.conf"
 	echo "dalek module		Parameters: ./dalek module <list|load|unload> [<module>]"
 	echo "dalek help		Shows this list"
+	echo " "
+	echo "./dalek works better with dialog installed!"
+	echo "Install dialog (sudo apt install dialog) and run ./dalek to try out the good interface!"
+	
 }
 
-if [ "$1" = "help" ] ; then
-	echo "Showing ./dalek help:"
+if [ $# -eq 0 ] ; then
+	if ! which dialog ; then
+		dalek_help_display
+	else
+		./scripts/gui --interface
+	fi
+elif [ "$1" = "help" ] ; then
 	dalek_help_display
 
 elif [ "$1" = "start" ] ; then
@@ -101,7 +116,9 @@ elif [ "$1" = "genconf" ] ; then
 elif [ "$1" = "rehash" ] ; then
 	curl -s --insecure -X POST -d '{"jsonrpc": "2.0", "method": "rehash", "params": {"server": "services.valware.uk"}, "id": 123}' http://localhost:1024/api >> /dev/null
 	echo "Sent signal to REHASH"
-
+elif [ "$1" = "config" ] ; then
+	./scripts/config_script
+	
 elif [ "$1" = "module" ] ; then
 	
 	if [ "$2" = "list" ] ; then
@@ -121,6 +138,28 @@ elif [ "$1" = "module" ] ; then
 		fi
 	elif [ "$2" = "install" ] ; then
 		dalek_module_install $3
+
+	elif [ "$2" = "install-with-gui" ] ; then
+		HEIGHT=15
+		WIDTH=80
+		CHOICE_HEIGHT=8
+		BACKTITLE="🚨 DALEKS REIGN SUPREME 🚨"
+		TITLE="⚠️ CONFIRM YOUR DECISION"
+		
+		CHOICE=$(dialog --backtitle "$BACKTITLE" \
+						--title "$TITLE" \
+						--yesno "Are you sure you want to install ${3}?" $HEIGHT $WIDTH \
+						3>&1 1>&2 2>&3)
+		if [ "$?" -eq 0 ] ; then
+			./dalek module install $3
+			if [ -f "src/modules/third/${3}.php" ] ; then
+				./scripts/gui --loaded-successful-dialog $3
+			else
+				./scripts/gui --loaded-unsuccessful-dialog $3
+			fi
+		else
+			./scripts/gui --aborted-dialog
+		fi
 	fi
 
 

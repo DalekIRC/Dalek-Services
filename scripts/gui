@@ -1,0 +1,191 @@
+#!/bin/bash
+
+dalek_lsd()
+{
+	HEIGHT=15
+	WIDTH=80
+	CHOICE_HEIGHT=8
+	BACKTITLE="🚨 DALEKS REIGN SUPREME 🚨"
+	TITLE="✔️ INSTALL SUCCESSFUL"
+	
+
+	BOX=$(dialog --backtitle "$BACKTITLE" \
+					--title "$TITLE" \
+					--msgbox \
+					"$2 has been successfully installed.\n\n\nDon't forget to add it to conf/modules.conf:\n\nloadmodule(\"third/${2}\");" $HEIGHT $WIDTH \
+					3>&1 1>&2 2>&3)
+}
+
+dalek_lud()
+{
+	HEIGHT=15
+	WIDTH=80
+	CHOICE_HEIGHT=8
+	BACKTITLE="🚨 DALEKS REIGN SUPREME 🚨"
+	TITLE="🛑 INSTALL FAILED"
+	
+
+	BOX=$(dialog --backtitle "$BACKTITLE" \
+					--title "$TITLE" \
+					--msgbox \
+					"$2 has failed to install." $HEIGHT $WIDTH \
+					3>&1 1>&2 2>&3)
+}
+
+dalek_aborted()
+{
+	HEIGHT=15
+	WIDTH=80
+	CHOICE_HEIGHT=8
+	BACKTITLE="🚨 DALEKS REIGN SUPREME 🚨"
+	TITLE="🚫 ABORT"
+	
+
+	BOX=$(dialog --backtitle "$BACKTITLE" \
+					--title "$TITLE" \
+					--msgbox \
+					"Aborted module installation." $HEIGHT $WIDTH \
+					3>&1 1>&2 2>&3)
+}
+dalek_success()
+{
+	HEIGHT=15
+	WIDTH=80
+	CHOICE_HEIGHT=8
+	BACKTITLE="🚨 DALEKS REIGN SUPREME 🚨"
+	TITLE="✔️ SUCCESS"
+	
+
+	BOX=$(dialog --backtitle "$BACKTITLE" \
+					--title "$TITLE" \
+					--msgbox \
+					"Success." $HEIGHT $WIDTH \
+					3>&1 1>&2 2>&3)
+}
+
+dalek_interface()
+{
+	HEIGHT=20
+	WIDTH=80
+	CHOICE_HEIGHT=10
+	BACKTITLE="🚨 DALEKS REIGN SUPREME 🚨"
+	TITLE="⚙️ DALEK UI"
+	MENU="Choose one of the following options:"
+
+	OPTIONS=(	1 "Start"
+				2 "Rehash"
+				3 "Restart"
+				4 "Stop"
+				5 "Generate a link block for UnrealIRCd (unrealircd.conf)"
+				6 "List loaded third-party modules"
+				7 "List all loaded modules"
+				8 "List all third-party modules available for download"
+				9 "Run Configuration (setup for the first time)");
+
+	CHOICE=$(dialog --backtitle "$BACKTITLE" \
+					--title "$TITLE" \
+					--help-button \
+					--help-label "Description" \
+					--menu "$MENU" \
+					$HEIGHT $WIDTH $CHOICE_HEIGHT \
+					"${OPTIONS[@]}" \
+					3>&1 1>&2 2>&3)
+
+	HELPLINE=""
+	case $CHOICE in
+			1)
+				./dalek start
+				dalek_success
+				;;
+			2)
+				curl -s --insecure -X POST -d '{"jsonrpc": "2.0", "method": "rehash", "params": {"server": "services.valware.uk"}, "id": 123}' http://localhost:1024/api >> /dev/null
+				dalek_success
+				;;
+			3)
+				./dalek restart
+				dalek_success
+
+				;;
+			4)
+				./dalek stop
+				dalek_success
+				;;
+			5)
+				;;
+			6)
+				php scripts/module_manager list --genbash
+				;;
+			7)
+				php scripts/module_manager list all --genbash
+				;;
+			8)
+				php scripts/module_manager list repo --genbash
+				;;
+			9)
+				./scripts/config_script
+				;;
+			"HELP 1")
+				HELPLINE="This command will start Dalek as well as its RPC Server. You'll need to make sure you've configured things correctly. For more information, visit https://github.com/DalekIRC/Dalek-Services/wiki/Configuration"
+				CMD="Start"
+				;;
+			"HELP 2")
+				HELPLINE="This command will update services with any changes you've made to the configuration file without the need for a restart."
+				CMD="Rehash"
+				;;
+			"HELP 3")
+				HELPLINE="This command will stop Dalek and RPC Server, then start them again."
+				CMD="Restart"
+				;;
+			"HELP 4")
+				HELPLINE="This command will stop Dalek and RPC Server"
+				CMD="Stop"
+				;;
+			"HELP 5")
+				HELPLINE="This command will generate a configuration block you can use in your UnrealIRCd's configuration file. You'll need to make sure you've configured things correctly. For more information, visit https://github.com/DalekIRC/Dalek-Services/wiki/Configuration"
+				CMD="Generate a link block"
+				;;
+			"HELP 6")
+				HELPLINE="This command will list all third-party modules you have loaded in your currently-running Dalek instance."
+				CMD="List loaded third-party modules"
+				;;
+			"HELP 7")
+				HELPLINE="This command will list ALL modules you have loaded in your currently-running Dalek instance."
+				CMD="List all loaded modules"
+				;;
+			"HELP 8")
+				HELPLINE="This command will list all modules which are available for download and installation from the Dalek-Contrib repository (https://github.com/DalekIRC/Dalek-Contrib)"
+				CMD="List all installable modules"
+				;;
+			"HELP 9")
+				HELPLINE="This command takes you through Daleks configuration. We'll ask you some questions and get a config file written for you.\nYou'll find it in the directory \"conf/dalek.conf\""
+				CMD="Run Configuration"
+	esac
+
+	if [ "$CHOICE" -eq 5 ] ; then
+		clear
+		php scripts/genlinkblock
+
+	elif [ "$HELPLINE" = "" ] ; then
+		clear
+	else
+		TITLE="ℹ️ INFORMATION: ${CMD}"
+		HELPBOX=$(dialog --backtitle "$BACKTITLE" \
+			--title "$TITLE" \
+			--msgbox \
+			"$HELPLINE" $HEIGHT $WIDTH \
+			3>&1 1>&2 2>&3)
+		dalek_interface
+	fi
+}
+
+if [ "$1" = "--interface" ] ; then
+	dalek_interface
+elif [ "$1" = "--loaded-successful-dialog" ] ; then
+	dalek_lsd $1 $2
+elif [ "$1" = "--aborted-dialog" ] ; then
+	dalek_aborted $1 $2
+elif [ "$1" = "--loaded-unsuccessful-dialog" ] ; then
+	dalek_lud $1 $2
+elif [ "$1" = "--success" ] ; then
+	dalek_success
+fi
