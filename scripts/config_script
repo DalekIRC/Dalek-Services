@@ -36,7 +36,7 @@ if [ -z "$NETWORK_NAME" ] ; then
     ./dalek && exit 1
 fi
 echo "  'network' => '${NETWORK_NAME}'," >> test.conf
-
+echo "  'debugmode' => 'off'," >> test.conf
 REQUEST_SERVERNAME="What should your Dalek server be called?\n\nHint: Probably something like 'services.${NETWORK_NAME}.net'"
 SERVERNAME=$(dialog --backtitle "$BACKTITLE" \
                 --title "$TITLE" \
