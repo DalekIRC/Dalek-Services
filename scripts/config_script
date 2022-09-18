@@ -14,8 +14,8 @@ BOX=$(dialog --backtitle "$BACKTITLE" \
                 "$INTRODUCTION" $HEIGHT $WIDTH \
                 3>&1 1>&2 2>&3)
 if [ "$?" = 1 ] ; then
-    ./dalek
-    exit 1
+   
+    ./dalek && exit 1
 fi
 echo -n "<?php global \$cf;" > test.conf
 echo "" >> test.conf && echo "" >> test.conf
@@ -33,7 +33,7 @@ NETWORK_NAME=$(dialog --backtitle "$BACKTITLE" \
                 3>&1 1>&2 2>&3)
 if [ -z "$NETWORK_NAME" ] ; then
     ./scripts/gui --aborted-config You must specify a network name
-    exit 1
+    ./dalek && exit 1
 fi
 echo "  'network' => '${NETWORK_NAME}'," >> test.conf
 
@@ -85,7 +85,7 @@ PASS=$(dialog --backtitle "$BACKTITLE" \
                 3>&1 1>&2 2>&3)
 if [ -z "$PASS" ] ; then
     ./scripts/gui --aborted-config You must specify a password
-    exit 1
+    ./dalek && exit 1
 fi
 
 echo "  'password' => '${PASS}'," >> test.conf
@@ -114,12 +114,12 @@ EMAIL=$(dialog --backtitle "$BACKTITLE" \
 
 if [ -z "$EMAIL" ] ; then
     ./scripts/gui --aborted-config You must specify an email address
-    exit 1
+    ./dalek && exit 1
 else
     echo "  'email' => '${EMAIL}'," >> test.conf
 fi
 
-REQUEST_SQLIP="Now, moving on to WordPress.\n\nPlease provide the hostname or IP of your SQL database, specifically the one WordPress uses"
+REQUEST_SQLIP="Now, moving on to WordPress.\n\nPlease provide the hostname or IP of your SQL database, specifically the one WordPress uses.\n\nIf you would like to use a UNIX domain socket file, leave this blank"
 SQLIP=$(dialog --backtitle "$BACKTITLE" \
                 --title "$TITLE" \
                 --inputbox \
@@ -127,10 +127,22 @@ SQLIP=$(dialog --backtitle "$BACKTITLE" \
                 3>&1 1>&2 2>&3)
 
 if [ -z "$SQLIP" ] ; then
-    ./scripts/gui --aborted-config You must specify an IP address or hostname for your SQL database
-    exit 1
+    REQUEST_UXDF="Please specify the directory of your UNIX domain file"
+    UXDF=$(dialog --backtitle "$BACKTITLE" \
+            --title "$TITLE" \
+            --inputbox \
+            "$REQUEST_UXDF" $HEIGHT $WIDTH \
+            3>&1 1>&2 2>&3)
+    if [ -z "$UXDF" ] ; then
+        ./scripts/gui --aborted-config You did not specify a UNIX domain socket.\nYou must specify either an IP/hostname or a UNIX domain socket.\nDalek will not work without sharing an SQL database with WordPress.
+        ./dalek && exit 1
+    else
+        echo "  'sqlip' => NULL," >> test.conf
+        echo "  'sqlsock' => '${UXDF}'," >> test.conf
+    fi
 else
     echo "  'sqlip' => '${SQLIP}'," >> test.conf
+    echo "  'sqlsock' => NULL," >> test.conf
 fi
 
 REQUEST_SQLDB="Please provide the name of the SQL database which WordPress uses"
@@ -142,7 +154,7 @@ SQLDB=$(dialog --backtitle "$BACKTITLE" \
 
 if [ -z "$SQLDB" ] ; then
     ./scripts/gui --aborted-config You must specify an SQL database
-    exit 1
+    ./dalek && exit 1
 else
     echo "  'sqldb' => '${SQLDB}'," >> test.conf
 fi
@@ -156,7 +168,7 @@ SQLUSER=$(dialog --backtitle "$BACKTITLE" \
 
 if [ -z "$SQLUSER" ] ; then
     ./scripts/gui --aborted-config You must specify an SQL user
-    exit 1
+    ./dalek && exit 1
 else
     echo "  'sqluser' => '${SQLUSER}'," >> test.conf
 fi
@@ -170,7 +182,7 @@ SQLPASS=$(dialog --backtitle "$BACKTITLE" \
 
 if [ -z "$SQLPASS" ] ; then
     ./scripts/gui --aborted-config You must specify an SQL user password
-    exit 1
+    ./dalek && exit 1
 else
     echo "  'sqlpass' => '${SQLPASS}'," >> test.conf
 fi
@@ -246,7 +258,7 @@ if [ -f "conf/dalek.conf" ] ; then
         ./scripts/gui --aborted-config Configuration not saved
         rm -rf test.conf
         ./dalek
-        exit 1
+        ./dalek && exit 1
     fi
 else
     mv test.conf conf/dalek.conf
