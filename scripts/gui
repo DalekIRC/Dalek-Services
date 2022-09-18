@@ -31,7 +31,25 @@ dalek_lud()
 					"$2 has failed to install." $HEIGHT $WIDTH \
 					3>&1 1>&2 2>&3)
 }
+dalek_abort_config()
+{
+	HEIGHT=15
+	WIDTH=80
+	CHOICE_HEIGHT=8
+	BACKTITLE="🚨 DALEKS REIGN SUPREME 🚨"
+	TITLE="🚫 ABORT"
+	LINE="Configuration aborted:\n"
+	LINE+=$@
+	LINE+="\n\nStarting over."
+	
 
+	BOX=$(dialog --backtitle "$BACKTITLE" \
+					--title "$TITLE" \
+					--msgbox \
+					"$LINE" $HEIGHT $WIDTH \
+					3>&1 1>&2 2>&3)
+	./scripts/config_script					
+}
 dalek_aborted()
 {
 	HEIGHT=15
@@ -54,12 +72,14 @@ dalek_success()
 	CHOICE_HEIGHT=8
 	BACKTITLE="🚨 DALEKS REIGN SUPREME 🚨"
 	TITLE="✔️ SUCCESS"
+	LINE="Success: "
+	LINE+=$@
 	
 
 	BOX=$(dialog --backtitle "$BACKTITLE" \
 					--title "$TITLE" \
 					--msgbox \
-					"Success." $HEIGHT $WIDTH \
+					"$LINE" $HEIGHT $WIDTH \
 					3>&1 1>&2 2>&3)
 }
 
@@ -95,22 +115,28 @@ dalek_interface()
 	case $CHOICE in
 			1)
 				./dalek start
-				dalek_success
+				dalek_success Services has started.
+				./dalek
 				;;
 			2)
 				curl -s --insecure -X POST -d '{"jsonrpc": "2.0", "method": "rehash", "params": {"server": "services.valware.uk"}, "id": 123}' http://localhost:1024/api >> /dev/null
-				dalek_success
+				dalek_success Services has rehashed.
+				./dalek
 				;;
 			3)
 				./dalek restart
-				dalek_success
-
+				dalek_success Services has been restarted
+				./dalek
 				;;
 			4)
 				./dalek stop
-				dalek_success
+				dalek_success Services has stopped.
+				./dalek
 				;;
 			5)
+				clear
+				php scripts/genlinkblock
+				exit 1
 				;;
 			6)
 				php scripts/module_manager list --genbash
@@ -164,10 +190,11 @@ dalek_interface()
 	if [ "$CHOICE" -eq 5 ] ; then
 		clear
 		php scripts/genlinkblock
-
-	elif [ "$HELPLINE" = "" ] ; then
+		exit 1
+	
+	elif [ -z "$CHOICE" ] ; then
 		clear
-	else
+	elif [ ! -z "$HELPLINE" ] ; then
 		TITLE="ℹ️ INFORMATION: ${CMD}"
 		HELPBOX=$(dialog --backtitle "$BACKTITLE" \
 			--title "$TITLE" \
@@ -184,8 +211,11 @@ elif [ "$1" = "--loaded-successful-dialog" ] ; then
 	dalek_lsd $1 $2
 elif [ "$1" = "--aborted-dialog" ] ; then
 	dalek_aborted $1 $2
+elif [ "$1" = "--aborted-config" ] ; then
+	dalek_abort_config "${@:2}"
+	exit
 elif [ "$1" = "--loaded-unsuccessful-dialog" ] ; then
 	dalek_lud $1 $2
 elif [ "$1" = "--success" ] ; then
-	dalek_success
+	dalek_success "${@:2}"
 fi

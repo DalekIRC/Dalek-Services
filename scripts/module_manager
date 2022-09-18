@@ -89,7 +89,7 @@ function do_bash($res, $title, $repo = 0, $all = 0)
     $file = fopen($filename, 'w');
     fwrite($file,"#!/bin/bash\n\n");
     fwrite($file,"our_cute_little_script()\n{\n");
-    fwrite($file,"HEIGHT=15\nWIDTH=60\nCHOICE_HEIGHT=10\nBACKTITLE=\"🚨 DALEKS REIGN SUPREME 🚨\"\nTITLE=\"ℹ️ $title\"\n");
+    fwrite($file,"HEIGHT=25\nWIDTH=60\nCHOICE_HEIGHT=20\nBACKTITLE=\"🚨 DALEKS REIGN SUPREME 🚨\"\nTITLE=\"ℹ️ $title\"\n");
     fwrite($file,"MENU=\"$menu\"\n\n");
     fwrite($file,"OPTIONS=(");
     $i = 1;

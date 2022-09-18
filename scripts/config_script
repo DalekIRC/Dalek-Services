@@ -14,8 +14,8 @@ BOX=$(dialog --backtitle "$BACKTITLE" \
                 "$INTRODUCTION" $HEIGHT $WIDTH \
                 3>&1 1>&2 2>&3)
 if [ "$?" = 1 ] ; then
-    clear
-    exit
+    ./dalek
+    exit 1
 fi
 echo -n "<?php global \$cf;" > test.conf
 echo "" >> test.conf && echo "" >> test.conf
@@ -31,7 +31,10 @@ NETWORK_NAME=$(dialog --backtitle "$BACKTITLE" \
                 --inputbox \
                 "$REQUEST_NETWORK_NAME" $HEIGHT $WIDTH \
                 3>&1 1>&2 2>&3)
-
+if [ -z "$NETWORK_NAME" ] ; then
+    ./scripts/gui --aborted-config You must specify a network name
+    exit 1
+fi
 echo "  'network' => '${NETWORK_NAME}'," >> test.conf
 
 REQUEST_SERVERNAME="What should your Dalek server be called?\n\nHint: Probably something like 'services.${NETWORK_NAME}.net'"
@@ -41,32 +44,35 @@ SERVERNAME=$(dialog --backtitle "$BACKTITLE" \
                 "$REQUEST_SERVERNAME" $HEIGHT $WIDTH \
                 3>&1 1>&2 2>&3)
 
-if [ "$SERVERNAME" = 0 ] ; then
+if [ -z "$SERVERNAME" ] ; then
     echo "  'servicesname' => 'services.'," >> test.conf
 else
     echo "  'servicesname' => '${SERVERNAME}'," >> test.conf
 fi
 
-REQUEST_UPLINK="Please type the server name or IP of your uplink.\nNOTE: If you are connecting to a remote machine, it's recommended that you use TLS/SSL.\nYou can do this by prefixing the address with 'tls://'.\n\nIf you are connecting to the same machine you can use 'localhost'"
+REQUEST_UPLINK="Please type the server name or IP of your uplink.\nNOTE: If you are connecting to a remote machine, it's recommended that you use TLS/SSL.\nYou can do this by prefixing the address with 'tls://'.\n\nIf you are connecting to the same machine you can leave this blank to default to 'localhost'"
 UPLINK=$(dialog --backtitle "$BACKTITLE" \
                 --title "$TITLE" \
                 --inputbox \
                 "$REQUEST_UPLINK" $HEIGHT $WIDTH \
                 3>&1 1>&2 2>&3)
 
-if [ "$UPLINK" = 0 ] ; then
+if [ -z "$UPLINK" ] ; then
     echo "  'uplink' => 'localhost'," >> test.conf
 else
     echo "  'uplink' => '${UPLINK}'," >> test.conf
 fi
 
-REQUEST_PASS="Please type a password. Don't worry, about noting it down, you can generate an UnrealIRCd-style link block after!\n\nMake sure it's long and confusing!"
+REQUEST_PASS="Please type a password. Don't worry, about noting it down, you can generate an UnrealIRCd-style link block after!\n\nMake sure it's long and confusing!\n\nNote: Input is invisible as this is a password"
 PASS=$(dialog --backtitle "$BACKTITLE" \
                 --title "$TITLE" \
                 --passwordbox \
                 "$REQUEST_PASS" $HEIGHT $WIDTH \
                 3>&1 1>&2 2>&3)
-
+if [ -z "$PASS" ] ; then
+    ./scripts/gui --aborted-config You must specify a password
+    exit 1
+fi
 
 echo "  'password' => '${PASS}'," >> test.conf
 
@@ -79,7 +85,7 @@ PORT=$(dialog --backtitle "$BACKTITLE" \
                 "$REQUEST_PORT" $HEIGHT $WIDTH \
                 3>&1 1>&2 2>&3)
 
-if [ "$PORT" = 0 ] ; then
+if [ -z "$PORT" ] ; then
     echo "  'port' => '7001'," >> test.conf
 else
     echo "  'port' => '${PORT}'," >> test.conf
@@ -92,8 +98,9 @@ EMAIL=$(dialog --backtitle "$BACKTITLE" \
                 "$REQUEST_EMAIL" $HEIGHT $WIDTH \
                 3>&1 1>&2 2>&3)
 
-if [ "$EMAIL" = 0 ] ; then
-    echo "Aborted"
+if [ -z "$EMAIL" ] ; then
+    ./scripts/gui --aborted-config You must specify an email address
+    exit 1
 else
     echo "  'email' => '${EMAIL}'," >> test.conf
 fi
@@ -105,8 +112,9 @@ SQLIP=$(dialog --backtitle "$BACKTITLE" \
                 "$REQUEST_SQLIP" $HEIGHT $WIDTH \
                 3>&1 1>&2 2>&3)
 
-if [ "$SQLIP" = 0 ] ; then
-    echo "Aborted"
+if [ -z "$SQLIP" ] ; then
+    ./scripts/gui --aborted-config You must specify an IP address or hostname for your SQL database
+    exit 1
 else
     echo "  'sqlip' => '${SQLIP}'," >> test.conf
 fi
@@ -118,8 +126,9 @@ SQLDB=$(dialog --backtitle "$BACKTITLE" \
                 "$REQUEST_SQLDB" $HEIGHT $WIDTH \
                 3>&1 1>&2 2>&3)
 
-if [ "$SQLDB" = 0 ] ; then
-    echo "Aborted"
+if [ -z "$SQLDB" ] ; then
+    ./scripts/gui --aborted-config You must specify an SQL database
+    exit 1
 else
     echo "  'sqldb' => '${SQLDB}'," >> test.conf
 fi
@@ -131,8 +140,9 @@ SQLUSER=$(dialog --backtitle "$BACKTITLE" \
                 "$REQUEST_SQLUSER" $HEIGHT $WIDTH \
                 3>&1 1>&2 2>&3)
 
-if [ "$SQLUSER" = 0 ] ; then
-    echo "Aborted"
+if [ -z "$SQLUSER" ] ; then
+    ./scripts/gui --aborted-config You must specify an SQL user
+    exit 1
 else
     echo "  'sqluser' => '${SQLUSER}'," >> test.conf
 fi
@@ -144,8 +154,9 @@ SQLPASS=$(dialog --backtitle "$BACKTITLE" \
                 "$REQUEST_SQLPASS" $HEIGHT $WIDTH \
                 3>&1 1>&2 2>&3)
 
-if [ "$SQLPASS" = 0 ] ; then
-    echo "Aborted"
+if [ -z "$SQLPASS" ] ; then
+    ./scripts/gui --aborted-config You must specify an SQL user password
+    exit 1
 else
     echo "  'sqlpass' => '${SQLPASS}'," >> test.conf
 fi
@@ -169,9 +180,12 @@ LOGCHAN=$(dialog --backtitle "$BACKTITLE" \
                 "$REQUEST_LOGCHAN" $HEIGHT $WIDTH \
                 3>&1 1>&2 2>&3)
 
+if [ -z "$LOGCHAN" ] ; then
+    echo "  'logchan' => '#services'," >> test.conf
 
-echo "  'logchan' => '${LOGCHAN}'," >> test.conf
-
+else 
+    echo "  'logchan' => '${LOGCHAN}'," >> test.conf
+fi
 REQUEST_MASK="Would you like to automatically assign users hostnames based on placemarks?"
 ISMASK=$(dialog --backtitle "$BACKTITLE" \
                 --title "$TITLE" \
@@ -215,7 +229,10 @@ if [ -f "conf/dalek.conf" ] ; then
         rm -rf conf/dalek.conf
         mv test.conf conf/dalek.conf
     else
+        ./scripts/gui --aborted-config Configuration not saved
         rm -rf test.conf
+        ./dalek
+        exit 1
     fi
 else
     mv test.conf conf/dalek.conf
@@ -228,5 +245,6 @@ REHASH=$(dialog --backtitle "$BACKTITLE" \
             3>&1 1>&2 2>&3)
 if [ "$?" -eq 0 ] ; then
     ./dalek rehash
-    ./scripts/gui --success
+    ./scripts/gui --success Services were rehashed
+    ./dalek
 fi
