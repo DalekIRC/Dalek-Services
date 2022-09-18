@@ -50,6 +50,20 @@ else
     echo "  'servicesname' => '${SERVERNAME}'," >> test.conf
 fi
 
+
+REQUEST_SID="What should the SID for the server be?\n\nLeave it blank to use the default (69L)"
+SID=$(dialog --backtitle "$BACKTITLE" \
+                --title "$TITLE" \
+                --inputbox \
+                "$REQUEST_SID" $HEIGHT $WIDTH \
+                3>&1 1>&2 2>&3)
+
+if [ -z "$SID" ] ; then
+    echo "  'sid' => '69L'," >> test.conf
+else
+    echo "  'sid' => '${SID}'," >> test.conf
+fi
+
 REQUEST_UPLINK="Please type the server name or IP of your uplink.\nNOTE: If you are connecting to a remote machine, it's recommended that you use TLS/SSL.\nYou can do this by prefixing the address with 'tls://'.\n\nIf you are connecting to the same machine you can leave this blank to default to 'localhost'"
 UPLINK=$(dialog --backtitle "$BACKTITLE" \
                 --title "$TITLE" \
