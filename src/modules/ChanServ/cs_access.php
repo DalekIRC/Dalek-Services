@@ -88,7 +88,7 @@ class cs_access {
 			return;
 		}
 
-		if (BadPtr($parv[3]))
+		if (BadPtr($parv[2]))
 		{
 			$cs->notice($nick->uid,"Syntax: /msg $cs->nick ACCESS <channel> <add|del|list> [<account|nick>]");
 			return;
@@ -116,7 +116,7 @@ class cs_access {
 
 		$control = $parv[2];
 		$lvl = (isset($parv[4])) ? $parv[4] : NULL;
-		if (!($account = new WPUser($parv[3]))->IsUser) // couldn't find the account. search for a nick with an account
+		if (strcasecmp($control,"list") && !($account = new WPUser($parv[3]))->IsUser) // couldn't find the account. search for a nick with an account
 		{
 			if (!($account = new User($parv[3]))->IsUser)
 			{
@@ -124,7 +124,9 @@ class cs_access {
 				return;
 			}
 		}
-		$account = ($account instanceof WPUser) ? $account : $account->wp;
+		if (strcasecmp($control,"list"))
+			$account = ($account instanceof WPUser) ? $account : $account->wp;
+
 		if (strcasecmp($control,"add") && strcasecmp($control,"del") && strcasecmp($control,"list"))
 		{
 			sendnotice($nick, $cs, $mtags, "Invalid subcommand \"$control\"");
@@ -140,51 +142,87 @@ class cs_access {
 		if (!strcasecmp($control,"add"))
 		{
 			self::add_access($chan, $account->user_login, $lvl);
-			$cs->notice($nick->uid, "You have added permissions of $lvl to $account->user_login in $chan->chan");
+			sendnotice($nick, $cs, $mtags, "You have added permissions of $lvl to $account->user_login in $chan->chan");
 			foreach ($chan->userlist as $user)
 				if (isset($user->account) && !strcasecmp($user->account,$account->user_login))
 					$cs->up($chan, $user);
 		}
-		if (!strcasecmp($control,"del"))
+		elseif (!strcasecmp($control,"del"))
 		{
 			foreach ($chan->userlist as $user)
 				if (isset($user->account) && !strcasecmp($user->account,$account->user_login))
 					$cs->down($chan,$user);
 			self::del_access($chan, $account->user_login);
 
-			$cs->notice($nick->uid, "You have removed permissions $account->user_login in $chan->chan");
+			sendnotice($nick, $cs, $mtags, "You have removed permissions of $account->user_login in $chan->chan");
+		}
+		elseif (!strcasecmp($control,"list"))
+		{
+			$list = self::access_list($chan);
+			if (empty($list))
+			{
+				sendnotice($nick, $cs, $mtags, "No access list. Weird. So how can you see this message? Hmm... ;)");
+				return;
+			}
+			
+			sendnotice($nick, $cs, $mtags, "Listing access list for channel $chan->chan:");
+			foreach($list as $acc)
+			{
+				sendnotice($nick, $cs, $mtags, clean_align(bold("Nick: ").$acc["nick"])." ".bold("Access: ").$acc["access"]);
+			}
+
 		}
 	}
 
 	public static function add_access(Channel $chan, $account_name, $level)
 	{
+		$chan = strtolower($chan->chan);
 		$conn = sqlnew();
-		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."chanaccess WHERE nick = ? and channel = ?");
-		$prep->bind_param("ss", $account_name, $chan->chan);
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."chanaccess WHERE nick = ? and lower(channel) = ?");
+		$prep->bind_param("ss", $account_name, $chan);
 		$prep->execute();
 
 		if (!($result = $prep->get_result()) || !$result->num_rows)
 		{
 			$prep = $conn->prepare("INSERT INTO ".sqlprefix()."chanaccess (channel, nick, access) VALUES (?, ?, ?)");
-			$prep->bind_param("sss", $chan->chan, $account_name, $level);
+			$prep->bind_param("sss", $chan, $account_name, $level);
 			$prep->execute();
 		}
 
 		else
 		{
-			$prep = $conn->prepare("UPDATE ".sqlprefix()."chanaccess SET access = ? WHERE channel = ? AND nick = ?");
-			$prep->bind_param("sss",$level, $chan->chan, $account_name);
+			$prep = $conn->prepare("UPDATE ".sqlprefix()."chanaccess SET access = ? WHERE lower(channel) = ? AND nick = ?");
+			$prep->bind_param("sss",$level, $chan, $account_name);
 			$prep->execute();
 		}
 		$prep->close();
 	}
 	public static function del_access(Channel $chan, $account_name)
 	{
+		$chan = strtolower($chan->chan);
 		$conn = sqlnew();
 		$prep = $conn->prepare("DELETE FROM ".sqlprefix()."chanaccess WHERE nick = ? AND lower(channel) = ?");
-		$prep->bind_param("ss", $account_name, strtolower($chan->chan));
+		$prep->bind_param("ss", $account_name, $chan);
 		$prep->execute();
 
 		$prep->close();
+	}
+
+	public static function access_list(Channel $chan)
+	{
+		$return = [];
+		$conn = sqlnew();
+		$chan = strtolower($chan->chan);
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."chanaccess WHERE lower(channel) = ?");
+		$prep->bind_param("s", $chan);
+		$prep->execute();
+		$result = $prep->get_result();
+		if (!$result || !$result->num_rows)
+			return $return;
+
+		while($row = $result->fetch_assoc())
+			$return[] = $row;
+
+		return $return;
 	}
 }
