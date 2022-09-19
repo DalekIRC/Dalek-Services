@@ -52,7 +52,7 @@ class cs_access {
 	*/
 	function __init()
 	{
-		$help_string = "ACCESS a channel to your account";
+		$help_string = "Manage the access list on your channel";
 		$syntax = "ACCESS <#channel>";
 		$extended_help = 	"$help_string\n$syntax";
 
