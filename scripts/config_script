@@ -88,7 +88,7 @@ if [ -z "$PASS" ] ; then
     ./dalek && exit 1
 fi
 
-echo "  'password' => '${PASS}'," >> test.conf
+echo "  'serverpassword' => '${PASS}'," >> test.conf
 
 
 
