@@ -40,15 +40,15 @@ dalek_abort_config()
 	TITLE="🚫 ABORT"
 	LINE="Configuration aborted:\n"
 	LINE+=$@
-	LINE+="\n\nStarting over."
+	LINE+="\n\nExiting."
 	
 
 	BOX=$(dialog --backtitle "$BACKTITLE" \
 					--title "$TITLE" \
 					--msgbox \
 					"$LINE" $HEIGHT $WIDTH \
-					3>&1 1>&2 2>&3)
-	./scripts/config_script					
+					3>&1 1>&2 2>&3)	
+	dalek_interface			
 }
 dalek_aborted()
 {
@@ -186,14 +186,9 @@ dalek_interface()
 				HELPLINE="This command takes you through Daleks configuration. We'll ask you some questions and get a config file written for you.\nYou'll find it in the directory \"conf/dalek.conf\""
 				CMD="Run Configuration"
 	esac
-
-	if [ "$CHOICE" -eq 5 ] ; then
-		clear
-		php scripts/genlinkblock
-		exit 1
 	
-	elif [ -z "$CHOICE" ] ; then
-		clear
+	if [ -z "$CHOICE" ] ; then
+		exit 1
 	elif [ ! -z "$HELPLINE" ] ; then
 		TITLE="ℹ️ INFORMATION: ${CMD}"
 		HELPBOX=$(dialog --backtitle "$BACKTITLE" \

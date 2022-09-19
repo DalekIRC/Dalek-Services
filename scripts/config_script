@@ -14,8 +14,8 @@ BOX=$(dialog --backtitle "$BACKTITLE" \
                 "$INTRODUCTION" $HEIGHT $WIDTH \
                 3>&1 1>&2 2>&3)
 if [ "$?" = 1 ] ; then
-   
-    ./dalek && exit 1
+    ./scripts/gui --interface
+    exit 1
 fi
 echo -n "<?php global \$cf;" > test.conf
 echo "" >> test.conf && echo "" >> test.conf
@@ -33,7 +33,7 @@ NETWORK_NAME=$(dialog --backtitle "$BACKTITLE" \
                 3>&1 1>&2 2>&3)
 if [ -z "$NETWORK_NAME" ] ; then
     ./scripts/gui --aborted-config You must specify a network name
-    ./dalek && exit 1
+    exit 1
 fi
 echo "  'network' => '${NETWORK_NAME}'," >> test.conf
 echo "  'debugmode' => 'off'," >> test.conf
