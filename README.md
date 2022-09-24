@@ -50,7 +50,7 @@ With WordPress + Dalek + UnrealIRCd, you have more creative control over things 
 
 __NickServ__
 
-As always, you can use NickServ to manage your account settings. These services support `SASL` and `draft/account-registration`, and so registering your account directly over IRC is also possible. The only main differences are you can't register an account by messaging NickServ, and the `IDENTIFY` command takes one of `PLAIN` or `EXTERNAL` based on however you have your client set up, and it will take this to mean that you would like to start/continue a SASL flow.
+As always, you can use NickServ to manage your account settings. These services support [`SASL`](https://ircv3.net/specs/extensions/sasl-3.2) and [`draft/account-registration`](https://ircv3.net/specs/extensions/account-registration), and so registering your account directly over IRC is also possible. The only main differences are you can't register an account by messaging NickServ, and the `IDENTIFY` command takes one of `PLAIN` or `EXTERNAL` based on however you have your client set up, and it will take this to mean that you would like to start/continue a SASL flow.
 
 __ChanServ__
 
