@@ -14,7 +14,7 @@
 
 # Dalek IRC Services
 
-Dalek IRC Services with WordPress integration tailored to you.
+Dalek IRC Services with UnrealIRCd & WordPress integration tailored to you.
 
 
 ### Why do I need Dalek? ###
