@@ -40,12 +40,12 @@ class Server
 	{
 		
 		// Declare de globals;
-		global $socket,$cf;
+		global $socket;
 		
 		// Anything we wanna initialise before we connect
 		
-		$this->sid = $cf['sid'];
-		$this->name = $cf['servicesname'];
+		$this->sid = Conf::$settings['info']['SID'];
+		$this->name = Conf::$settings['info']['services-name'];
 		/* pre connect shit */
 		
 		// we are disabling verification for now until built upon more :>
@@ -64,12 +64,12 @@ class Server
 		
 		
 		$this->sendraw("PASS $password");
-		$this->sendraw("PROTOCTL EAUTH=".$cf['servicesname'].",6000 SID=".$cf['sid']);
+		$this->sendraw("PROTOCTL EAUTH=$this->name,6000 SID=$this->sid");
 		$this->sendraw("PROTOCTL NOQUIT NICKv2 SJOIN SJOIN2 SJ3 CLK TKLEXT2 NICKIP ESVID MLOCK NEXTBANS EXTSWHOIS SJSBY MTAGS");
-		$this->sendraw("SERVER ".$cf['servicesname']." 1 :Dalek IRC Services");
-		$this->sendraw("MD client ".$cf['sid']." saslmechlist :PLAIN,EXTERNAL");
-		$this->sendraw("MD client ".$cf['sid']." externalreglink :https://valware.uk/register");
-		$this->sendraw("MD client ".$cf['sid']." regkeylist :before-connect,email-required,custom-account-name");
+		$this->sendraw("SERVER $this->name 1 :Dalek IRC Services");
+		$this->sendraw("MD client $this->sid saslmechlist :PLAIN,EXTERNAL");
+		$this->sendraw("MD client $this->sid externalreglink :https://valware.uk/register");
+		$this->sendraw("MD client $this->sid regkeylist :before-connect,email-required,custom-account-name");
 		$this->sendraw("EOS");
 		
 
@@ -86,7 +86,7 @@ class Server
 	function sendraw($string)
 	{
 		// Declare de globals;
-		global $socket,$cf;
+		global $socket;
 		
 		if ($string[0] !== "@") // if there are no mtags on it
 		{
@@ -94,7 +94,7 @@ class Server
 			strprefix($string, $new_mtags);
 		}
 
-		if ($cf['debugmode'] == "on")
+		if (Conf::$settings['log']['debug'] == "yes")
 			echo "[\e[0;30;42mSEND\e[0m] $string\n";
 			
 		fputs($socket, ircstrip($string)."\n");
@@ -118,15 +118,15 @@ class Server
 
 hook::func(HOOKTYPE_RAW, function($u)
 {
-	global $cf;
-	$us = $cf['sid'];
+	if (Conf::$settings['log']['debug'] == "yes")
+	$us = Conf::$settings['info']['SID'];
 	$parv = explode(" ",$u['string']);
 	if ($parv[0] !== "NETINFO"){ return; }
 	$array = array(
-		"server" => $cf['servicesname'],
+		"server" => Conf::$settings['info']['services-name'],
 		"hops" => "0",
-		"sid" => $cf['sid'],
-		"desc" => $cf['network'],
+		"sid" => Conf::$settings['info']['SID'],
+		"desc" => Conf::$settings['info']['network-name'],
 		"intro_by" => $us);
 	hook::run("SID", $array);
 	$var = [];
@@ -138,13 +138,12 @@ hook::func(HOOKTYPE_RAW, function($u)
 /* SID */
 hook::func(HOOKTYPE_RAW, function($u)
 {
-	global $cf;
 	$parv = explode(" ",$u['string']);
 	if ($parv[1] !== "SID")
 		return;
 	$us = mb_substr($parv[0],1);
 	if (!$us)
-		$us = $cf['sid'];
+		$us = Conf::$settings['info']['SID'];
 	$servername = $parv[2];
 	$hops = $parv[3];
 	$sid = $parv[4];

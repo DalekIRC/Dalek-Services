@@ -32,9 +32,9 @@
 
 function fail2ban($ip, int $s)
 {
-    global $cf,$servertime,$fail2ban,$saslignore;
+    global $fail2ban,$saslignore;
 
-    $sn = $cf['servicesname'];
+    $sn = Conf::$settings['info']['services-name'];
     if (!isset($saslignore))
         $saslignore = array();
 
@@ -57,11 +57,11 @@ function fail2ban($ip, int $s)
     {
         return;
     }
-    $cb = (isset($cf['fail2ban-failcount'])) ? $cf['fail2ban-failcount'] : 10; // default value is 10 incorrect attempts
-    $db = (isset($cf['fail2ban-bantime'])) ? $cf['fail2ban-bantime'] : 30; // default value is 30 minutes ban
+    $cb = (isset(Config::$settings['security settings']['fail2ban']['count']) && Config::$settings['security settings']['fail2ban']['count'] > 0) ? Config::$settings['security settings']['fail2ban']['count'] : 10; // default value is 10 incorrect attempts
+    $db = (isset(Config::$settings['security settings']['fail2ban']['bantime']) && Config::$settings['security settings']['fail2ban']['bantime'] > 0) ? Config::$settings['security settings']['fail2ban']['bantime'] : 30; // default value is 30 minutes ban
     $duration = $db * 60; // we want the seconds
-    $expiry = $servertime + $duration;
+    $expiry = servertime() + $duration;
 
     if ($fail2ban[$ip] >= $cb)
-        S2S("TKL + Z * $ip $sn $expiry $servertime :Too many bad auth attempts. [".$db."m]");
+        S2S("TKL + Z * $ip $sn $expiry".servertime()." :Too many bad auth attempts. [".$db."m]");
 }

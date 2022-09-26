@@ -80,7 +80,9 @@ class cloak {
 	 */
 	public static function do_cloak($u)
 	{
-		global $cf;
+		$clk = (isset(Conf::$settings['cloak']['active']) && Conf::$settings['cloak']['active'] == "yes") ? true : false;
+		if (!$clk) // if we are not cloaking the user
+			return;
 		if (!BadPtr($u['account']))
 			DoCloak($u['uid'],$u['account']);
 	}

@@ -74,7 +74,6 @@ class modules {
 	 */
 	public static function cmd_module($u)
 	{
-        global $cf;
 		/* Get the command that called us */
 		$cmd = $u['cmd'];
 
@@ -85,7 +84,7 @@ class modules {
 		$parv = explode(" ",$u['params']);
 		if ($parv[0] !== "-all")
         {
-    		modules::module_response($nick, "Showing loaded 3rd party modules (use \"MODULE -all ".$cf['servicesname']."\" to show all modules):");
+    		modules::module_response($nick, "Showing loaded 3rd party modules (use \"MODULE -all ".Conf::$settings['info']['services-name']."\" to show all modules):");
             foreach (Module::$modules as $m)
 			{
 				if (isset($m->official))

@@ -94,7 +94,7 @@ class cs_info {
 		}
 		if (!$chan)
 		{
-			$cs->notice($nick->uid,"Invalid parameters");
+			$cs->notice($nick->uid, "Invalid parameters");
 			return;
 		}
 	
@@ -107,5 +107,6 @@ class cs_info {
 		$cs->notice_with_mtags($mtags,$nick->uid,"$chan->chan was registered on: ".gmdate("Y-m-d\TH:i:s\Z", $chan->RegDate));
 		$cs->notice_with_mtags($mtags,$nick->uid,"Channel email: $chan->email");
 		$cs->notice_with_mtags($mtags,$nick->uid,"Channel URL: $chan->url");
+		$cs->notice_with_mtags($mtags,$nick->uid,"Channel topic: $chan->topic");
 	}
 }

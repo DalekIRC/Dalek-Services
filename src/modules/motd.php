@@ -75,7 +75,6 @@ class motd {
 	 */
 	public static function cmd_motd($u)
 	{
-		global $cf;
 		$nick = $u['nick'];
 
 		$f = "conf/dalek.motd";
@@ -85,7 +84,7 @@ class motd {
 			return;
 		}
 
-		$sn = $cf['servicesname'];
+		$sn = Conf::$settings['info']['services-name'];
 		S2S("375 $nick->nick :--------oOo------- $sn Message of the Day --------oOo-------");
 
 		while(!feof($motd)){

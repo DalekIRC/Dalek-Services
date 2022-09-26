@@ -116,7 +116,7 @@ class ns_pronouns {
 			$opts = serialize($opts);
 
 			$prep = $conn->prepare("UPDATE ".$wpconfig['dbprefix']."usermeta set meta_value = ? WHERE user_id = ? AND meta_key = 'show_irc'");
-			$prep->bind_param("si",$opts,$user->wp->user_id);
+			$prep->bind_param("si",$opts,$nick->wp->user_id);
 			$prep->execute();
 			$ns->notice($nick->uid,"You have set to have your pronouns visible in your WHOIS");
 			return true;		

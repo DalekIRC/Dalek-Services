@@ -35,7 +35,7 @@ class tkl {
 	public $description = "Provides TKL compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -366,13 +366,11 @@ function gzline($string, $from = NULL)
 
 function gline_add($host,$from = NULL,$reason = NULL,$expiry = 0,$ut = NULL)
 {
-	global $cf;
-
 	if ($reason && strlen($reason))
 		$reason = NULL;
 
 	if (!$from)
-		$from = $cf['sid'];
+		$from = Conf::$settings['info']['SID'];
 
 	if (_line(TKL_GLOBAL,TKL_ADD,$ut,$from,$expiry,$reason))
 		return true;
@@ -381,13 +379,11 @@ function gline_add($host,$from = NULL,$reason = NULL,$expiry = 0,$ut = NULL)
 
 function gline_del($host,$ut = NULL)
 {
-	global $cf;
-
 	if ($reason && strlen($reason))
 		$reason = NULL;
 
 	if (!$from)
-		$from = $cf['sid'];
+		$from = Conf::$settings['info']['SID'];
 
 	if (_line(TKL_GLOBAL,TKL_DEL,$ut,$from,$expiry,$reason))
 		return true;
@@ -398,13 +394,11 @@ function gline_del($host,$ut = NULL)
 
 function gzline_add($host,$from = NULL,$reason = NULL,$expiry = 0,$ut = NULL)
 {
-	global $cf;
-
 	if ($reason && strlen($reason))
 		$reason = NULL;
 
 	if (!$from)
-		$from = $cf['sid'];
+		$from = Conf::$settings['info']['SID'];
 
 	if (_line(TKL_GZAP,TKL_ADD,$ut,$from,$expiry,$reason))
 		return true;
@@ -414,13 +408,11 @@ function gzline_add($host,$from = NULL,$reason = NULL,$expiry = 0,$ut = NULL)
 
 function gzline_del($host,$ut = NULL)
 {
-	global $cf;
-
 	if ($reason && strlen($reason))
 		$reason = NULL;
 
 	if (!$from)
-		$from = $cf['sid'];
+		$from = Conf::$settings['info']['SID'];
 
 	if (_line(TKL_ZAP,TKL_DEL,$ut,$from,$expiry,$reason))
 		return true;

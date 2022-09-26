@@ -85,9 +85,8 @@ class metadata {
 	/* Send USERMETA command */
 	public static function send_usermeta($from = NULL, $to, $key, $value)
 	{
-		global $cf;
 		if (!$from)
-			$from = $cf['sid'];
+			$from = Conf::$settings['info']['SID'];
 
 		S2S(":$from METADATA $to $key * :$value");
 		md::add($to,$key,$value);

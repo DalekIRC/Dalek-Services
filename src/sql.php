@@ -31,7 +31,6 @@ class SQL {
 	}
 	function query($query)
 	{
-		global $cf;
 		$conn = sqlnew();
 		if (!$conn) { return false; }
 		else {
@@ -41,7 +40,6 @@ class SQL {
 	}
 	function user_insert($u)
 	{
-		global $cf;
 		$gecos = NULL; // empty gecos to fix a weird error
 		$conn = sqlnew();
 		$user = new User($u['nick']);
@@ -129,7 +127,6 @@ class SQL {
 	}
 	function user_delete($u)
 	{
-		global $cf;
 		$conn = sqlnew();
 		if (!$conn) { return false; }
 		if (!$u)
@@ -152,7 +149,6 @@ class SQL {
 	}
 	function sid($u)
 	{
-		global $cf;
 		$conn = sqlnew();
 		if (!$conn) { return false; }
 		else {
@@ -171,7 +167,7 @@ class SQL {
 			)");
 			if (!isset($u['intro_by']) || !$u['intro_by'])
 			{
-				$u['intro_by'] = $cf['sid'];
+				$u['intro_by'] = Conf::$settings['info']['SID'];
 			}
 			$prep->bind_param("sssss",$u['server'],$u['hops'],$u['sid'],$u['desc'],$u['intro_by']);
 			$prep->execute();
@@ -195,7 +191,6 @@ class SQL {
 	}
 	static function sjoin($u)
 	{
-		global $cf;
 		$conn = sqlnew();
 		if (!$conn) { return false; }
 		if (find_channel($u['channel']))
@@ -295,7 +290,6 @@ class SQL {
 	}
 	function insert_ison($chan,$uid,$mode = "")
 	{
-		global $cf;
 		$conn = sqlnew();
 		if (!$conn) { return false; }
 		else {
@@ -439,17 +433,15 @@ function get_chmode($channel)
 
 function sqlnew()
 {
-	global $cf;
-
 	$i = 0;
 	beginning:
 	if ($i >= 15)
 		die(SVSLog("Could not connect to the database for 30 seconds. Shutting down.", LOG_FATAL));
 		
-	if (is_null($cf['sqlsock']))
-		$conn = mysqli_connect($cf['sqlip'],$cf['sqluser'],$cf['sqlpass'],$cf['sqldb'],$cf['sqlport'] = "3306");
+	if (!isset(Conf::$settings['sql']['sockfile']) || is_null(Conf::$settings['sql']['sockfile']))
+		$conn = mysqli_connect(Conf::$settings['sql']['hostname'],Conf::$settings['sql']['username'],Conf::$settings['sql']['password'],Conf::$settings['sql']['database'],Conf::$settings['sql']['port'] = "3306");
 	else
-		$conn = mysqli_connect($cf['sqlip'],$cf['sqluser'],$cf['sqlpass'],$cf['sqldb'],$cf['sqlport'] = "3306",$cf['sqlsock']);
+		$conn = mysqli_connect(Conf::$settings['sql']['hostname'],Conf::$settings['sql']['username'],Conf::$settings['sql']['password'],Conf::$settings['sql']['database'],Conf::$settings['sql']['port'] = "3306",Conf::$settings['sql']['sockfile']);
 
 	if ($conn->connect_error)
 	{
@@ -463,8 +455,7 @@ function sqlnew()
 
 function sqlprefix()
 {
-    global $cf;
-    return (isset($cf['sqlprefix'])) ? $cf['sqlprefix'] : 'dalek_';
+    return (isset(Conf::$settings['sql']['prefix'])) ? Conf::$settings['sql']['prefix'] : 'dalek_';
 }
 
 hook::func(HOOKTYPE_PRE_CONNECT, function($u)

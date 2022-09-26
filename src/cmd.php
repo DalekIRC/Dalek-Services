@@ -57,8 +57,6 @@ class cmd {
 
 hook::func("raw", function($u)
 {
-	global $cf;
-	
 	$parv = explode(" ", $u['string']);
 	$mtags = NULL;
 	
@@ -69,8 +67,8 @@ hook::func("raw", function($u)
 	/* one of those commands without a 'sender', spoof it as our uplink */
 	if ($parv[0][0] !== ":")
 	{
-		if (!($serv = serv_attach($cf['sid'])))
-			$serv = [$cf['sid']];
+		if (!($serv = serv_attach(Conf::$settings['info']['SID'])))
+			$serv = [Conf::$settings['info']['SID']];
 		$u['string'] = ":".$serv[0]." ".$u['string'];
 		$parv = explode(" ", $u['string']);
 	}

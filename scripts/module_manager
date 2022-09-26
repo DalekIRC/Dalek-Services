@@ -1,6 +1,6 @@
 <?php
 include "src/misc.php";
-
+var_dump(phpinfo());
 if (count($argv) < 2)
     die("Parameters: ./dalek module list|load|unload|install|delete [<module>]");
 
@@ -28,7 +28,7 @@ if ($argv[1] == "list")
     }
     if (!isset($response) || !$response || empty($response))
     {
-        echo("Module was already loaded");
+        echo("Unable to list modules.");
         die();
     }
 

@@ -64,8 +64,8 @@ class Dictionary {
 
 	static function spawn_client()
 	{
-		global $Dictionary,$cf;
-		/* spawn client with $bbs
+		global $Dictionary;
+		/* spawn client with $dict
 		 * You don't need to store this anywhere as it's done automatically
 		 * You can find this client from anywhere by finding the global $Dictionary:
 		 * $dict = Client::find($Dictionary['nick']);

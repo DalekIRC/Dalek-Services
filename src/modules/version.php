@@ -90,7 +90,6 @@ class version {
 	}
     static function version_response(User $nick)
     {
-        global $cf;
-    	S2S("351 $nick->nick ".DALEK_VERSION." ".$cf['servicesname']." 0 [".php_uname()."]");
+    	S2S("351 $nick->nick ".DALEK_VERSION." ".Conf::$settings['info']['services-name']." 0 [".php_uname()."]");
     }
 }

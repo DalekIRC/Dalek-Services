@@ -28,7 +28,7 @@ class Channel
 		else
 		{
 			$this->IsChan = true;
-			$this->owner = isset($u['owner']) ?? NULL;
+			$this->owner = isset($u['owner']) ? $u['owner'] : NULL;
 			$this->modes = mb_substr($u['modes'],1) ?? false;
 			$this->topic = $u['topic'];
 			$this->timestamp = $u['timestamp'];
@@ -128,16 +128,15 @@ class Channel
 	}
 	function SetMode($mode)
 	{
-		global $cf;
-		S2S("MODE $this->chan $mode",$cf['servicesname']);
+		S2S("MODE $this->chan $mode",Conf::$settings['info']['services-name']);
 		$tok = explode(" ",$mode);
 		if (isset($tok[1]))
 		{
 			$params = rparv($mode);
-			MeatballFactory($this,$tok[0],$params,$cf['servicesname']);
+			MeatballFactory($this,$tok[0],$params,Conf::$settings['info']['services-name']);
 		}
 		else
-			MeatballFactory($this,$mode,"",$cf['servicesname']);
+			MeatballFactory($this,$mode,"",Conf::$settings['info']['services-name']);
 			
 		return true;
 	}

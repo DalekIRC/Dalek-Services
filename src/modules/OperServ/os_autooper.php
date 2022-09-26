@@ -55,9 +55,7 @@ class os_autooper {
 	
 	public static function auth($u)
 	{
-		global $cf;
-
-		if (!isset($cf['auto_oper']) || $cf['auto_oper'] !== "on")
+			if (!isset(Conf::$settings['operserv']['settings']['auto_oper']) || Conf::$settings['operserv']['settings']['auto_oper'] !== "on")
 			return;
 			
 		$nick = new User($u['nick']);

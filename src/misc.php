@@ -35,9 +35,8 @@ function microsecs()
  */
 function IsMe($srv)
 {
-	global $cf;
 	$serv = new User($srv);
-	if (!$serv->IsServer || (strcmp($serv->uid,$cf['sid']) && strcmp($serv->nick,$cf['servicesname'])))
+	if (!$serv->IsServer || (strcmp($serv->uid,Conf::$settings['info']['SID']) && strcmp($serv->nick,Conf::$settings['info']['services-name'])))
 		return false;
 	return true;
 }
@@ -355,7 +354,7 @@ function ul($s)
 function SVSLog($string, $type = "") : void
 {
 	/* affix a type */
-	global $cf,$serv;
+	global $serv;
 	$string = $type.$string;
 
 	/* If we have OperServ, use that */
@@ -370,7 +369,7 @@ function SVSLog($string, $type = "") : void
 
 	elseif (isset($serv)) // if nobody connected yet, fkn log using the server!!
 	{
-		S2S("PRIVMSG ".$cf['logchan']." :".$string);
+		S2S("PRIVMSG ".Conf::$settings['log']['channel']." :".$string);
 	}
 	log_to_disk($string);
 }
@@ -736,9 +735,8 @@ function strlprefix(&$targ,$string,$size)
 
 function svslogin($uid, $account, $by = NULL)
 {
-	global $cf;
 
-	$by = ($by) ? $by->uid : $cf['sid'];
+	$by = ($by) ? $by->uid : Conf::$settings['info']['SID'];
 	S2S(":$by SVSLOGIN * $uid $account");
 	
 }
@@ -757,26 +755,23 @@ function svslogin($uid, $account, $by = NULL)
 function DoCloak($uid,$account)
 {
 	$u = new WPUser($account);
+	$au = new User($uid);
 	
-	global $cf;
-	$clk = (isset($cf['cloak_users'])) ? $cf['cloak_users'] : false;
-
-	if (!$clk) // if we are not cloaking the user
-		return;
 	$cloak = "";
 	$rank = cloak_rank($u);
 	if ($clk == true) //de folt
-		$cloak = $cf['network']."/".$rank."/".$account;
+		$cloak = Conf::$settings['info']['network-name']."/".$rank."/".$account;
 	
 	else // they doing a custom one
 	{
 		$cloak = str_replace("%r",$rank,$clk);
 		$cloak = str_replace("%a",$account,$clk);
-		$cloak = str_replace("%n",$cf['network'],$clk);
+		$cloak = str_replace("%n",Conf::$settings['info']['network-name'],$clk);
 	}
-
+	if ($au->cloak == $cloak) // if this is already their cloak, abort
+		return;
 	/* actually set the cloak */
-	$send = "CHGHOST $uid :$cloak";
+	$send = "CHGHOST $uid $cloak";
 	S2S($send); // send it out
 	Buffer::add_to_buffer($send); // we also need to process it, this is the quickest way	
 }
@@ -880,8 +875,7 @@ function is_invalid_hostmask_char($char)
 /* If we are running in debug mode */
 function IsDebugMode()
 {
-	global $cf;
-	if (isset($cf['debugmode']) && $cf['debugmode'] == "on")
+	if (isset(Conf::$settings['log']['debug']) && Conf::$settings['log']['debug'])
 		return true;
 	return false;
 }
@@ -891,8 +885,6 @@ function DebugLog($string, $type = "") : void
 
 	if (!IsDebugMode())
 		return;
-	/* affix a type */
-	global $cf,$serv;
 	$string = "[DEBUG]".trim($type)." ".$string;
 
 	echo $string."\n";
@@ -901,9 +893,8 @@ function DebugLog($string, $type = "") : void
 
 function LogChan()
 {
-	global $cf;
-	if (isset($cf['logchan']))
-		return $cf['logchan'];
+	if (isset(Conf::$settings['log']['channel']))
+		return Conf::$settings['log']['channel'];
 	else
 		return "#services";
 }
@@ -974,6 +965,7 @@ function local_rpc_call($json)
 				$json);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	$server_output = curl_exec($ch);
+	
 	curl_close ($ch);
 	$json = json_decode($server_output, true);
 	return $json;

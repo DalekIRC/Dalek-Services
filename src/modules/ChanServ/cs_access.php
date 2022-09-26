@@ -133,7 +133,7 @@ class cs_access {
 			return;
 		}
 
-		if (!strcasecmp($control,"add") && strcasecmp($lvl,"owner") && strcasecmp($lvl,"admin") && strcasecmp($lvl,"op") && strcasecmp($lvl,"halfop") && strcasecmp($lvl,"voice"))
+		if (!strcasecmp($control,"add") && strcasecmp($lvl,"owner") && strcasecmp($lvl,"admin") && strcasecmp($lvl,"operator") && strcasecmp($lvl,"halfop") && strcasecmp($lvl,"voice"))
 		{
 			sendnotice($nick, $cs, $mtags, "Invalid access level: \"$lvl\"");
 			return;

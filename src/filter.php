@@ -1,6 +1,27 @@
 <?php
-
-/* TO-DO */
+/*				
+//	(C) 2021 DalekIRC Services
+\\				
+//			pathweb.org
+\\				
+//	GNU GENERAL PUBLIC LICENSE
+\\							v3
+//				
+\\				
+//				
+\\	Title:		Filtering
+//				
+\\	Desc:		Provides the ability to use filters on pseudoclients in modules
+//				That is, to replace certain things in their outputs with other things
+\\				
+//				
+\\				
+//				
+\\	Version:	1
+//				
+\\	Author:		Valware
+//				
+*/
 class Filter
 {
 	static $filter_list = [];

@@ -119,9 +119,8 @@ class JupeServer {
 	}
 	function connect()
 	{
-		global $cf;
-		S2S(":".$cf['sid']." SQUIT $this->name :$this->description");
-		S2S(":".$cf['sid']." SID $this->name 2 $this->sid :$this->description");
+		S2S(":".Conf::$settings['info']['SID']." SQUIT $this->name :$this->description");
+		S2S(":".Conf::$settings['info']['SID']." SID $this->name 2 $this->sid :$this->description");
 		S2S(":$this->sid SINFO 99999999999 6000 dhiopqrstwxzBDGHIRSTWZ beI,fkL,lH,cdgimnprstzCDGKMNOPQRSTVWZ * DALEK");
 		S2S(":$this->sid EOS");
 		$array = array(
@@ -129,7 +128,7 @@ class JupeServer {
 			"hops" => 1,
 			"sid" => $this->sid,
 			"desc" => $this->description,
-			"intro_by" => $cf['sid']);
+			"intro_by" => Conf::$settings['log']['channel']);
 		hook::run("SID", $array);
 	}
 	function die()

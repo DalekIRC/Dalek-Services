@@ -19,146 +19,171 @@
 \\	Author:		Valware
 //				
 */
-define("DALEK_VERSION", "Dalek-Services-0.1-git");
+require_once("misc.php");
+define("DALEK_VERSION", "Dalek-Services-0.1.1-git");
 define("CONF_SYMBOL", "[CONFIG] ");
-
+$error = [];
+new Conf("/home/ircd/Dalek-Services/conf/dalek.conf", $error);
+if (!empty($error))
+{
+	echo "Configuration test failed. Dalek encountered the following error(s):\n";
+	foreach($error as $err)
+		echo $err."\n";
+}
 class Conf
 {
-
-	static $arrae = []; // de arrae we is using lol
-	static $list = NULL;
-	static function run($by = "SSH Admin") // to run on startup
+	static $settings_short = [];
+	static $settings_temp = [];
+	static $settings = [];
+	function __construct($filename, &$error)
 	{
-		global $cf;
-		$confile = DALEK_CONF_DIR . "/dalek.conf";
-
-		/* empty the list first */
-		self::$arrae = [];
-		if (!file_exists($confile))
-			config_fail("No configuration file detected.\n".
-				"Please make sure you have a valid /conf/dalek.conf file\n",$by);
-		$file = file_get_contents($confile);
-		if (!$file)
-		  config_fail("Config file was found, but there were no contents.\n".
-				"Please make sure you have a valid /conf/dalek.conf file\n");
-	   
-		Conf::parse_config($file, $by);
-		
-		self::$list = (object)self::$arrae;
-		//var_dump(self::$list);
+		if (!is_file($filename))
+		{
+			$error[] = "Not a valid configuration file: $filename";
+		}
+		else
+		{
+			$file = file_get_contents($filename);
+			$file = preg_replace('/\/\*(.|\s)*?\*\//', '', $file);
+			$file = preg_replace('/\/\/(.|\s)*?\n/', '', $file);
+			$file = str_replace("\t"," ",$file);
+			$file = str_replace("\n\n","\n",$file);
+			$file = str_replace("\n", " ",$file);
+			for(; strstr($file,"  ");)
+				$file = str_replace("  "," ",$file);
+			$config = $this->parse_config($file, $error);
+		}
 	}
 
-	/* Turns a file as a string into an array of objects
-	 * representing each config block.
-	 */
-	static function parse_config(&$file, $by)
+	private function parse_config($string, &$error)
 	{
-		$config = array(); // de arrae we going to return and get a fkn refund
-
-		/* Strip comments like this one lol */
-		$file = preg_replace('/\/\*(.|\s)*?\*\//', '
-		', $file);
-		$file = preg_replace('/\/\/(.|\s)*?\n/', '
-		', $file);
-		$file = preg_replace('/#(.|\s)*?\n/', '
-		', $file);
-		$file = str_replace("	"," ",$file);
-		//$file = str_replace("  ", " ",$file);
-		$c = split($file); // split words up into arrae
-		$line = 1; // where we are keeping track of line numbers for the error printer
-
-		$r = "";
-
-		$entry = NULL; // an entry for the config that we add below;
-		$option = NULL; // the option for the entry
-
-		if (dcount_chars($file,"{") !== dcount_chars($file,"}"))
-			config_fail("Odd amount of curly braces", $by);
-
-		foreach ($c as $i => &$word)
+		$tok = split($string);
+		$n = 0;
+		$blockstring = "";
+		$full = "";
+		foreach($tok as $str)
 		{
-			for ($i = 0; isset($word[$i]); $i++)
-			{
-				$char = $word[$i];
-				$double = (isset($word[$i + 1])) ? $word[$i].$word[$i + 1] : $word[$i];
-				
-					
-				// if it's a newline, increment the line count and continue
-				if ($char == "\n")
-				{
-					$r .= "\n";
-					$line++;
-					continue;
-				}
-
-				// if it's a tab, ignore it
-				if ($char == "\t")
-				{
-					$r .= " ";
-					continue;
-				}
-				
-				$r .= $char;
-			}
+			$str = trim($str);
+			if (!strcmp($str,"{") && mb_substr($blockstring,-2,2) !== "::")
+				strcat($blockstring,"::");
 			
-			$r .= " ";
+			elseif (!strcmp($str,"}"))
+			{
+				$p = $blockstring;
+				$split = split($blockstring,"::");
+				if (BadPtr($split[sizeof($split) - 1]))
+					unset($split[sizeof($split) - 1]);
+				unset($split[sizeof($split) - 1]);
+				$blockstring = glue($split,"::");
+				if (!BadPtr($blockstring))
+				{
+					strcat($blockstring,"::");
+				}
+			}
+			// if we found a value and it's time to go to the next one
+			elseif (!BadPtr($str) && $str[strlen($str) - 1] == ";")
+			{
+				if (substr_count($str,"\"") != 1)
+					strcat($blockstring, "::".rtrim($str,";")); // finish off our item
+				else strcat($blockstring, " ".rtrim($str,";"));
+				strcat($full,str_replace(["::::", "\""],["::", ""],$blockstring)."\n"); // add the full line to our $full variable
+				
+				/* rejig the blockstring */
+				$split = split($blockstring,"::");
+				if (BadPtr($split[sizeof($split) - 1]))
+					unset($split[sizeof($split) - 1]);
+				unset($split[sizeof($split) - 1]);
+				unset($split[sizeof($split) - 1]);
+				$blockstring = glue($split,"::");
+				if (!BadPtr($blockstring))
+				{
+					rtrim($blockstring,":");
+					strcat($blockstring,"::");
+				}
+			}
+
+			else
+			{	if (!BadPtr($blockstring) && mb_substr($blockstring,-2,2) !== "::")
+					strcat($blockstring," ");
+				strcat($blockstring,$str);
+			}
 		}
-		if (BadPtr($r))
-			config_fail("Invalid configuration. Is it empty?", $by);
+		$full = split($full,"\n");
+		$long = [];
 
-		conf2json2array2obj($r);
-	}
-}
-
-function config_fail($reason = "No reason provided", $user = NULL)
-{
-	SVSLog("Configuration failed to pass: $reason");
-
-	if (IsConnected() && $user)
-		sendnotice($user, NULL, NULL, "Configuration failed to pass:", $reason);
-
-	if (!IsConnected()) // if we're not connected yet, let it die
-		die($reason);
-}
-
-
-function conf2json2array2obj(&$conf)
-{
-	$c = explode("\n",$conf);
-	$Conf = [];
-	$json = "{";
-	foreach($c as $line)
-	{
-		if (BadPtr($line))
-			continue;
-		
-		
-		$tok = split($line);
-		
-		for ($i = 0; $i <= count($tok) - 1; $i++)
+		foreach($full as $config_item)
 		{
-			if ($tok[0] == "{")
-				strcat($json," { ");
+			$arr = &$long;
+			self::$settings_short[] = $config_item;
+			$tok = split($config_item,"::");
+			for ($i = 0; $i <= count($tok); $i++)
+			{
+				if (isset($tok[$i + 2]))
+					$arr = &$arr[$tok[$i]];					
+				
+				elseif (isset($tok[$i + 1]) && isset($tok[$i - 1]))
+					$arr[$tok[$i]] = $tok[$i + 1];
 
-			elseif ($tok[0] == "}")
-				strcat($json, " }, ");
-
-			elseif (strstr($tok[0],";"))
-				$value = $tok[0];
-
+				elseif (isset($tok[$i + 1]))
+					$arr[$tok[$i]][] = $tok[$i + 1];
+			}
 		}
+		self::$settings_temp = $long;
+		$cf = &self::$settings_temp;
+		if (!isset($cf['info']))
+			$error[] = "No info block was found.";
+
+		if (!isset($cf['info']['SID']))
+			$error[] = "'info::SID' not found.";
+
+		if (!isset($cf['info']['network-name']))
+			$error[] = "'info::network-name' not found.";
+
+		if (!isset($cf['info']['services-name']))
+			$error[] = "'info::services-name' not found.";
+
+		if (!isset($cf['info']['admin-email']))
+			$error[] = "'info::admin-email' not found.";
+
+		if (!isset($cf['link']))
+			$error[] = "No link block was found.";
+
+		if (!isset($cf['link']['hostname']))
+			$error[] = "'link::hostname' not found.";
+
+		if (!isset($cf['link']['port']))
+			$error[] = "'link::port' not found.";
+
+		if (!isset($cf['link']['password']))
+			$error[] = "'link::password' not found.";
+			
+		if (!isset($cf['sql']))
+			$error[] = "No sql block was found.";
+
+		if (!isset($cf['sql']['hostname']) && !isset($cf['sql']['sockfile']))
+			$error[] = "'sql::hostname' and 'sql::sockfile' not found. You must choose one.";
+		
+		if (isset($cf['sql']['hostname']) && isset($cf['sql']['sockfile']))
+			$error[] = "'sql::hostname' and 'sql::sockfile' are both defined. You must choose one.";
+
+		if (!isset($cf['sql']['port']) && isset($cf['sql']['hostname']))
+			$error[] = "'sql::hostname' found but not 'sql::port'.";
+
+		if (!isset($cf['wordpress']))
+			$error[] = "No wordpress block was found.";
+			
+		if (!isset($cf['wordpress']['prefix']))
+			$error[] = "'wordpress::prefix' not found";
+
+		if (!empty($error))
+		{
+			self::$settings_temp = [];
+			return false;
+		}
+		self::$settings = self::$settings_temp;
+		self::$settings_temp = [];
+		
 	}
 }
 
-
-class ConfigEntry {
-
-	/* Fillable */
-	public $name = NULL;
-	public $value = NULL; // can be 
-	public $modname = NULL;
-	public $next,$prev = NULL;
-
-	function __construct(){}
-}
 

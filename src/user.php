@@ -29,8 +29,6 @@ class User {
 	
 	public function __construct($user)
 	{
-		global $cf;
-
 		$this->IsClient = false;
 		$this->IsWordPressUser = false;
 		$this->IsServer = false;
@@ -95,8 +93,8 @@ class User {
 		}
 		else {
 			$this->IsServer = true;
-			$this->nick = $cf['servicesname'];
-			$this->uid = $cf['sid'];
+			$this->nick = Conf::$settings['info']['services-name'];
+			$this->uid = Conf::$settings['info']['SID'];
 		}
 	}
 	function NewNick($nick)

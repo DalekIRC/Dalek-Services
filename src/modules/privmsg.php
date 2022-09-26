@@ -120,7 +120,7 @@ class privmsg {
 			hook::run(HOOKTYPE_CHANNEL_MESSAGE, $u);
 			return;
 		}
-
+		else hook::run(HOOKTYPE_USER_MESSAGE, $u);
 		$client = NULL;
 		/* Bot-check
 		 * Here is where we check if we're supporting botz and if so, deal w/ it

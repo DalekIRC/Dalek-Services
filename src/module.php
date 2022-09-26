@@ -122,7 +122,7 @@ class Module
 		rpc_append_result($reply, Module::$modules);
 		rpc_append_id($reply, $id);
 		rpc_send_reply($id, $reply);
-		SVSLog("[RPC] Request to list modules");
+		DebugLog("[RPC] Request to list modules");
 	}
 
 	/* RPC functions */
@@ -131,7 +131,7 @@ class Module
 		$reply = rpc_new_reply();
 		if (count($params) != 1)
 		{
-			rpc_append_error($reply, "You may only specify one module per request", RPC_ERR_SEVER_ERROR);
+			rpc_append_error($reply, "You may only specify one module per request", RPC_ERR_API_CALL_DENIED);
 			rpc_append_id($reply, $id);
 			rpc_send_reply($id, $reply);
 			SVSLog("[RPC] Erroneous module.load request: Too many targets");
@@ -139,7 +139,7 @@ class Module
 		}
 		elseif (!loadmodule($params['module']))
 		{
-			rpc_append_error($reply, "Module failed to load \"".$params['module']."\"", RPC_ERR_SEVER_ERROR);
+			rpc_append_error($reply, "Module failed to load \"".$params['module']."\"", RPC_ERR_API_CALL_DENIED);
 			rpc_append_id($reply, $id);
 			rpc_send_reply($id, $reply);
 			SVSLog("[RPC] Erroneous module.load request: Unknown reason");
@@ -156,7 +156,7 @@ class Module
 		$reply = rpc_new_reply();
 		if (count($params) != 1)
 		{
-			rpc_append_error($reply, "You may only specify one module per request", RPC_ERR_SEVER_ERROR);
+			rpc_append_error($reply, "You may only specify one module per request", RPC_ERR_API_CALL_DENIED);
 			rpc_append_id($reply, $id);
 			rpc_send_reply($id, $reply);
 			SVSLog("[RPC] Erroneous module.unload request: Too many targets");
@@ -164,7 +164,7 @@ class Module
 		}
 		elseif (!unloadmodule($params['module']))
 		{
-			rpc_append_error($reply, "Module failed to unload \"".$params['module']."\": Module was not loaded", RPC_ERR_SEVER_ERROR);
+			rpc_append_error($reply, "Module failed to unload \"".$params['module']."\": Module was not loaded", RPC_ERR_API_CALL_DENIED);
 			rpc_append_id($reply, $id);
 			rpc_send_reply($id, $reply);
 			SVSLog("[RPC] Erroneous module.unload request: Module was not unloaded");

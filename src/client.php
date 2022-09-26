@@ -30,7 +30,7 @@ class Client {
 
 	function __construct($nick,$ident,$hostmask,$uid = NULL, $gecos ,$modinfo = NULL)
 	{
-		global $servertime,$cf;
+		global $servertime;
 		
 		$this->nick = $nick;
 		$this->uid = $uid = generate_uid($nick);
@@ -46,13 +46,13 @@ class Client {
 			'usermodes' => "+oiqS",
 			'cloak' => $hostmask,
 			'ip' => "",
-			'sid' => $cf['sid'],
+			'sid' => Conf::$settings['info']['SID'],
 			'ipb64' => "",
 			'gecos' => $gecos);
 		hook::run("UID", $array);
 		self::add_to_client_list($this);
 		
-		$this->join($cf['logchan']);
+		$this->join(Conf::$settings['log']['channel']);
 		
 		
 	}
@@ -121,10 +121,9 @@ class Client {
 
 		S2S("$mtags_to_send :$this->uid TAGMSG $dest");
 	}
-	function log($string){
-		global $cf;
-		
-		$this->msg($cf['logchan'],$string);
+	function log($string)
+	{
+		$this->msg(Conf::$settings['log']['channel'],$string);
 	}
 		
 	function join(...$dests)
@@ -137,7 +136,8 @@ class Client {
 			if ($chan->HasUser($this->uid))
 				return;
 			$timestamp = (isset($chan->timestamp)) ? $chan->timestamp : $servertime;
-			S2S("SJOIN $timestamp $dest $chan->modes :~@".$this->uid);
+			$modes = (isset($chan->modes)) ? $chan->modes : "";
+			S2S("SJOIN $timestamp $dest $modes :~@".$this->uid);
 			$sql->insert_ison($dest,$this->uid);
 		}
 	}
@@ -315,6 +315,5 @@ class Client {
 
 function generate_uid($str)
 {
-	global $cf;
-	return $cf['sid'].strtoupper(mb_substr(md5($str),0,6));
+	return Conf::$settings['info']['SID'].strtoupper(mb_substr(md5($str),0,6));
 }

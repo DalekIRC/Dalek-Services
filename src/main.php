@@ -38,8 +38,9 @@ define("DALEK_CONF_DIR", getenv("DALEK_CONF_DIR") ?: __DIR__."/../conf");
 define("DALEK_LOG_DIR", getenv("DALEK_LOG_DIR") ?: __DIR__."/../logs");
 
 include DALEK_CONF_DIR . '/dalek.conf';
-global $cf,$sql,$server,$port,$serv,$servertime;
+global $sql,$server,$port,$serv,$servertime;
 include "misc.php";
+
 include "conf.php";
 include "language.php";
 include "hook.php";
@@ -59,18 +60,16 @@ include "buffer.php";
 
 //include "plugins/PATHWEB/uplink.php";
 // Server config
-$server = $cf['uplink'];
-$port = $cf['port'];
-$mypass = $cf['serverpassword'];
+$server = Conf::$settings['link']['hostname'];
+$port = Conf::$settings['link']['port'];
+$mypass = Conf::$settings['link']['password'];
 
-/* Config run */
-Conf::run();
 
 // SQL config
-$sqlip = $cf['sqlip'];
-$sqluser = $cf['sqluser'];
-$sqlpass = $cf['sqlpass'];
-$sqldb = $cf['sqldb'];
+$sqlip = Conf::$settings['sql']['hostname'];
+$sqluser = Conf::$settings['sql']['username'];
+$sqlpass = Conf::$settings['sql']['password'];;
+$sqldb = Conf::$settings['sql']['database'];
 $arr = [];
 $sql = new SQL($sqlip,$sqluser,$sqlpass,$sqldb); hook::run("preconnect", $arr);
 /* Okay, we've established all the information lmao, let's load the modules */
@@ -104,7 +103,7 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 		continue;
 
 	log_to_disk($input);
-	if ($cf['debugmode'] == "on")
+	if (Conf::$settings['log']['debug'] == "yes")
 		echo "[\e[0;30;47mRECV\e[0m] ".$input."\n";
 	
 	flush();
@@ -171,7 +170,7 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 			
 			$pass = mb_substr($splittem[1],1);
 			
-			if ($pass !== $cf['serverpassword'])
+			if ($pass !== Conf::$settings['link']['password'])
 				die("Passwords do not match.");
 			
 			$array = [];

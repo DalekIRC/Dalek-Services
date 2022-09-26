@@ -64,7 +64,7 @@ class BugServ {
 
 	static function spawn_client()
 	{
-		global $BugServ,$cf;
+		global $BugServ;
 		/* spawn client with $bbs
 		 * You don't need to store this anywhere as it's done automatically
 		 * You can find this client from anywhere by finding the global $BugServ:

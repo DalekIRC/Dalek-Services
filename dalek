@@ -77,7 +77,7 @@ dalek_restart()
 
 dalek_help_display()
 {
-	echo "******** DALEK HELP *******"
+	echo "-----oOo----- DALEK HELP ----oOo----"
 	echo " "
 	echo "dalek start		Starts Dalek Services and RPC WebServer"
 	echo "dalek stop		Stops Dalek Services and RPC WebServer"
@@ -85,9 +85,13 @@ dalek_help_display()
 	echo "dalek genconf		Generates an UnrealIRCd link block for unrealircd.conf"
 	echo "dalek module		Parameters: ./dalek module <list|load|unload> [<module>]"
 	echo "dalek help		Shows this list"
+	echo "-----oOo---------oOo---------oOo----"
 	echo " "
+	echo "----oOo---- Did you know ----oOo----"
+	echo "Did you know?"
 	echo "./dalek works better with dialog installed!"
-	echo "Install dialog (sudo apt install dialog) and run ./dalek to try out the good interface!"
+	echo "Install dialog using your package manager and run ./dalek to try out the good interface!"
+	echo "***************************"
 	
 }
 

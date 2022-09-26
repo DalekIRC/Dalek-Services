@@ -31,7 +31,7 @@ class md {
 	public $description = "Provides MD compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -92,7 +92,6 @@ class md {
 	 */
 	public static function cmd_md($u)
     {
-		global $cf;
 		$parv = split($u['params']);
 		$target = $parv[1];
 		$key = $parv[2];
@@ -130,7 +129,7 @@ class md {
 
 		if ($return == -1)
 		{
-			S2S(":".$cf['servicesname']." MD ".($isChan) ? "channel" : "client"." ".$parv[2]." :0");
+			S2S(":".Conf::$settings['info']['SID']." MD ".($isChan) ? "channel" : "client"." ".$parv[2]." :0");
 			return;	
 		}
 
@@ -146,7 +145,7 @@ class md {
 			return false;
 
 
-		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user_meta WHERE UID = ? AND meta_key");
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user_meta WHERE UID = ? AND meta_key = ?");
 		$prep->bind_param("ss",$person,$key);
 		$prep->execute();
 		$result = $prep->get_result();

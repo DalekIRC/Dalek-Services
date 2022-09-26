@@ -79,8 +79,6 @@ class registration {
 	 */
 	public static function cmd_registration($u)
 	{
-		global $cf;
-
 		/* User object of caller */
 		$nick = $u['nick'];
 
@@ -104,7 +102,7 @@ class registration {
 		$data3 = str_replace($tok[0]." :","",$u['params']);
 
 		/* if it's not for us, leave it alone */
-		if (strcmp($cf['servicesname'], $dest) && strcmp($cf['sid'], $dest))
+		if (strcmp(Conf::$settings['info']['services-name'], $dest) && strcmp(Conf::$settings['info']['SID'], $dest))
 			return;
 
 		/* User is attempting to register */

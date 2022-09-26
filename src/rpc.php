@@ -21,8 +21,7 @@
 //				
 */
 
-if (file_exists("../../../conf/dalek.conf"))
-	require_once("../../../conf/dalek.conf");
+
 if (file_exists("../../misc.php"))
 	require_once("../../misc.php");
 if (file_exists("../../hook.php"))
@@ -30,9 +29,6 @@ if (file_exists("../../hook.php"))
 if (file_exists("../../sql.php"))
 	require_once("../../sql.php");
 
-
-
-global $cf;
 
 /* JSON-RPC version */
 const JSON_RPC_VERSION = "2.0";
@@ -399,7 +395,13 @@ function rpc_check()
 	if (empty_pipe($pipe->pipe)) // nothing do deal with =]
 		return;
 
-	$contents = split(file_get_contents($pipe->pipe), RPC_MAGIC_LEVEL);
+	$contents = file_get_contents($pipe->pipe);
+	if (!$contents)
+	{
+		unset($contents);
+		return;
+	}
+	$contents = split($contents, RPC_MAGIC_LEVEL);
 	if (!count($contents))
 		return;
 	for ($i = 1; isset($contents[$i]); $i++)
@@ -410,13 +412,15 @@ function rpc_check()
 			continue;
 		RPC::run($parv[1], $parv[0], $parv[2]);
 	}
+	unset($contents);
 }
 
 function empty_pipe($src)
 {
-	$contents = split(file_get_contents($src), RPC_MAGIC_LEVEL);
-	if ($contents == false)
+	$contents = file_get_contents($src);
+	if ($contents == false || !$contents)
 		return false;
+	$contents = split($contents, RPC_MAGIC_LEVEL);
 	$c = count($contents);
 
 	if ($c == 1)
