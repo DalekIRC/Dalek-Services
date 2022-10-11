@@ -58,7 +58,6 @@ class fakelag {
         /* Let's check the config */
         __FakeLag::config_check();
         hook::func(HOOKTYPE_REHASH, '__FakeLag::config_check');
-
 		return true;
 	}
 }
@@ -69,14 +68,15 @@ class __FakeLag {
 	public static $list = [];
     public static $active = 0;
 
+	
     /**Our config checking */
     public static function config_check()
     {
-        if (isset(Conf::$settings['security settings']['fakelag']) && (Conf::$settings['security settings']['fakelag']['active'] == "yes"))
+        if (isset(Conf::$settings['security settings']['fakelag']) && Conf::$settings['security settings']['fakelag']['active'] == "yes")
         {
             self::$active = 1;
             if (!isset(Conf::$settings['security settings']['fakelag']['limit']) || !is_numeric(Conf::$settings['security settings']['fakelag']['limit']))
-                Conf::$settings['security']['fakelag']['limit'] = 10;
+                Conf::$settings['security settings']['fakelag']['limit'] = 10;
         }
         else self::$active = 0;
     }
@@ -111,7 +111,7 @@ class __FakeLag {
 			if ($item->lag_until <= servertime())
 				unset(self::$list[$key]);
 
-			elseif ($item->lag_until - servertime() >= Conf::$settings['security']['fakelag']['limit'])
+			elseif ($item->lag_until - servertime() >= Conf::$settings['security settings']['fakelag']['limit'])
 			{
 				$qmsg = "Your connection has been exterminated: Flood";
 				S2S("KILL $item->uid :$qmsg");

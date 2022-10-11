@@ -79,27 +79,6 @@ class privmsg {
 		$nick = $u['nick'];
 		/* if we've got the module loaded for fakelag and
 			if they're fakelagged */ 
-		if (module_exists("fakelag") && $nick->IsUser && !$nick->IsService && !IsOper($nick))
-		{
-			if (IsFakeLag($nick))
-			{
-				if (!isset($u['mtags'][RECYCLED_MESSAGE]))
-				{
-					add_fake_lag($nick, 1);
-				}
-				if (!$nick)
-					return;
-				add_mtag($u['mtags'], RECYCLED_MESSAGE, "true"); // let future us know it's a recycled message lol
-				Buffer::add_to_buffer(array_to_mtag($u['mtags'])." ".$u['raw']); // recycle it to the buffer
-				return;
-			}
-			else add_fake_lag($nick, 1);
-		}
-
-		/* User may have been killed from fake lag so $nick now has the potential to be NULL,
-		   so lets just make sure we're still here */
-		if (!$nick)
-			return;
 		
 		update_last($nick->nick);
 
@@ -121,6 +100,27 @@ class privmsg {
 			return;
 		}
 		else hook::run(HOOKTYPE_USER_MESSAGE, $u);
+		if (module_exists("fakelag") && $nick->IsUser && !$nick->IsService && !IsOper($nick))
+		{
+			if (IsFakeLag($nick))
+			{
+				if (!isset($u['mtags'][RECYCLED_MESSAGE]))
+				{
+					add_fake_lag($nick, 1);
+				}
+				if (!$nick)
+					return;
+				add_mtag($u['mtags'], RECYCLED_MESSAGE, "true"); // let future us know it's a recycled message lol
+				Buffer::add_to_buffer(array_to_mtag($u['mtags'])." ".$u['raw']); // recycle it to the buffer
+				return;
+			}
+			else add_fake_lag($nick, 1);
+		}
+
+		/* User may have been killed from fake lag so $nick now has the potential to be NULL,
+		   so lets just make sure we're still here */
+		if (!$nick)
+			return;
 		$client = NULL;
 		/* Bot-check
 		 * Here is where we check if we're supporting botz and if so, deal w/ it
