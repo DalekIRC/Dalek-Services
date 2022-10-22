@@ -157,6 +157,12 @@ class Conf
 		if (!isset($cf['link']['password']))
 			$error[] = "'link::password' not found.";
 			
+		if (!isset($cf['log']))
+			$error[] = "No log block was found.";
+
+		if (!isset($cf['log']['debug']))
+			$error[] = "'log::debug' not found.";
+
 		if (!isset($cf['sql']))
 			$error[] = "No sql block was found.";
 
