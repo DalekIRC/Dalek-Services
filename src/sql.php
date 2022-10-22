@@ -441,7 +441,7 @@ function sqlnew()
 	if (!isset(Conf::$settings['sql']['sockfile']) || is_null(Conf::$settings['sql']['sockfile']))
 		$conn = mysqli_connect(Conf::$settings['sql']['hostname'],Conf::$settings['sql']['username'],Conf::$settings['sql']['password'],Conf::$settings['sql']['database'],Conf::$settings['sql']['port'] = "3306");
 	else
-		$conn = mysqli_connect(Conf::$settings['sql']['hostname'],Conf::$settings['sql']['username'],Conf::$settings['sql']['password'],Conf::$settings['sql']['database'],Conf::$settings['sql']['port'] = "3306",Conf::$settings['sql']['sockfile']);
+		$conn = mysqli_connect("",Conf::$settings['sql']['username'],Conf::$settings['sql']['password'],Conf::$settings['sql']['database'],Conf::$settings['sql']['port'] = "3306",Conf::$settings['sql']['sockfile']);
 
 	if ($conn->connect_error)
 	{
