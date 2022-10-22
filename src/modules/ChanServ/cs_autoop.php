@@ -149,7 +149,7 @@ class cs_autoop {
 		return false;
 	}
 
-	function is_autoop(WPUser $nick,$chan)
+	static function is_autoop(WPUser $nick,$chan)
 	{
 		$conn = sqlnew();
 		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."account_settings WHERE account = ?");
