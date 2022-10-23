@@ -1,3 +1,5 @@
+# <img width="50" height="35" src="https://i.imgur.com/w6cScKo.png"> Dalek IRC Services
+
 [![Version](https://img.shields.io/badge/Extermin-8-red.svg)]()
 [![Version](https://img.shields.io/badge/Beta-0.1-blue.svg)]()
 [![Version](https://img.shields.io/badge/Status-Work%20In%20Progress-cyan.svg)]()
@@ -5,8 +7,6 @@
 [![Maintainer](https://img.shields.io/badge/Developer-Valware-purple.svg)](https://github.com/ValwareIRC/)
 [![Unreal](https://img.shields.io/badge/UnrealIRCd-6.0_or_later-green.svg)](https://unrealircd.org)
 [![WP](https://img.shields.io/badge/WordPress-6.0_or_later-green.svg)](https://wordpress.com)
-
-# <img width="50" height="35" src="https://i.imgur.com/w6cScKo.png"> Dalek IRC Services
 
 Dalek IRC Services with UnrealIRCd & WordPress integration tailored to you.<br><br>
 ### <img width="50" height="35" src="https://i.imgur.com/w6cScKo.png"> + <a href="https://github.com/unrealircd/unrealircd/"><img width="160" height="35" src="https://i.ibb.co/dB6H5Zq/Screenshot-from-2022-09-26-00-20-15.png"> </a> + <a href="https://github.com/wordpress/wordpress/"><img width="160" height="35" src="https://i.ibb.co/0c5NpSV/Word-Press-Logo-2003-2008.png"></a> = The <img width="60" height="35" src="https://www.seekpng.com/png/full/9-91160_future-services-inc.png"> 👉😎👉
