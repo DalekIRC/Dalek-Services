@@ -1,8 +1,3 @@
-
-
-[![CodeBabes](https://forthebadge.com/images/badges/built-by-codebabes.svg)]()
-[![SpagYetti](https://forthebadge.com/images/badges/contains-tasty-spaghetti-code.svg)]()<br>
-
 [![Version](https://img.shields.io/badge/Extermin-8-red.svg)]()
 [![Version](https://img.shields.io/badge/Beta-0.1-blue.svg)]()
 [![Version](https://img.shields.io/badge/Status-Work%20In%20Progress-cyan.svg)]()
