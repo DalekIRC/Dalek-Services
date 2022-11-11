@@ -63,7 +63,7 @@ class bbserv {
 
 	static function spawn_client()
 	{
-		global $bbserv,$bbs,$cf;
+		global $bbserv,$bbs;
 			
 		// spawn client with $bbs
 		$bbs = new Client($bbserv['nick'],$bbserv['ident'],$bbserv['hostmask'],$bbserv['uid'],$bbserv['gecos'],'bbserv');

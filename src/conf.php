@@ -19,6 +19,7 @@
 \\	Author:		Valware
 //				
 */
+require_once("hook.php");
 require_once("misc.php");
 define("DALEK_VERSION", "Dalek-Services-0.1.1-git");
 define("CONF_SYMBOL", "[CONFIG] ");
@@ -108,6 +109,10 @@ class Conf
 				strcat($blockstring,$str);
 			}
 		}
+		$temp_settings_file = fopen(DALEK_CONF_DIR."/.settings.temp","w");
+		fwrite($temp_settings_file, $full);
+		fclose($temp_settings_file);
+
 		$full = split($full,"\n");
 		$long = [];
 
@@ -180,10 +185,50 @@ class Conf
 			self::$settings_temp = [];
 			return false;
 		}
+		$arr = ['cfg' => $cf, 'err' => &$error];
+		hook::run(HOOKTYPE_CONFIGTEST, $arr);
+		if (!empty($error))
+		{
+			self::$settings_temp = [];
+			return false;
+		}
 		self::$settings = self::$settings_temp;
 		self::$settings_temp = [];
 		
 	}
 }
 
+/**
+ * 2nd November 2022
+ * Added to easily get/find a config item.
+ * @param item String of config block directory, example:
+ * config_get_item("info::network-name")
+ * will return your network name.
+ * @return mixed Will return config item if not, or return DebugLog("") (which ultimately returns false)
+ */
+function config_get_item($item = NULL)
+{
+	$file_name = DALEK_CONF_DIR."/.settings.temp";
+	if (BadPtr($item))
+		return DebugLog("Did not specify an item");
+	if (!file_exists($file_name))
+		return DebugLog("Could not find settings.temp file. Try rehashing.");
 
+	$file = split(file_get_contents($file_name),"\n");
+
+	foreach($file as $line)
+	{
+		if (strstr($line,$item))
+		{
+			$linecount = substr_count($line,"::");
+			$itemcount = substr_count($item,"::");
+			if ($linecount !== $itemcount + 1)
+				continue;
+			
+			$tok = split($line,"::");
+			$value = $tok[count($tok) - 1];
+			return $value;
+		}
+	}
+	return DebugLog("Could not find config item '$item'");
+}

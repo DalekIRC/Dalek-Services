@@ -33,6 +33,9 @@ class registration {
 	public $version = "1.0";
 	public $official = true;
 
+
+	public static $reg_caps = "";
+
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
 	function __construct()
@@ -67,7 +70,8 @@ class registration {
 	{
 		if (!CommandAdd($this->name, 'REGISTRATION', 'registration::cmd_registration', 0))
 			return false;
-
+		hook::func(HOOKTYPE_CONFIGTEST, 'registration::configtest');
+		hook::func(HOOKTYPE_BURST, 'registration::configtest');
 		return true;
 	}
 
@@ -133,7 +137,7 @@ class registration {
 			$toCheck = NULL;
 
 			/* email already has an account, we don't allow multiples */
-			$toCheck = new WPUser($email, LKUP_BY_EMAIL);
+			$toCheck = new WPUser($email, LOOKUP_BY_EMAIL);
 			if ($toCheck->IsUser)
 			{
 				S2S("REGISTRATION $nick->nick $uid $ip R F UNACCEPTABLE_EMAIL $email :The email address you provided has been taken.");
@@ -149,7 +153,7 @@ class registration {
 			WPNewUser(["name" => $account, "email" => $email, "password" => $password]);
 
 
-			$ns->svslogin($uid,servertime());
+			$ns->svslogin($uid,$account);
 
 			S2S("REGISTRATION $nick->nick $uid $ip R S $account * :You have successfully registered your account");
 		}
@@ -168,4 +172,21 @@ class registration {
 
 		return $wpconfig['siteurl']."ircverify/?id=$p";
 	}
+	public static function configtest($sock)
+	{
+		$r = &self::$reg_caps;
+		$r = "";
+		if (($value = config_get_item("account-registration::before-connect")) && !strcmp($value,"yes"))
+			strcat($r,"before-connect,");
+		if (($value = config_get_item("account-registration::email-required")) && !strcmp($value,"yes"))
+			strcat($r,"email-required,");
+		if (($value = config_get_item("account-registration::custom-account-name")) && !strcmp($value,"yes"))
+			strcat($r,"custom-account-name");
+		$r = rtrim($r,",");
+
+		$sid = config_get_item("info::SID");
+		md::add($sid, "regkeylist", $r);
+		$sock->sendraw("MD client $sid regkeylist :$r");
+	}
+
 }

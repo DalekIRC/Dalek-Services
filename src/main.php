@@ -40,10 +40,10 @@ define("DALEK_LOG_DIR", getenv("DALEK_LOG_DIR") ?: __DIR__."/../logs");
 include DALEK_CONF_DIR . '/dalek.conf';
 global $sql,$server,$port,$serv,$servertime;
 include "misc.php";
-
-include "conf.php";
-include "language.php";
 include "hook.php";
+include "conf.php";
+include "numeric.php";
+include "language.php";
 include "rpc.php";
 include "serv.php";
 include "sql.php";

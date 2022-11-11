@@ -81,7 +81,7 @@ class topic {
 		self::update_topic($chan,utf8_encode($topic));
     }
 
-	private static function update_topic($chan,$topic)
+	public static function update_topic($chan,$topic)
 	{
 		$conn = sqlnew();
 		

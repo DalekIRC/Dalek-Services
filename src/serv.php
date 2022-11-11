@@ -69,7 +69,8 @@ class Server
 		$this->sendraw("SERVER $this->name 1 :Dalek IRC Services");
 		$this->sendraw("MD client $this->sid saslmechlist :PLAIN,EXTERNAL");
 		$this->sendraw("MD client $this->sid externalreglink :https://valware.uk/register");
-		$this->sendraw("MD client $this->sid regkeylist :before-connect,email-required,custom-account-name");
+		hook::run(HOOKTYPE_BURST, $this);
+		//$this->sendraw("MD client $this->sid regkeylist :before-connect,email-required,custom-account-name");
 		$this->sendraw("EOS");
 		
 
@@ -128,9 +129,9 @@ hook::func(HOOKTYPE_RAW, function($u)
 		"sid" => Conf::$settings['info']['SID'],
 		"desc" => Conf::$settings['info']['network-name'],
 		"intro_by" => $us);
-	hook::run("SID", $array);
+	hook::run(HOOKTYPE_SERVER_CONNECT, $array);
 	$var = [];
-	hook::run("start", $var);
+	hook::run(HOOKTYPE_START, $var);
 	
 });
 

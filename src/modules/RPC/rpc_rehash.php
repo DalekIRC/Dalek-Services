@@ -82,7 +82,7 @@ class rpc_rehash {
 				if (!$bool)
 				{
 					SVSLog("Could not rehash: $error", LOG_RPC);
-					rpc_append_error($reply, $error, RPC_INTERNAL_ERROR);
+					rpc_append_error($reply, $error, RPC_ERR_INTERNAL_ERROR);
 				}
 				else
 				{

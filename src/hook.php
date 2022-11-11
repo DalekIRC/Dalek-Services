@@ -65,10 +65,9 @@ define('HOOKTYPE_EOS', 'eos'); // end of sync
 define('HOOKTYPE_REHASH', 'rehash'); // when Dalek has been rehashed
 define('HOOKTYPE_USER_MD', 'usermd');
 define('HOOKTYPE_CHANNEL_MD', 'chanmd');
-
-
-
-
+define('HOOKTYPE_CONFIGTEST', 'cfgtest');
+define('HOOKTYPE_CONFIGRUN', 'cfgrun');
+define('HOOKTYPE_BURST', 'servburst');
 
 class hook {
 

@@ -95,7 +95,7 @@ class ns_regain {
 	 */
 	public static function cmd_regain($u)
 	{
-		global $ns,$servertime,$cf;
+		global $ns,$servertime;
 		$ns = $u['target'];
 		
 		$nick = $u['nick'];

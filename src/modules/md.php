@@ -204,6 +204,26 @@ class md {
 		return [];
 	}
 
+	public static function del(User $u, $key = NULL)
+	{
+		$conn = sqlnew();
+		if (!$conn)
+			return false;
+
+		if (!BadPtr($key))
+			$prep = $conn->prepare("DELETE FROM ".sqlprefix()."user_meta WHERE UID = ?");
+
+		else
+			$prep = $conn->prepare("DELETE FROM ".sqlprefix()."user_meta WHERE UID = ? AND meta_key = ?");
+
+		$bindparams = (BadPtr($key)) ? "s" : "ss";
+		if (BadPtr($key))
+			$prep->bind_param($bindparams,$u->uid);
+		else
+			$prep->bind_param($bindparams,$u->uid, $key);
+
+		$prep->execute();
+	}
 	public static function rpc_get($id, $params)
 	{
 		$reply = rpc_new_reply();

@@ -651,7 +651,7 @@ function duplicate_mtags(&$target, $current) : void
 */
 function BadPtr(&$tok)
 {
-	if (!isset($tok) ||	!$tok || strlen($tok) == 0)
+	if (!isset($tok) || empty($tok) || !$tok || strlen($tok) == 0)
 		return true;
 	return false;
 }
@@ -759,7 +759,8 @@ function DoCloak($uid,$account)
 	
 	$cloak = "";
 	$rank = cloak_rank($u);
-	if ($clk == true) //de folt
+	$clk = isset(Conf::$settings['cloak']);
+	if ($clk) //de folt
 		$cloak = Conf::$settings['info']['network-name']."/".$rank."/".$account;
 	
 	else // they doing a custom one
@@ -880,15 +881,16 @@ function IsDebugMode()
 	return false;
 }
 
-function DebugLog($string, $type = "") : void
+function DebugLog($string, $type = "")
 {
 
 	if (!IsDebugMode())
 		return;
-	$string = "[DEBUG]".trim($type)." ".$string;
-
+	$string = "[DEBUG]".trim($type)." ".$string."\n";
+	strcat($string,"Calling function: ".debug_backtrace()[1]['function']);
 	echo $string."\n";
 	log_to_disk($string);
+	return false;
 }
 
 function LogChan()

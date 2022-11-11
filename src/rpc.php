@@ -220,30 +220,39 @@ function rpc_dir()
 }
 
 
-/* RPC Shared pipe
+/** RPC Shared pipe
  * Example structure of pipe containing 1 request to listen channels matching "#dalek*":
- *------|--------------|-----------------|
+ *
  *   id |    method    |      params     |
  *------|--------------|-----------------|
  *  123 |  chan.list   |   [#dalek*]     |
- *------|--------------|-----------------|
+ * 	456 | etc... | etc... |
 */
 class RPCpipe
 {
+	/** Finds our pipe */
 	static function find_pipe()
 	{
 		return rpc_dir().RPC_PIPE;
 	}
+	/** Finds our response pipe */
 	static function find_responder()
 	{
 		return rpc_dir().RPC_RESPONSES;
 	}
+	
+	/**  Constructor requires no parameters */
 	function __construct()
 	{
 		$this->pipe = self::find_pipe();
 		$this->responder = self::find_responder();
 	}
 
+	/** Add information to our pipe
+	 * @param id ID of the request
+	 * @param method Method of the request
+	 * @param params The parameters associated with the method
+	 */
 	function add($id, $method, $params)
 	{
 		while ($this->IsBeingWritten($this->pipe)) // wait for it to become available
@@ -261,6 +270,9 @@ class RPCpipe
 		fclose($pipe);
 		return true;
 	}
+	/** Looks up an RPC request by ID
+	 * @param id
+	 */
 	function lookup($id)
 	{
 		while ($this->IsBeingWritten($this->pipe)) // wait for it to become available
@@ -275,6 +287,9 @@ class RPCpipe
 		}
 		return false;
 	}
+	/** Look up a reply by ID
+	 * @param id ID of the RPC command we are replying to
+	 */
 	function get_reply($id)
 	{
 		$contents = file_get_contents($this->responder);

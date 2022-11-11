@@ -82,7 +82,7 @@ class tkl {
 		$parv = explode(" ",$u['params']);
 		$add = ($parv[0] == "+") ? true : false;
 		$type = $parv[1];
-		$ut = $parv[2];
+		$ut = $parv[2]; // "user-thing" this is the ident portion, often "*"
 		$mask = $parv[3];
 		$set_by = $parv[4];
 		$expiry = $parv[5];

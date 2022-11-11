@@ -104,6 +104,9 @@ class whois {
 		$hostmask = (strpos($whois->usermode,"x")) ? $whois->cloak : $whois->realhost;
 		$showhost = (strpos($whois->usermode,"t")) ? $whois->cloak : $hostmask;
 
+		/* TO:DO
+		 * Convert to this: sendnumeric("%i %c %s :%s", RPL_AWAY, $nick, $whois->nick, "testing");
+		 */
 		/* Line 1 of whois */
 		S2S("311 $nick->nick $whois->nick $whois->ident $showhost * :$whois->gecos");
 		

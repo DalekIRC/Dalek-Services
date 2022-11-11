@@ -55,7 +55,7 @@ class cmd {
 	}
 }
 
-hook::func("raw", function($u)
+hook::func(HOOKTYPE_RAW, function($u)
 {
 	$parv = explode(" ", $u['string']);
 	$mtags = NULL;

@@ -9,9 +9,9 @@
 //				
 \\				
 //				
-\\	Title:		UMODE2
+\\	Title:		SVSO
 //				
-\\	Desc:		UMODE2 compatibility
+\\	Desc:		SVSO compatibility
 \\				
 //				
 \\				
@@ -23,12 +23,12 @@
 */
 
 /* class name needs to be the same name as the file */
-class umode2 {
+class svso {
 
 	/* Module handle */
 	/* $name needs to be the same name as the class and file lol */
-	public $name = "umode2";
-	public $description = "Provides UMODE2 compatibility";
+	public $name = "svso";
+	public $description = "Provides SVSO compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
 	public $official = true;
@@ -59,10 +59,6 @@ class umode2 {
 		/* the function is a string reference to this class, the cmd_elmer method (function) */
 		/* The last param is expected parameter count for the command */
 		/* (both point to the same function which determines) */
-
-		if (!CommandAdd($this->name, 'UMODE2', 'umode2::cmd_umode2', 1))
-			return false;
-
 		return true;
 	}
 
@@ -71,28 +67,21 @@ class umode2 {
 	 * In this example (and throughout the source), $u contains an array with
 	 * information passed along by the caller
 	 * $u['nick'] = User object
+	 * SVSO <uid|nick> <oper account> <operclass> <class> <modes> <snomask> <vhost>
 	 */
-	public static function cmd_umode2($u)
+	public static function send(User $user, $oper_account, $oper_class, $class = "-", $modes = "-", $snomask = "-", $vhost = "-")
 	{
-		/* Get the command that called us */
-		$cmd = $u['cmd'];
+		S2S("SVSO $user->nick $oper_account $oper_class $class $modes $snomask $vhost");
+		if (strcmp($modes,"-"))
+			update_usermode($user->uid, $user->usermode.$modes);
+		else
+			update_usermode($user->uid, $user->usermode."o");
+		if (strcmp($vhost,"-"))
+			update_host($user->uid,"$vhost",servertime());
 
-		/* User object of caller */
-		$nick = $u['nick'];
+		md::add($user->uid,"operlogin","services:$oper_account");
+		md::add($user->uid,"operclass","$oper_class");
 
-		/* Tokenise the incoming string into $parv */ 
-		$parv = explode(" ",$u['dest']);
-		
-		/* errors and shit lol */
-		if (count($parv) < $u['parc'])
-		{
-			S2S("461 $nick->nick $cmd :Need more parameters.");
-			return;
-		}
-
-        $nick->SetMode($u['dest']);
-
-		/* You don't HAVE to return, butt-fuck it */
 		return;
 	}
 }

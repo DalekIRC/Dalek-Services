@@ -141,7 +141,7 @@ class cs_autoop {
 		sendnotice($nick, $cs, $mtags, "Permission denied.");
 	}
 
-	function can_autoop($nick,Channel $channel)
+	public static function can_autoop($nick,Channel $channel)
 	{
 		$access = ChanAccess($channel,$nick);
 		if ($access == "owner" || $access == "operator" || $access == "admin")
@@ -149,7 +149,7 @@ class cs_autoop {
 		return false;
 	}
 
-	function is_autoop(WPUser $nick,$chan)
+	public static function is_autoop(WPUser $nick,$chan)
 	{
 		$conn = sqlnew();
 		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."account_settings WHERE account = ?");
@@ -169,7 +169,7 @@ class cs_autoop {
 		return $return;
 	}
 
-	function autoop_toggle(WPUser $nick,$chan,$toggle)
+	public static function autoop_toggle(WPUser $nick,$chan,$toggle)
 	{
 		$conn = sqlnew();
 		if (!$conn)
