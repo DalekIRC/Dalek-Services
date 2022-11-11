@@ -24,7 +24,7 @@ require_once("misc.php");
 define("DALEK_VERSION", "Dalek-Services-0.1.1-git");
 define("CONF_SYMBOL", "[CONFIG] ");
 $error = [];
-new Conf("/home/ircd/Dalek-Services/conf/dalek.conf", $error);
+new Conf(DALEK_CONF_DIR . "/dalek.conf", $error);
 if (!empty($error))
 {
 	echo "Configuration test failed. Dalek encountered the following error(s):\n";
@@ -162,6 +162,12 @@ class Conf
 		if (!isset($cf['link']['password']))
 			$error[] = "'link::password' not found.";
 			
+		if (!isset($cf['log']))
+			$error[] = "No log block was found.";
+
+		if (!isset($cf['log']['debug']))
+			$error[] = "'log::debug' not found.";
+
 		if (!isset($cf['sql']))
 			$error[] = "No sql block was found.";
 
