@@ -24,7 +24,7 @@ require_once("misc.php");
 define("DALEK_VERSION", "Dalek-Services-0.1.1-git");
 define("CONF_SYMBOL", "[CONFIG] ");
 $error = [];
-new Conf("/home/ircd/Dalek-Services/conf/dalek.conf", $error);
+new Conf(DALEK_CONF_DIR . "/dalek.conf", $error);
 if (!empty($error))
 {
 	echo "Configuration test failed. Dalek encountered the following error(s):\n";
