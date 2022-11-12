@@ -66,12 +66,9 @@ $mypass = Conf::$settings['link']['password'];
 
 
 // SQL config
-$sqlip = Conf::$settings['sql']['hostname'];
-$sqluser = Conf::$settings['sql']['username'];
-$sqlpass = Conf::$settings['sql']['password'];;
-$sqldb = Conf::$settings['sql']['database'];
 $arr = [];
-$sql = new SQL($sqlip,$sqluser,$sqlpass,$sqldb); hook::run("preconnect", $arr);
+$sql = new SQL();
+hook::run("preconnect", $arr);
 /* Okay, we've established all the information lmao, let's load the modules */
 
 
