@@ -52,7 +52,9 @@ class Client {
 		hook::run("UID", $array);
 		self::add_to_client_list($this);
 		
-		$this->join(Conf::$settings['log']['channel']);
+		if (isset(Conf::$settings['log']['channel'])) {
+			$this->join(Conf::$settings['log']['channel']);
+		}
 		
 		
 	}
@@ -123,7 +125,9 @@ class Client {
 	}
 	function log($string)
 	{
-		$this->msg(Conf::$settings['log']['channel'],$string);
+		if (isset(Conf::$settings['log']['channel'])) {
+			$this->msg(Conf::$settings['log']['channel'],$string);
+		}
 	}
 		
 	function join(...$dests)
