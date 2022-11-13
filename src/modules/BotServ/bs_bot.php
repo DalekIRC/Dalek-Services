@@ -139,7 +139,7 @@ class bs_bot {
 				$bot = self::bot_add($botn,$botI,$botH,$botgecos,$nick->nick);
 				$bot->log("$bot->nick reporting for duty!");
 			}
-			elseif (!strcasecmp($flag,"edit"))
+			elseif (!strcasecmp($flag,"del"))
 			{
 				if (!$botn)
 				{
@@ -354,3 +354,4 @@ class Bot extends Client
 		return false;
 	}
 }
+
