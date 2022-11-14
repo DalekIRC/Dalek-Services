@@ -58,11 +58,10 @@ include "servcmd.php";
 include "events.php";
 include "buffer.php";
 
-//include "plugins/PATHWEB/uplink.php";
 // Server config
-$server = Conf::$settings['link']['hostname'];
-$port = Conf::$settings['link']['port'];
-$mypass = Conf::$settings['link']['password'];
+$server = config_get_item("link::hostname");
+$port = config_get_item("link::port");
+$mypass = config_get_item("link::password");
 
 
 // SQL config
@@ -104,7 +103,6 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 		echo "[\e[0;30;47mRECV\e[0m] ".$input."\n";
 	
 	flush();
-	//RPC::check();
 	$strippem = ircstrip(str_replace('\\','\\\\',$input));
 	$splittem = explode(' ',$strippem);
 	
