@@ -30,32 +30,32 @@ class Client {
 
 	function __construct($nick,$ident,$hostmask,$uid = NULL, $gecos ,$modinfo = NULL)
 	{
-		/* Only spawn if it doesn't exist. This can be the case for hubs-in-waiting */
+		global $servertime;
 		if (!find_user($nick))
 		{
-			$servertime = servertime();
-			$this->nick = $nick;
-			$this->uid = $uid = generate_uid($nick);
-			$this->modinfo = $modinfo;
-			$this->cmds = NULL;
-			S2S("UID $nick 0 $servertime $ident $hostmask $uid 0 +oiqS * * * :$gecos");
-			$array = array(
-				'nick' => $nick,
-				'timestamp' => $servertime,
-				'ident' => $ident,
-				'realhost' => $hostmask,
-				'uid' => $uid,
-				'usermodes' => "+oiqS",
-				'cloak' => $hostmask,
-				'ip' => "",
-				'sid' => Conf::$settings['info']['SID'],
-				'ipb64' => "",
-				'gecos' => $gecos);
-			hook::run(HOOKTYPE_WELCOME, $array);
-			self::add_to_client_list($this);
-			
-			$this->join(config_get_item("log::channel"));
-		}
+      $this->nick = $nick;
+      $this->uid = $uid = generate_uid($nick);
+      $this->modinfo = $modinfo;
+      $this->cmds = NULL;
+      S2S("UID $nick 0 $servertime $ident $hostmask $uid 0 +oiqS * * * :$gecos");
+      $array = array(
+        'nick' => $nick,
+        'timestamp' => $servertime,
+        'ident' => $ident,
+        'realhost' => $hostmask,
+        'uid' => $uid,
+        'usermodes' => "+oiqS",
+        'cloak' => $hostmask,
+        'ip' => "",
+        'sid' => Conf::$settings['info']['SID'],
+        'ipb64' => "",
+        'gecos' => $gecos);
+      hook::run("UID", $array);
+      self::add_to_client_list($this);
+
+      if (isset(Conf::$settings['log']['channel'])) {
+        $this->join(Conf::$settings['log']['channel']);
+      }
 	}
 	function __destruct()
 	{
@@ -124,7 +124,9 @@ class Client {
 	}
 	function log($string)
 	{
-		$this->msg(Conf::$settings['log']['channel'],$string);
+		if (isset(Conf::$settings['log']['channel'])) {
+			$this->msg(Conf::$settings['log']['channel'],$string);
+		}
 	}
 		
 	function join(...$dests)
