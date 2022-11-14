@@ -120,8 +120,7 @@ class ns_version_servers {
 		$prep = $conn->prepare("SELECT * FROM dalek_server_version WHERE sid = ?");
 		$prep->bind_param("s", $sid);
 		$prep->execute();
-		$result = $prep->get_result();
-		if (!($result = $prep->get_result()))
+		if (!$prep->get_result())
 		{
 			$prep = $conn->prepare("INSERT INTO dalek_server_version (sid, version) VALUES (?, ?)");
 			$prep->bind_param("ss", $sid, $version);
