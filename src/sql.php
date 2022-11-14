@@ -25,10 +25,6 @@
 
 
 class SQL {
-	function __construct($ip,$user,$pass,$db)
-	{
-		global $ip,$user,$pass,$db;
-	}
 	function query($query)
 	{
 		$conn = sqlnew();

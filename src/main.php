@@ -58,20 +58,16 @@ include "servcmd.php";
 include "events.php";
 include "buffer.php";
 
-//include "plugins/PATHWEB/uplink.php";
 // Server config
-$server = Conf::$settings['link']['hostname'];
-$port = Conf::$settings['link']['port'];
-$mypass = Conf::$settings['link']['password'];
+$server = config_get_item("link::hostname");
+$port = config_get_item("link::port");
+$mypass = config_get_item("link::password");
 
 
 // SQL config
-$sqlip = Conf::$settings['sql']['hostname'];
-$sqluser = Conf::$settings['sql']['username'];
-$sqlpass = Conf::$settings['sql']['password'];;
-$sqldb = Conf::$settings['sql']['database'];
 $arr = [];
-$sql = new SQL($sqlip,$sqluser,$sqlpass,$sqldb); hook::run("preconnect", $arr);
+$sql = new SQL();
+hook::run("preconnect", $arr);
 /* Okay, we've established all the information lmao, let's load the modules */
 
 
@@ -107,7 +103,6 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 		echo "[\e[0;30;47mRECV\e[0m] ".$input."\n";
 	
 	flush();
-	//RPC::check();
 	$strippem = ircstrip(str_replace('\\','\\\\',$input));
 	$splittem = explode(' ',$strippem);
 	
