@@ -539,18 +539,15 @@ hook::func(HOOKTYPE_PRE_CONNECT, function($u)
 		timestamp varchar(255) NOT NULL,
 		realtime int NOT NULL,
 		PRIMARY KEY(id)
-	);");
+	);
+	TRUNCATE TABLE ".sqlprefix()."user;
+	TRUNCATE TABLE ".sqlprefix()."channels;
+	TRUNCATE TABLE ".sqlprefix()."server;
+	TRUNCATE TABLE ".sqlprefix()."swhois;
+	TRUNCATE TABLE ".sqlprefix()."ison;
+	TRUNCATE TABLE ".sqlprefix()."user_meta;
+	TRUNCATE TABLE ".sqlprefix()."tkldb;");
 
-	if (find_server(config_get_item("info::SID")))
-	{
-		$conn->multi_query("TRUNCATE TABLE ".sqlprefix()."user;
-		TRUNCATE TABLE ".sqlprefix()."channels;
-		TRUNCATE TABLE ".sqlprefix()."server;
-		TRUNCATE TABLE ".sqlprefix()."swhois;
-		TRUNCATE TABLE ".sqlprefix()."ison;
-		TRUNCATE TABLE ".sqlprefix()."user_meta;
-		TRUNCATE TABLE ".sqlprefix()."tkldb;");
-	}
 	$conn->close();
 });
 
