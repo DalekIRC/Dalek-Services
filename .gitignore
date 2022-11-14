@@ -1,0 +1,6 @@
+logs/*.log
+*.log
+conf/*.conf
+*.conf
+conf/dalek.conf
+*.conf

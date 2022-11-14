@@ -322,3 +322,29 @@ function validate_nick($string)
 	}
 	return true;
 }
+
+/**
+ * Finds a user
+ * @param String $search
+ * @return User|false
+ */
+function find_user($search)
+{
+	$user = new User($search);
+	if ($user->IsUser)
+		return $user;
+	return false;
+}
+
+/**
+ * Finds a server
+ * @param String $search
+ * @return User|false
+ */
+function find_server($search)
+{
+	$user = new User($search);
+	if ($user->IsServer)
+		return $user;
+	return false;
+}
