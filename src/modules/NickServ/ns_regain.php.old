@@ -86,6 +86,6 @@ nickserv::func("helplist", function($u)
 	
 	$nick = $u['nick'];
 	
-	$ns->notice($nick,"REGAIN              ".IRC("HELPCMD_REGAIN"));
+	$ns->notice($nick,"REGAIN			  ".IRC("HELPCMD_REGAIN"));
 	
 });

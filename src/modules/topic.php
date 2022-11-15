@@ -31,7 +31,7 @@ class topic {
 	public $description = "Provides TOPIC compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -59,7 +59,7 @@ class topic {
 		 * the function is a string reference to this class, the cmd_elmer method (function)
 		 * The last param is expected parameter count for the command
 		 * (both point to the same function which determines)
-        */
+		*/
 
 		if (!CommandAdd($this->name, 'TOPIC', 'topic::cmd_topic', 0))
 			return false;
@@ -74,12 +74,12 @@ class topic {
 	 * $u['nick'] = User object
 	 */
 	public static function cmd_topic($u)
-    {
+	{
 		$parv = explode(" ",$u['params']);
 		$topic = ($t = explode(" :",$u['params'])) ? str_replace($t[0]." :","",$u['params']) : "";
 		$chan = strtolower($parv[0]);
 		self::update_topic($chan,utf8_encode($topic));
-    }
+	}
 
 	public static function update_topic($chan,$topic)
 	{

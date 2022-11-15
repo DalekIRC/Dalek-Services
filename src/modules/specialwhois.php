@@ -31,7 +31,7 @@ class specialwhois {
 	public $description = "Provides SWHOIS compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -59,7 +59,7 @@ class specialwhois {
 		 * the function is a string reference to this class, the cmd_elmer method (function)
 		 * The last param is expected parameter count for the command
 		 * (both point to the same function which determines)
-        */
+		*/
 
 		if (!CommandAdd($this->name, 'SWHOIS', 'specialwhois::cmd_swhois', 0))
 			return false;
@@ -74,89 +74,89 @@ class specialwhois {
 	 * $u['nick'] = User object
 	 */
 	public static function cmd_swhois($u)
-    {
-        $parv = explode(" ",$u['params']);
+	{
+		$parv = explode(" ",$u['params']);
 
-    
-        $username = (!($user = new User($parv[0]))->IsUser) ? $parv[0] : $user->nick;
-        $switch = $parv[1];
-        $tag = $parv[2];
-        $priority = $parv[3];
+	
+		$username = (!($user = new User($parv[0]))->IsUser) ? $parv[0] : $user->nick;
+		$switch = $parv[1];
+		$tag = $parv[2];
+		$priority = $parv[3];
 
-        $whois = ($s = explode(" :",$u['params'])) ? $s[1] : "";
-        
-        self::SWHOIS("$username $switch $tag $priority $whois");
-    }
+		$whois = ($s = explode(" :",$u['params'])) ? $s[1] : "";
+		
+		self::SWHOIS("$username $switch $tag $priority $whois");
+	}
 
-    /*	SWHOIS command (incoming)
-        $parv[1] = UID,
-        $parv[2] = +/-,
-        $parv[3] = tag,
-        $parv[4] = priority,
-        $parv[5] = swhois
-    */
-    public static function SWHOIS($string){
-       
-        $conn = sqlnew();
-        $parv = explode(" ",$string);
-        
-        $user = (!($u = new User($parv[0]))->IsUser) ? $parv[0] : $u->nick;
-        $switch = $parv[1];
-        $tag = $parv[2];
-        $priority = $parv[3];
-        $whois = str_replace("$user $switch $tag $priority ","",$string);
-        
-        
-        if ($switch == "+")
-        {
-            $whois = ($whois[0] == ":") ? mb_substr($whois,1) : $whois;
-            if (!$conn) { return false; }
-            else
-            {
-                $prep = $conn->prepare("INSERT INTO ".sqlprefix()."swhois (tag, uid, priority, swhois) VALUES (?, ?, ?, ?)");
-                $prep->bind_param("ssss",$tag,$user,$priority,$whois);
-                $prep->execute();
-                $prep->close();
-            }
-            
-        }
-        elseif ($switch == "-")
-        {
-            if (!$conn){ return false; }
-            else
-            {
-                if ($whois == "*")
-                {
-                    $prep = $conn->prepare("DELETE FROM ".sqlprefix()."swhois WHERE uid = ? AND tag = ?");
-                    $prep->bind_param("ss",$user,$tag);
-                }
-                else
-                {
-                    $prep = $conn->prepare("DELETE FROM ".sqlprefix()."swhois WHERE uid = ? AND tag = ? AND swhois = ?");
-                    $prep->bind_param("sss",$user,$tag,$whois);
-                }
-                $prep->execute();
-                $prep->close();
-            }
-        }
-    }
+	/*	SWHOIS command (incoming)
+		$parv[1] = UID,
+		$parv[2] = +/-,
+		$parv[3] = tag,
+		$parv[4] = priority,
+		$parv[5] = swhois
+	*/
+	public static function SWHOIS($string){
+	   
+		$conn = sqlnew();
+		$parv = explode(" ",$string);
+		
+		$user = (!($u = new User($parv[0]))->IsUser) ? $parv[0] : $u->nick;
+		$switch = $parv[1];
+		$tag = $parv[2];
+		$priority = $parv[3];
+		$whois = str_replace("$user $switch $tag $priority ","",$string);
+		
+		
+		if ($switch == "+")
+		{
+			$whois = ($whois[0] == ":") ? mb_substr($whois,1) : $whois;
+			if (!$conn) { return false; }
+			else
+			{
+				$prep = $conn->prepare("INSERT INTO ".sqlprefix()."swhois (tag, uid, priority, swhois) VALUES (?, ?, ?, ?)");
+				$prep->bind_param("ssss",$tag,$user,$priority,$whois);
+				$prep->execute();
+				$prep->close();
+			}
+			
+		}
+		elseif ($switch == "-")
+		{
+			if (!$conn){ return false; }
+			else
+			{
+				if ($whois == "*")
+				{
+					$prep = $conn->prepare("DELETE FROM ".sqlprefix()."swhois WHERE uid = ? AND tag = ?");
+					$prep->bind_param("ss",$user,$tag);
+				}
+				else
+				{
+					$prep = $conn->prepare("DELETE FROM ".sqlprefix()."swhois WHERE uid = ? AND tag = ? AND swhois = ?");
+					$prep->bind_param("sss",$user,$tag,$whois);
+				}
+				$prep->execute();
+				$prep->close();
+			}
+		}
+	}
 
 
-    public static function send_swhois($uid,$tag,$swhois)
-    {
-        self::del_swhois($uid,$tag);
-        $cmd = "$uid + $tag -500 :$swhois";
-        self::SWHOIS($cmd);
-        S2S("SWHOIS $cmd");
-    }
-    public static function del_swhois($uid,$tag)
-    {
-        $cmd = "$uid - $tag -500 *";
-        self::SWHOIS($cmd);
-        S2S("SWHOIS $cmd");
-    }
+	public static function send_swhois($uid,$tag,$swhois)
+	{
+		self::del_swhois($uid,$tag);
+		$cmd = "$uid + $tag -500 :$swhois";
+		self::SWHOIS($cmd);
+		S2S("SWHOIS $cmd");
+	}
+	public static function del_swhois($uid,$tag)
+	{
+		$cmd = "$uid - $tag -500 *";
+		self::SWHOIS($cmd);
+		S2S("SWHOIS $cmd");
+	}
 
-    static function list_swhois_for_user(User $user, $tag = NULL)
+	static function list_swhois_for_user(User $user, $tag = NULL)
 	{
 		$swhois = [];
 		$conn = sqlnew();
@@ -181,15 +181,15 @@ class specialwhois {
 		return $swhois;
 	}
 
-    static function is_swhois($nick,$tag)
-    {
-        $conn = sqlnew();
-        $prep = $conn->prepare("SELECT * FROM ".sqlprefix()."swhois WHERE uid = ? AND tag = ?");
-        $prep->bind_param("ss",$nick,$tag);
-        $prep->execute();
+	static function is_swhois($nick,$tag)
+	{
+		$conn = sqlnew();
+		$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."swhois WHERE uid = ? AND tag = ?");
+		$prep->bind_param("ss",$nick,$tag);
+		$prep->execute();
 		$result = $prep->get_result();
 		if (!$result || !$result->num_rows)
-            return false;
-        return true;
-    }
+			return false;
+		return true;
+	}
 }

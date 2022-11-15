@@ -91,7 +91,7 @@ chanserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$cs->notice($nick,"VOICE               Voices you in a channel.");
+	$cs->notice($nick,"VOICE			   Voices you in a channel.");
 	
 });
 

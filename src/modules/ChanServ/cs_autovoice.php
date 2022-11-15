@@ -163,7 +163,7 @@ chanserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$cs->notice($nick,"AUTOVOICE           Modify your AUTOVOICE setting for a channel.");
+	$cs->notice($nick,"AUTOVOICE		   Modify your AUTOVOICE setting for a channel.");
 	
 });
 

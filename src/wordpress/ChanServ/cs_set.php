@@ -46,7 +46,7 @@ chanserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$cs->notice($nick,"SET                 Set options for your channel.");
+	$cs->notice($nick,"SET				 Set options for your channel.");
 });
 
 

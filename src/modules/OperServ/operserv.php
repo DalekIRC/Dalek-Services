@@ -126,7 +126,7 @@ class operserv {
 		 * @param3 String $hostmask
 		 * @param4 NULL
 		 * @param5 String $gecos
-		 * @param6 String $module_name    (This module)
+		 * @param6 String $module_name	(This module)
 		 */
 		$os = new Client($operserv['nick'],$operserv['ident'],$operserv['hostmask'],NULL,$operserv['gecos'],'operserv');
 

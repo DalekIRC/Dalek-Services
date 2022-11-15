@@ -94,7 +94,7 @@ nickserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$ns->notice($nick,"INFO                ".IRC("HELPCMD_INFO"));
+	$ns->notice($nick,"INFO				".IRC("HELPCMD_INFO"));
 	
 });
 

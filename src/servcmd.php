@@ -103,8 +103,8 @@ function($mod)
 {
 	foreach (ServCmd::$list as $i => $cmd)
 		if (!strcmp($cmd->mod_handle,$mod[1]))
-        {
-            SVSLog("Command removed for $cmd->client: $cmd->command ($cmd->help_cmd_entry)");
+		{
+			SVSLog("Command removed for $cmd->client: $cmd->command ($cmd->help_cmd_entry)");
 			array_splice(ServCmd::$list,$i);
-        }
+		}
 });

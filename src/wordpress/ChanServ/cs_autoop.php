@@ -162,7 +162,7 @@ chanserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$cs->notice($nick,"AUTOOP              Modify your AUTOOP setting for a channel");
+	$cs->notice($nick,"AUTOOP			  Modify your AUTOOP setting for a channel");
 	
 });
 

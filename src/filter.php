@@ -31,7 +31,7 @@ class Filter
 		if ($mod && !module_exists($mod))
 		{
 			SVSLog(LOG_WARN."Filter is trying to attach to a module which is not yet loaded. Maybe the module is loading things in the wrong order? Aborting.");
-            return;
+			return;
 		}
 		$filter = [];
 		$filter['modname'] = $mod;
@@ -55,13 +55,13 @@ class Filter
 	static function String($nick,&$mtags = NULL,&$haystack) : void
 	{
 		foreach(self::$filter_list as $filter)
-        {
-            if (!$filter)
-                return;
+		{
+			if (!$filter)
+				return;
 
 			if (!strcasecmp($nick,$filter['nick']))
 				$haystack = str_replace($filter['needle'],$filter['replace'],$haystack);
-        }
+		}
 	}
 	/* 
 	 * Filters a given array full of strings

@@ -115,7 +115,7 @@ class metaserv {
 		 * @param3 String $hostmask
 		 * @param4 NULL
 		 * @param5 String $gecos
-		 * @param6 String $module_name    (This module)
+		 * @param6 String $module_name	(This module)
 		 */
 		$meta = new Client($metaserv['nick'],$metaserv['ident'],$metaserv['hostmask'],NULL,$metaserv['gecos'],'metaserv');
 

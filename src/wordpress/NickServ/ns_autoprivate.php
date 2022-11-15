@@ -161,7 +161,7 @@ nickserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$ns->notice($nick,"AUTOPRIVATE         Automatically disables your private messages when you login.");
+	$ns->notice($nick,"AUTOPRIVATE		 Automatically disables your private messages when you login.");
 	
 });
 
@@ -188,7 +188,7 @@ nickserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$ns->notice($nick,"PRIVATE             Disable/enable PRIVATE (sets/unsets privdeaf +D)");
+	$ns->notice($nick,"PRIVATE			 Disable/enable PRIVATE (sets/unsets privdeaf +D)");
 	
 });
 

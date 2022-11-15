@@ -223,9 +223,9 @@ function rpc_dir()
 /** RPC Shared pipe
  * Example structure of pipe containing 1 request to listen channels matching "#dalek*":
  *
- *   id |    method    |      params     |
+ *   id |	method	|	  params	 |
  *------|--------------|-----------------|
- *  123 |  chan.list   |   [#dalek*]     |
+ *  123 |  chan.list   |   [#dalek*]	 |
  * 	456 | etc... | etc... |
 */
 class RPCpipe

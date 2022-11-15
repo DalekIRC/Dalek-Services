@@ -2,148 +2,148 @@
 include "src/misc.php";
 var_dump(phpinfo());
 if (count($argv) < 2)
-    die("Parameters: ./dalek module list|load|unload|install|delete [<module>]");
+	die("Parameters: ./dalek module list|load|unload|install|delete [<module>]");
 
 $genbash = ((isset($argv[2]) && !strcasecmp($argv[2],"--genbash")) || (isset($argv[3]) && !strcasecmp($argv[3],"--genbash"))) ? 1 : 0;
 
 if ($argv[1] == "list")
 {
-    $all = (isset($argv[2]) && !strcasecmp($argv[2],"all")) ? 1 : 0;
-    $repo = (isset($argv[2]) && !strcasecmp($argv[2],"repo")) ? 1 : 0;
-    $str = ($all) ? "all" : "third-party";
-    $str = ($repo) ? "installable" : $str;
+	$all = (isset($argv[2]) && !strcasecmp($argv[2],"all")) ? 1 : 0;
+	$repo = (isset($argv[2]) && !strcasecmp($argv[2],"repo")) ? 1 : 0;
+	$str = ($all) ? "all" : "third-party";
+	$str = ($repo) ? "installable" : $str;
 
-    $response = [];
-    if ($repo)
-    {
-        $json = json_decode(file_get_contents("https://raw.githubusercontent.com/DalekIRC/Dalek-Contrib/main/modules.list"), true);
-        $response['result'] = $json['modules'];
-        
-    }
+	$response = [];
+	if ($repo)
+	{
+		$json = json_decode(file_get_contents("https://raw.githubusercontent.com/DalekIRC/Dalek-Contrib/main/modules.list"), true);
+		$response['result'] = $json['modules'];
+		
+	}
 
-    else
-    {
-        $json = '{"jsonrpc": "2.0", "method": "module.list", "params": {}, "id": 123}';
-        $response = local_rpc_call($json);
-    }
-    if (!isset($response) || !$response || empty($response))
-    {
-        echo("Unable to list modules.");
-        die();
-    }
+	else
+	{
+		$json = '{"jsonrpc": "2.0", "method": "module.list", "params": {}, "id": 123}';
+		$response = local_rpc_call($json);
+	}
+	if (!isset($response) || !$response || empty($response))
+	{
+		echo("Unable to list modules.");
+		die();
+	}
 
-    if ($genbash)
-    {
-        do_bash($response['result'], "Listing $str modules and their information", $repo, $all);
-        return;
-    }
-    echo "Listing $str modules and their information\n";
-    echo "╔═════════════════════╦═════════════════════╦════════════════════════════════════════════════════════\n";
-    echo "║ ".clean_align("Name")."║ ".clean_align("Version")."║ ".clean_align("Description")."\n";
-    echo "╠═════════════════════╬═════════════════════╬════════════════════════════════════════════════════════\n";
-    $i = 0;
-    foreach($response['result'] as $mod)
-    {
-        $mod = (object)$mod;
-        if ($all || !isset($mod->official))
-        {
-            $i++;
-            echo "║ ".clean_align("$mod->name")."║ ".clean_align("$mod->version")."║ ".clean_align("$mod->description")."\n";
-        }
-    }
-    if (!$i)
-        echo "║ ".clean_align("<empty>")."║ ".clean_align("<empty>")."║ ".clean_align("<empty>")."\n";
-    echo "╚═════════════════════╩═════════════════════╩════════════════════════════════════════════════════════\n";
+	if ($genbash)
+	{
+		do_bash($response['result'], "Listing $str modules and their information", $repo, $all);
+		return;
+	}
+	echo "Listing $str modules and their information\n";
+	echo "╔═════════════════════╦═════════════════════╦════════════════════════════════════════════════════════\n";
+	echo "║ ".clean_align("Name")."║ ".clean_align("Version")."║ ".clean_align("Description")."\n";
+	echo "╠═════════════════════╬═════════════════════╬════════════════════════════════════════════════════════\n";
+	$i = 0;
+	foreach($response['result'] as $mod)
+	{
+		$mod = (object)$mod;
+		if ($all || !isset($mod->official))
+		{
+			$i++;
+			echo "║ ".clean_align("$mod->name")."║ ".clean_align("$mod->version")."║ ".clean_align("$mod->description")."\n";
+		}
+	}
+	if (!$i)
+		echo "║ ".clean_align("<empty>")."║ ".clean_align("<empty>")."║ ".clean_align("<empty>")."\n";
+	echo "╚═════════════════════╩═════════════════════╩════════════════════════════════════════════════════════\n";
 }
 
 elseif ($argv[1] == "load")
 {
-    $mod = $argv[2];
-    $json = '{"jsonrpc": "2.0", "method": "module.load", "params": {"module": "'.$mod.'"}, "id": 123}';
-    $response = local_rpc_call($json);
-    if (isset($response['result']))
-        echo "Loaded module '$mod' successfully\n";
+	$mod = $argv[2];
+	$json = '{"jsonrpc": "2.0", "method": "module.load", "params": {"module": "'.$mod.'"}, "id": 123}';
+	$response = local_rpc_call($json);
+	if (isset($response['result']))
+		echo "Loaded module '$mod' successfully\n";
 
-    else
-        echo "Could not load module: ".$response['error']['message']."\n";
+	else
+		echo "Could not load module: ".$response['error']['message']."\n";
 }
 
 elseif ($argv[1] == "unload")
 {
-    $mod = $argv[2];
-    $json = '{"jsonrpc": "2.0", "method": "module.unload", "params": {"module": "'.$mod.'"}, "id": 123}';
-    $response = local_rpc_call($json);
-    if (isset($response['result']))
-        echo "Unloaded module '$mod' successfully\n";
+	$mod = $argv[2];
+	$json = '{"jsonrpc": "2.0", "method": "module.unload", "params": {"module": "'.$mod.'"}, "id": 123}';
+	$response = local_rpc_call($json);
+	if (isset($response['result']))
+		echo "Unloaded module '$mod' successfully\n";
 
-    else
-        echo "Could not unload module: ".$response['error']['message']."\n";
+	else
+		echo "Could not unload module: ".$response['error']['message']."\n";
 }
 
 
 
 function do_bash($res, $title, $repo = 0, $all = 0)
 {
-    $menu = ($repo) ? "Select a module to install:" : "Showing list:";
-    $filename = "temp".servertime().".dalek";
-    $file = fopen($filename, 'w');
-    fwrite($file,"#!/bin/bash\n\n");
-    fwrite($file,"our_cute_little_script()\n{\n");
-    fwrite($file,"HEIGHT=25\nWIDTH=60\nCHOICE_HEIGHT=20\nBACKTITLE=\"🚨 DALEKS REIGN SUPREME 🚨\"\nTITLE=\"ℹ️ $title\"\n");
-    fwrite($file,"MENU=\"$menu\"\n\n");
-    fwrite($file,"OPTIONS=(");
-    $i = 1;
-    $arr = [];
-    foreach($res as $mod)
-    {
-        $mod = (object)$mod;
-        if (!$repo && !$all)
-            if (isset($mod->official))
-                continue;
-        $arr[$i] = $mod;
-        fwrite($file,"\n  $i \"$mod->name\"");
-        $i++;
-    }
-    fwrite($file,")\n\n");
-    fwrite($file,"CHOICE=$(dialog --clear \\\n");
-    fwrite($file,"                  --backtitle \"\$BACKTITLE\" \\\n");
-    fwrite($file,"                  --title \"\$TITLE\" \\\n");
-    fwrite($file,"                  --help-button \\\n");
-    fwrite($file,"                  --help-label \"Module Info\" \\\n");
-    fwrite($file,"                  --menu \"\$MENU\" \\\n");
-    fwrite($file,"                  \$HEIGHT \$WIDTH \$CHOICE_HEIGHT \\\n");
-    fwrite($file,"                  \"\${OPTIONS[@]}\" \\\n");
-    fwrite($file,"                  3>&1 1>&2 2>&3)");
-    fwrite($file,"\n\n\n");
-    fwrite($file,"HELPLINE=\"\"\n");
-    fwrite($file,"case \$CHOICE in\n");
-    if ($repo)
-        foreach($arr as $i => $mod)
-        {
-            fwrite($file,"                  $i)\n");
-            fwrite($file,"                      clear\n");
-            fwrite($file,"                      ./dalek module install-with-gui $mod->name\n");
-            fwrite($file,"                      ;;\n");
-        }
-    foreach($arr as $i => $mod)
-    {
-        fwrite($file,"                  \"HELP $i\")\n");
-        fwrite($file,"                      HELPLINE=\"Description:\n$mod->description\n\nVersion: $mod->version\nAuthor: $mod->author\"\n");
-        fwrite($file,"                      ;;\n");
-    }
-    fwrite($file,"esac\n\n");
-    fwrite($file,"if [ \"\$HELPLINE\" = \"\" ] ; then\n");
-    fwrite($file,"./scripts/gui --interface\n\n");
-    fwrite($file,"else\n");
-    fwrite($file,"TITLE=\"ℹ️ INFORMATION:\"\n");
-    fwrite($file,"HELPBOX=\$(dialog --backtitle \"🚨 DALEKS REIGN SUPREME 🚨\" \\\n");
-    fwrite($file,"                  --title \"\$TITLE\" \\\n");
-    fwrite($file,"                  --msgbox \\\n");
-    fwrite($file,"                  \"\$HELPLINE\" \$HEIGHT \$WIDTH \\\n");
-    fwrite($file,"                  3>&1 1>&2 2>&3)\n\n");
-    fwrite($file,"            our_cute_little_script\nfi\n}\n our_cute_little_script\n");
-    fclose($file);
-    exec("chmod 755 $filename");
-    exec("./$filename");
-    unlink($filename);
+	$menu = ($repo) ? "Select a module to install:" : "Showing list:";
+	$filename = "temp".servertime().".dalek";
+	$file = fopen($filename, 'w');
+	fwrite($file,"#!/bin/bash\n\n");
+	fwrite($file,"our_cute_little_script()\n{\n");
+	fwrite($file,"HEIGHT=25\nWIDTH=60\nCHOICE_HEIGHT=20\nBACKTITLE=\"🚨 DALEKS REIGN SUPREME 🚨\"\nTITLE=\"ℹ️ $title\"\n");
+	fwrite($file,"MENU=\"$menu\"\n\n");
+	fwrite($file,"OPTIONS=(");
+	$i = 1;
+	$arr = [];
+	foreach($res as $mod)
+	{
+		$mod = (object)$mod;
+		if (!$repo && !$all)
+			if (isset($mod->official))
+				continue;
+		$arr[$i] = $mod;
+		fwrite($file,"\n  $i \"$mod->name\"");
+		$i++;
+	}
+	fwrite($file,")\n\n");
+	fwrite($file,"CHOICE=$(dialog --clear \\\n");
+	fwrite($file,"				  --backtitle \"\$BACKTITLE\" \\\n");
+	fwrite($file,"				  --title \"\$TITLE\" \\\n");
+	fwrite($file,"				  --help-button \\\n");
+	fwrite($file,"				  --help-label \"Module Info\" \\\n");
+	fwrite($file,"				  --menu \"\$MENU\" \\\n");
+	fwrite($file,"				  \$HEIGHT \$WIDTH \$CHOICE_HEIGHT \\\n");
+	fwrite($file,"				  \"\${OPTIONS[@]}\" \\\n");
+	fwrite($file,"				  3>&1 1>&2 2>&3)");
+	fwrite($file,"\n\n\n");
+	fwrite($file,"HELPLINE=\"\"\n");
+	fwrite($file,"case \$CHOICE in\n");
+	if ($repo)
+		foreach($arr as $i => $mod)
+		{
+			fwrite($file,"				  $i)\n");
+			fwrite($file,"					  clear\n");
+			fwrite($file,"					  ./dalek module install-with-gui $mod->name\n");
+			fwrite($file,"					  ;;\n");
+		}
+	foreach($arr as $i => $mod)
+	{
+		fwrite($file,"				  \"HELP $i\")\n");
+		fwrite($file,"					  HELPLINE=\"Description:\n$mod->description\n\nVersion: $mod->version\nAuthor: $mod->author\"\n");
+		fwrite($file,"					  ;;\n");
+	}
+	fwrite($file,"esac\n\n");
+	fwrite($file,"if [ \"\$HELPLINE\" = \"\" ] ; then\n");
+	fwrite($file,"./scripts/gui --interface\n\n");
+	fwrite($file,"else\n");
+	fwrite($file,"TITLE=\"ℹ️ INFORMATION:\"\n");
+	fwrite($file,"HELPBOX=\$(dialog --backtitle \"🚨 DALEKS REIGN SUPREME 🚨\" \\\n");
+	fwrite($file,"				  --title \"\$TITLE\" \\\n");
+	fwrite($file,"				  --msgbox \\\n");
+	fwrite($file,"				  \"\$HELPLINE\" \$HEIGHT \$WIDTH \\\n");
+	fwrite($file,"				  3>&1 1>&2 2>&3)\n\n");
+	fwrite($file,"			our_cute_little_script\nfi\n}\n our_cute_little_script\n");
+	fclose($file);
+	exec("chmod 755 $filename");
+	exec("./$filename");
+	unlink($filename);
 }

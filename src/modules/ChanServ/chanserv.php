@@ -115,7 +115,7 @@ class chanserv {
 		 * @param3 String $hostmask
 		 * @param4 NULL
 		 * @param5 String $gecos
-		 * @param6 String $module_name    (This module)
+		 * @param6 String $module_name	(This module)
 		 */
 		$cs = new Client($chanserv['nick'],$chanserv['ident'],$chanserv['hostmask'],NULL,$chanserv['gecos'],'chanserv');
 

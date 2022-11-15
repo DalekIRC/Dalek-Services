@@ -150,7 +150,7 @@ chanserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$cs->notice($nick,"REGISTER            Register a channel to your account");
+	$cs->notice($nick,"REGISTER			Register a channel to your account");
 	
 });
 

@@ -90,7 +90,7 @@ class umode2 {
 			return;
 		}
 		$oldmodes = $nick->usermode;
-        $nick->SetMode($u['dest']);
+		$nick->SetMode($u['dest']);
 		
 		/* Run the hook for usermode.
 		 * Information sent in the hook:

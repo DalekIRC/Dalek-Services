@@ -31,7 +31,7 @@ class modules {
 	public $description = "Provides MODULE command";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -83,31 +83,31 @@ class modules {
 		/* Tokenise the incoming string into $parv */ 
 		$parv = explode(" ",$u['params']);
 		if ($parv[0] !== "-all")
-        {
-    		modules::module_response($nick, "Showing loaded 3rd party modules (use \"MODULE -all ".Conf::$settings['info']['services-name']."\" to show all modules):");
-            foreach (Module::$modules as $m)
+		{
+			modules::module_response($nick, "Showing loaded 3rd party modules (use \"MODULE -all ".Conf::$settings['info']['services-name']."\" to show all modules):");
+			foreach (Module::$modules as $m)
 			{
 				if (isset($m->official))
 					continue;
 				$third = (isset($m->official) && $m->official == true) ? "[OFFICIAL]" : "[3RD]";
-                modules::module_response($nick, "*** $m->name v$m->version - $m->description - by $m->author $third");
-			}
-            modules::module_response($nick, "End of modules list");
-        }
-
-        else {
-            modules::module_response($nick, "Showing ALL loaded modules");
-            foreach (Module::$modules as $m)
-			{
-				$third = (isset($m->official) && $m->official == true) ? "[OFFICIAL]" : "[3RD]";
-                modules::module_response($nick, "*** $m->name v$m->version - $m->description - by $m->author $third");
+				modules::module_response($nick, "*** $m->name v$m->version - $m->description - by $m->author $third");
 			}
 			modules::module_response($nick, "End of modules list");
-        }
+		}
+
+		else {
+			modules::module_response($nick, "Showing ALL loaded modules");
+			foreach (Module::$modules as $m)
+			{
+				$third = (isset($m->official) && $m->official == true) ? "[OFFICIAL]" : "[3RD]";
+				modules::module_response($nick, "*** $m->name v$m->version - $m->description - by $m->author $third");
+			}
+			modules::module_response($nick, "End of modules list");
+		}
 		return;
 	}
-    static function module_response(User $nick, $string)
-    {
-    	S2S("304 $nick->nick :$string");
-    }
+	static function module_response(User $nick, $string)
+	{
+		S2S("304 $nick->nick :$string");
+	}
 }

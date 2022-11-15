@@ -59,7 +59,7 @@ class quit {
 		 * the function is a string reference to this class, the cmd_elmer method (function)
 		 * The last param is expected parameter count for the command
 		 * (both point to the same function which determines)
-        */
+		*/
 
 		if (!CommandAdd($this->name, 'QUIT', 'quit::cmd_quit', 0))
 			return false;

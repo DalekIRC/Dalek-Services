@@ -31,7 +31,7 @@ class away {
 	public $description = "Provides AWAY compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -74,7 +74,7 @@ class away {
 	 */
 	public static function cmd_away($u)
 	{
-        $away = false;
+		$away = false;
 
 		/* Get the command that called us */
 		$cmd = $u['cmd'];
@@ -82,23 +82,23 @@ class away {
 		/* User object of caller */
 		$nick = $u['nick'];
 
-        if (!isset($u['params']))
-            $away = true;
+		if (!isset($u['params']))
+			$away = true;
 
-        $params = (isset($u['params'])) ? mb_substr($u['params'],1) : NULL;
+		$params = (isset($u['params'])) ? mb_substr($u['params'],1) : NULL;
 
-        self::update_away($nick,$away,$params);
+		self::update_away($nick,$away,$params);
 		
 
 		/* You don't HAVE to return, butt-fuck it */
 		return;
 	}
-    private static function update_away(User $nick, $away, $msg)
-    {
-        $away = ($away) ? "Y" : NULL;
-        $conn = sqlnew();
-        $prep = $conn->prepare("UPDATE ".sqlprefix()."user SET away = ?, awaymsg = ? WHERE UID = ?");
-        $prep->bind_param("sss", $away, $msg, $nick->uid);
-        $prep->execute();
-    }
+	private static function update_away(User $nick, $away, $msg)
+	{
+		$away = ($away) ? "Y" : NULL;
+		$conn = sqlnew();
+		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET away = ?, awaymsg = ? WHERE UID = ?");
+		$prep->bind_param("sss", $away, $msg, $nick->uid);
+		$prep->execute();
+	}
 }

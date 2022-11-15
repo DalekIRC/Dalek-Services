@@ -31,7 +31,7 @@ class chgident {
 	public $description = "Provides CHGIDENT command";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -59,7 +59,7 @@ class chgident {
 		 * the function is a string reference to this class, the cmd_elmer method (function)
 		 * The last param is expected parameter count for the command
 		 * (both point to the same function which determines)
-        */
+		*/
 
 		$err = NULL;
 		if (!CommandAdd($this->name, 'CHGIDENT', 'chgident::cmd_chgident', 1))
@@ -76,20 +76,20 @@ class chgident {
 	 * In this example (and throughout the source), $u contains an array with
 	 * information passed along by the caller
 	 * $u['nick'] = User object
-     * $u['params'] = Parameters
-     * $u['cmd'] = calling command if needed
+	 * $u['params'] = Parameters
+	 * $u['cmd'] = calling command if needed
 	 */
 	public static function cmd_chgident($u)
 	{
 		$parv = explode(" :",$u['params']);
 		$uid = $parv[0];
-        $ident = $parv[1];
+		$ident = $parv[1];
 		$conn = sqlnew();
 		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET ident = ? WHERE UID = ?");
 		$prep->bind_param("ss",$ident,$uid);
 		$prep->execute();
 		return;
-    }
+	}
 
 	public static function rpc_cmd($id, $params)
 	{

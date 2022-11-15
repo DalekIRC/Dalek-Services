@@ -18,9 +18,9 @@ Dalek IRC Services with UnrealIRCd & WordPress integration tailored to you.<br><
 
 With WordPress + Dalek + UnrealIRCd, you have more creative control over things such as:
   * How your users register and manage their profile:
-    - Works with [Ultimate Member](https://ultimatemember.com/), customise how your profiles look
-    - Create your own registration options like Date of Birth, Gender ID, Location etc. in WordPress, and these will be reflected in chat.
-    - Profile pictures are shown on IRC to clients who support [`METADATA`](https://github.com/ircv3/ircv3-specifications/blob/7c76d2022992d4f9ce088420a861f185169965a2/extensions/metadata.md)
+	- Works with [Ultimate Member](https://ultimatemember.com/), customise how your profiles look
+	- Create your own registration options like Date of Birth, Gender ID, Location etc. in WordPress, and these will be reflected in chat.
+	- Profile pictures are shown on IRC to clients who support [`METADATA`](https://github.com/ircv3/ircv3-specifications/blob/7c76d2022992d4f9ce088420a861f185169965a2/extensions/metadata.md)
   * Confirmation emails, account deletion, bans and suspensions are all do-able from your WordPress dashboard.
   * Add and remove Services staff via website, simply by adding or revoking their permission in the WordPress `Users` tab.
   

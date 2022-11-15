@@ -31,7 +31,7 @@ class uid {
 	public $description = "Provides UID compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -59,7 +59,7 @@ class uid {
 		 * the function is a string reference to this class, the cuid_elmer method (function)
 		 * The last param is expected parameter count for the command
 		 * (both point to the same function which determines)
-        */
+		*/
 
 		if (!CommandAdd($this->name, 'UID', 'uid::cmd_uid', 0))
 			return false;
@@ -74,7 +74,7 @@ class uid {
 	 * $u['nick'] = User object
 	 */
 	public static function cmd_uid($u)
-    {
+	{
 			
 		$parv = explode(" ",$u['params']);
 
@@ -105,5 +105,5 @@ class uid {
 			"ip" => $ip ?? $ipb64,
 			"gecos" => $gecos);
 		hook::run("UID", $array);
-    }
+	}
 }

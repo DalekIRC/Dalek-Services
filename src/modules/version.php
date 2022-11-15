@@ -88,9 +88,9 @@ class version {
 		/* You don't HAVE to return, butt-fuck it */
 		return;
 	}
-    static function version_response(User $nick)
-    {
-        global $cf;
-    	S2S("351 $nick->nick ".DALEK_VERSION." ".$cf['servicesname']." 0 [". (IsOper($nick)) ? php_uname() : "*" ."=6000]");
-    }
+	static function version_response(User $nick)
+	{
+		global $cf;
+		S2S("351 $nick->nick ".DALEK_VERSION." ".$cf['servicesname']." 0 [". (IsOper($nick)) ? php_uname() : "*" ."=6000]");
+	}
 }

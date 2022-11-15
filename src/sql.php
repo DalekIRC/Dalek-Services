@@ -451,7 +451,7 @@ function sqlnew()
 
 function sqlprefix()
 {
-    return (isset(Conf::$settings['sql']['prefix'])) ? Conf::$settings['sql']['prefix'] : 'dalek_';
+	return (isset(Conf::$settings['sql']['prefix'])) ? Conf::$settings['sql']['prefix'] : 'dalek_';
 }
 
 hook::func(HOOKTYPE_PRE_CONNECT, function($u)

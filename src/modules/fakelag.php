@@ -31,7 +31,7 @@ class fakelag {
 	public $description = "Fake lag (anti-flood mechanism)";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -55,9 +55,9 @@ class fakelag {
 	*/
 	function __init()
 	{
-        /* Let's check the config */
-        __FakeLag::config_check();
-        hook::func(HOOKTYPE_REHASH, '__FakeLag::config_check');
+		/* Let's check the config */
+		__FakeLag::config_check();
+		hook::func(HOOKTYPE_REHASH, '__FakeLag::config_check');
 		return true;
 	}
 }
@@ -66,20 +66,20 @@ class fakelag {
 class __FakeLag {
 
 	public static $list = [];
-    public static $active = 0;
+	public static $active = 0;
 
 	
-    /**Our config checking */
-    public static function config_check()
-    {
-        if (isset(Conf::$settings['security settings']['fakelag']) && Conf::$settings['security settings']['fakelag']['active'] == "yes")
-        {
-            self::$active = 1;
-            if (!isset(Conf::$settings['security settings']['fakelag']['limit']) || !is_numeric(Conf::$settings['security settings']['fakelag']['limit']))
-                Conf::$settings['security settings']['fakelag']['limit'] = 10;
-        }
-        else self::$active = 0;
-    }
+	/**Our config checking */
+	public static function config_check()
+	{
+		if (isset(Conf::$settings['security settings']['fakelag']) && Conf::$settings['security settings']['fakelag']['active'] == "yes")
+		{
+			self::$active = 1;
+			if (!isset(Conf::$settings['security settings']['fakelag']['limit']) || !is_numeric(Conf::$settings['security settings']['fakelag']['limit']))
+				Conf::$settings['security settings']['fakelag']['limit'] = 10;
+		}
+		else self::$active = 0;
+	}
 
 	function __construct(User $nick, int $seconds)
 	{
@@ -89,14 +89,14 @@ class __FakeLag {
 	}
 	static function find(User &$nick)
 	{
-        $s_nick = []; // list of users who were possibly killed in the next function
+		$s_nick = []; // list of users who were possibly killed in the next function
 
-        /* Null the user object */
+		/* Null the user object */
 		if (self::cleanup($s_nick) && in_array($nick->uid,$s_nick))
-        {
-            $nick = NULL;
-            return;
-        }
+		{
+			$nick = NULL;
+			return;
+		}
 
 		foreach (self::$list as &$user)
 			if ($user && $user->uid == $nick->uid)
@@ -115,7 +115,7 @@ class __FakeLag {
 			{
 				$qmsg = "Your connection has been exterminated: Flood";
 				S2S("KILL $item->uid :$qmsg");
-                		$s_nick[] = $item->uid;
+						$s_nick[] = $item->uid;
 
 				quit::cmd_quit(array("nick" => new User($item->uid), "params" => $qmsg));
 				$killed++;
@@ -143,19 +143,19 @@ class __FakeLag {
 
 if (!function_exists('IsFakeLag'))
 {
-    function IsFakeLag(User $nick)
-    {
-        if (!__FakeLag::$active)
-            return 0;
-        return (__FakeLag::find($nick)) ? 1 : 0;
-    }
+	function IsFakeLag(User $nick)
+	{
+		if (!__FakeLag::$active)
+			return 0;
+		return (__FakeLag::find($nick)) ? 1 : 0;
+	}
 }
 if (!function_exists('add_fake_lag'))
 {
-    function add_fake_lag(User &$nick, int $seconds)
-    {
-        if (!__FakeLag::$active)
-            return;
-        __FakeLag::add_fake_lag($nick,$seconds);
-    }
+	function add_fake_lag(User &$nick, int $seconds)
+	{
+		if (!__FakeLag::$active)
+			return;
+		__FakeLag::add_fake_lag($nick,$seconds);
+	}
 }

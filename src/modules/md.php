@@ -59,7 +59,7 @@ class md {
 		 * the function is a string reference to this class, the cmd_elmer method (function)
 		 * The last param is expected parameter count for the command
 		 * (both point to the same function which determines)
-        */
+		*/
 
 		if (!CommandAdd($this->name, 'MD', 'md::cmd_md', 0))
 			return false;
@@ -91,7 +91,7 @@ class md {
 	 * $u['nick'] = User object
 	 */
 	public static function cmd_md($u)
-    {
+	{
 		$parv = split($u['params']);
 		$target = $parv[1];
 		$key = $parv[2];
@@ -137,7 +137,7 @@ class md {
 			$value = servertime();
 		if ($return == 1)
 			md::add($target,$key,$value);
-    }
+	}
 	public static function add($person,$key,$value)
 	{
 		$conn = sqlnew();

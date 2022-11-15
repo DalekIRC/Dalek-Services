@@ -9,13 +9,13 @@ BACKTITLE="Microsoft Windows 95 Setup (Floppy disk 1 of 13)"
 TITLE="Dalek Configuration"
 INTRODUCTION="Welcome to Dalek's Configuration setup. We'll run through some things together and get a configuration file generated for you.\n\nBefore we start, please make sure you know the address of your IRC server. We'll also need to know where to find the SQL database your WordPress uses.\nOnce you know you have this information handy, we'll get right on it!\n\nThis should only take around 5-10 minutes.\n\nShall we get started?"
 BOX=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --yesno \
-                "$INTRODUCTION" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--yesno \
+				"$INTRODUCTION" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 if [ "$?" = 1 ] ; then
-    ./scripts/gui --interface
-    exit 1
+	./scripts/gui --interface
+	exit 1
 fi
 echo -n "<?php global \$cf;" > test.conf
 echo "" >> test.conf && echo "" >> test.conf
@@ -27,65 +27,65 @@ echo "\$cf = [" >> test.conf
 BACKTITLE="Dalek Configuration"
 REQUEST_NETWORK_NAME="So, first, we need to know  about your server.\nTo start us off, what's the name of your network?\n\n\nPlease avoid spaces. Hyphens and underscores '-' and '_' are permitted."
 NETWORK_NAME=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --inputbox \
-                "$REQUEST_NETWORK_NAME" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--inputbox \
+				"$REQUEST_NETWORK_NAME" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 if [ -z "$NETWORK_NAME" ] ; then
-    ./scripts/gui --aborted-config You must specify a network name
-    exit 1
+	./scripts/gui --aborted-config You must specify a network name
+	exit 1
 fi
 echo "  'network' => '${NETWORK_NAME}'," >> test.conf
 echo "  'debugmode' => 'off'," >> test.conf
 REQUEST_SERVERNAME="What should your Dalek server be called?\n\nHint: Probably something like 'services.${NETWORK_NAME}.net'"
 SERVERNAME=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --inputbox \
-                "$REQUEST_SERVERNAME" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--inputbox \
+				"$REQUEST_SERVERNAME" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 
 if [ -z "$SERVERNAME" ] ; then
-    echo "  'servicesname' => 'services.'," >> test.conf
+	echo "  'servicesname' => 'services.'," >> test.conf
 else
-    echo "  'servicesname' => '${SERVERNAME}'," >> test.conf
+	echo "  'servicesname' => '${SERVERNAME}'," >> test.conf
 fi
 
 
 REQUEST_SID="What should the SID for the server be?\n\nLeave it blank to use the default (69L)"
 SID=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --inputbox \
-                "$REQUEST_SID" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--inputbox \
+				"$REQUEST_SID" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 
 if [ -z "$SID" ] ; then
-    echo "  'sid' => '69L'," >> test.conf
+	echo "  'sid' => '69L'," >> test.conf
 else
-    echo "  'sid' => '${SID}'," >> test.conf
+	echo "  'sid' => '${SID}'," >> test.conf
 fi
 
 REQUEST_UPLINK="Please type the server name or IP of your uplink.\nNOTE: If you are connecting to a remote machine, it's recommended that you use TLS/SSL.\nYou can do this by prefixing the address with 'tls://'.\n\nIf you are connecting to the same machine you can leave this blank to default to 'localhost'"
 UPLINK=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --inputbox \
-                "$REQUEST_UPLINK" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--inputbox \
+				"$REQUEST_UPLINK" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 
 if [ -z "$UPLINK" ] ; then
-    echo "  'uplink' => 'localhost'," >> test.conf
+	echo "  'uplink' => 'localhost'," >> test.conf
 else
-    echo "  'uplink' => '${UPLINK}'," >> test.conf
+	echo "  'uplink' => '${UPLINK}'," >> test.conf
 fi
 
 REQUEST_PASS="Please type a password. Don't worry, about noting it down, you can generate an UnrealIRCd-style link block after!\n\nMake sure it's long and confusing!\n\nNote: Input is invisible as this is a password"
 PASS=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --passwordbox \
-                "$REQUEST_PASS" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--passwordbox \
+				"$REQUEST_PASS" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 if [ -z "$PASS" ] ; then
-    ./scripts/gui --aborted-config You must specify a password
-    ./dalek && exit 1
+	./scripts/gui --aborted-config You must specify a password
+	./dalek && exit 1
 fi
 
 echo "  'serverpassword' => '${PASS}'," >> test.conf
@@ -94,183 +94,183 @@ echo "  'serverpassword' => '${PASS}'," >> test.conf
 
 REQUEST_PORT="Please type the port of your uplink. (Usually 7001)"
 PORT=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --inputbox \
-                "$REQUEST_PORT" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--inputbox \
+				"$REQUEST_PORT" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 
 if [ -z "$PORT" ] ; then
-    echo "  'port' => '7001'," >> test.conf
+	echo "  'port' => '7001'," >> test.conf
 else
-    echo "  'port' => '${PORT}'," >> test.conf
+	echo "  'port' => '${PORT}'," >> test.conf
 fi
 
 REQUEST_EMAIL="Please give an admin email that users should contact in case of accidental bans.\n\nThis item is mandatory"
 EMAIL=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --inputbox \
-                "$REQUEST_EMAIL" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--inputbox \
+				"$REQUEST_EMAIL" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 
 if [ -z "$EMAIL" ] ; then
-    ./scripts/gui --aborted-config You must specify an email address
-    ./dalek && exit 1
+	./scripts/gui --aborted-config You must specify an email address
+	./dalek && exit 1
 else
-    echo "  'email' => '${EMAIL}'," >> test.conf
+	echo "  'email' => '${EMAIL}'," >> test.conf
 fi
 
 REQUEST_SQLIP="Now, moving on to WordPress.\n\nPlease provide the hostname or IP of your SQL database, specifically the one WordPress uses.\n\nIf you would like to use a UNIX domain socket file, leave this blank"
 SQLIP=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --inputbox \
-                "$REQUEST_SQLIP" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--inputbox \
+				"$REQUEST_SQLIP" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 
 if [ -z "$SQLIP" ] ; then
-    REQUEST_UXDF="Please specify the directory of your UNIX domain file"
-    UXDF=$(dialog --backtitle "$BACKTITLE" \
-            --title "$TITLE" \
-            --inputbox \
-            "$REQUEST_UXDF" $HEIGHT $WIDTH \
-            3>&1 1>&2 2>&3)
-    if [ -z "$UXDF" ] ; then
-        ./scripts/gui --aborted-config You did not specify a UNIX domain socket.\nYou must specify either an IP/hostname or a UNIX domain socket.\nDalek will not work without sharing an SQL database with WordPress.
-        ./dalek && exit 1
-    else
-        echo "  'sqlip' => NULL," >> test.conf
-        echo "  'sqlsock' => '${UXDF}'," >> test.conf
-    fi
+	REQUEST_UXDF="Please specify the directory of your UNIX domain file"
+	UXDF=$(dialog --backtitle "$BACKTITLE" \
+			--title "$TITLE" \
+			--inputbox \
+			"$REQUEST_UXDF" $HEIGHT $WIDTH \
+			3>&1 1>&2 2>&3)
+	if [ -z "$UXDF" ] ; then
+		./scripts/gui --aborted-config You did not specify a UNIX domain socket.\nYou must specify either an IP/hostname or a UNIX domain socket.\nDalek will not work without sharing an SQL database with WordPress.
+		./dalek && exit 1
+	else
+		echo "  'sqlip' => NULL," >> test.conf
+		echo "  'sqlsock' => '${UXDF}'," >> test.conf
+	fi
 else
-    echo "  'sqlip' => '${SQLIP}'," >> test.conf
-    echo "  'sqlsock' => NULL," >> test.conf
+	echo "  'sqlip' => '${SQLIP}'," >> test.conf
+	echo "  'sqlsock' => NULL," >> test.conf
 fi
 
 REQUEST_SQLDB="Please provide the name of the SQL database which WordPress uses"
 SQLDB=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --inputbox \
-                "$REQUEST_SQLDB" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--inputbox \
+				"$REQUEST_SQLDB" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 
 if [ -z "$SQLDB" ] ; then
-    ./scripts/gui --aborted-config You must specify an SQL database
-    ./dalek && exit 1
+	./scripts/gui --aborted-config You must specify an SQL database
+	./dalek && exit 1
 else
-    echo "  'sqldb' => '${SQLDB}'," >> test.conf
+	echo "  'sqldb' => '${SQLDB}'," >> test.conf
 fi
 
 REQUEST_SQLUSER="And now please provide the username for that database"
 SQLUSER=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --inputbox \
-                "$REQUEST_SQLUSER" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--inputbox \
+				"$REQUEST_SQLUSER" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 
 if [ -z "$SQLUSER" ] ; then
-    ./scripts/gui --aborted-config You must specify an SQL user
-    ./dalek && exit 1
+	./scripts/gui --aborted-config You must specify an SQL user
+	./dalek && exit 1
 else
-    echo "  'sqluser' => '${SQLUSER}'," >> test.conf
+	echo "  'sqluser' => '${SQLUSER}'," >> test.conf
 fi
 
 REQUEST_SQLPASS="And now the password for that user"
 SQLPASS=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --passwordbox \
-                "$REQUEST_SQLPASS" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--passwordbox \
+				"$REQUEST_SQLPASS" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 
 if [ -z "$SQLPASS" ] ; then
-    ./scripts/gui --aborted-config You must specify an SQL user password
-    ./dalek && exit 1
+	./scripts/gui --aborted-config You must specify an SQL user password
+	./dalek && exit 1
 else
-    echo "  'sqlpass' => '${SQLPASS}'," >> test.conf
+	echo "  'sqlpass' => '${SQLPASS}'," >> test.conf
 fi
 
 REQUEST_FLOODPROT="Would you like services to implement flood protection?\nThat is, to protect service bots like NickServ from floods. This does not mean kicking users from channels when they message the channel too fast."
 FLOODPROT=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --yesno \
-                "$REQUEST_FLOODPROT" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--yesno \
+				"$REQUEST_FLOODPROT" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 
 if [ "$FLOODPROT" -eq 0 ] ; then
-    echo "  'fake_lag' => true," >> test.conf
-    echo "  'fake_lag_limit' => 10," >> test.conf
+	echo "  'fake_lag' => true," >> test.conf
+	echo "  'fake_lag_limit' => 10," >> test.conf
 fi
 
 REQUEST_LOGCHAN="Which channel would you like services to join and log to? (Usually #services)"
 LOGCHAN=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --inputbox \
-                "$REQUEST_LOGCHAN" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--inputbox \
+				"$REQUEST_LOGCHAN" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 
 if [ -z "$LOGCHAN" ] ; then
-    echo "  'logchan' => '#services'," >> test.conf
+	echo "  'logchan' => '#services'," >> test.conf
 
 else 
-    echo "  'logchan' => '${LOGCHAN}'," >> test.conf
+	echo "  'logchan' => '${LOGCHAN}'," >> test.conf
 fi
 REQUEST_MASK="Would you like to automatically assign users hostnames based on placemarks?"
 ISMASK=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --yesno \
-                "$REQUEST_MASK" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--yesno \
+				"$REQUEST_MASK" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 
 
 if [ "$?" -eq 0 ] ; then
-    REQUEST_MASK="Please enter a hostmask you would like users to have.\n\nYou can use placemarks anywhere in your mask.\n\n%n = Network name\n%a = Account name\n%r = Rank (Staff/User/Bot)\n\nExample:\n%n/%r/%a"
-    MASK=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --inputbox \
-                "$REQUEST_MASK" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+	REQUEST_MASK="Please enter a hostmask you would like users to have.\n\nYou can use placemarks anywhere in your mask.\n\n%n = Network name\n%a = Account name\n%r = Rank (Staff/User/Bot)\n\nExample:\n%n/%r/%a"
+	MASK=$(dialog --backtitle "$BACKTITLE" \
+				--title "$TITLE" \
+				--inputbox \
+				"$REQUEST_MASK" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 
-    echo "  'mask' => '$MASK'," >> test.conf
+	echo "  'mask' => '$MASK'," >> test.conf
 fi
 echo "];" >> test.conf && echo "" >> test.conf
 REQUEST_REVIEW="Amazing! It looks like that's everything we need! Would you like to review what we've got before we save it?"
 REVIEW=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --yesno \
-                "$REQUEST_REVIEW" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
+				--title "$TITLE" \
+				--yesno \
+				"$REQUEST_REVIEW" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
 
 if [ "$?" -eq 0 ] ; then
-    RV=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --textbox test.conf 100 $WIDTH \
-                3>&1 1>&2 2>&3)
+	RV=$(dialog --backtitle "$BACKTITLE" \
+				--title "$TITLE" \
+				--textbox test.conf 100 $WIDTH \
+				3>&1 1>&2 2>&3)
 fi
 
 if [ -f "conf/dalek.conf" ] ; then
-    CF=$(dialog --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --yesno \
-                "'dalek.conf' already exists. Would you like to overwrite it?" $HEIGHT $WIDTH \
-                3>&1 1>&2 2>&3)
-    if [ "$?" -eq 0 ] ; then
-        rm -rf conf/dalek.conf
-        mv test.conf conf/dalek.conf
-    else
-        ./scripts/gui --aborted-config Configuration not saved
-        rm -rf test.conf
-        ./dalek
-        ./dalek && exit 1
-    fi
+	CF=$(dialog --backtitle "$BACKTITLE" \
+				--title "$TITLE" \
+				--yesno \
+				"'dalek.conf' already exists. Would you like to overwrite it?" $HEIGHT $WIDTH \
+				3>&1 1>&2 2>&3)
+	if [ "$?" -eq 0 ] ; then
+		rm -rf conf/dalek.conf
+		mv test.conf conf/dalek.conf
+	else
+		./scripts/gui --aborted-config Configuration not saved
+		rm -rf test.conf
+		./dalek
+		./dalek && exit 1
+	fi
 else
-    mv test.conf conf/dalek.conf
+	mv test.conf conf/dalek.conf
 fi
 
 REHASH=$(dialog --backtitle "$BACKTITLE" \
-            --title "$TITLE" \
-            --yesno \
-            "Configuration saved!\n\nWould you like to rehash?" $HEIGHT $WIDTH \
-            3>&1 1>&2 2>&3)
+			--title "$TITLE" \
+			--yesno \
+			"Configuration saved!\n\nWould you like to rehash?" $HEIGHT $WIDTH \
+			3>&1 1>&2 2>&3)
 if [ "$?" -eq 0 ] ; then
-    ./dalek rehash
-    ./scripts/gui --success Services were rehashed
-    ./dalek
+	./dalek rehash
+	./scripts/gui --success Services were rehashed
+	./dalek
 fi

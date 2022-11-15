@@ -130,7 +130,7 @@ nickserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$ns->notice($nick,"CERTFP              Modifies or displays the certificate list for your nick.");
+	$ns->notice($nick,"CERTFP			  Modifies or displays the certificate list for your nick.");
 	
 });
 
@@ -146,7 +146,7 @@ nickserv::func("help", function($u){
 	
 	$ns->notice($nick,"Command: CERTFP");
 	$ns->notice($nick,"Syntax: /msg $ns->nick CERTFP ADD");
-	$ns->notice($nick,"             /msg $ns->nick CERTFP DEL <certfp>");
+	$ns->notice($nick,"			 /msg $ns->nick CERTFP DEL <certfp>");
 	$ns->notice($nick," ");
 	$ns->notice($nick,"Example: /msg $ns->nick CERTFP ADD");
 });

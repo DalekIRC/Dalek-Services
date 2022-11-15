@@ -31,7 +31,7 @@ class setname {
 	public $description = "Provides SETNAME command";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -59,12 +59,12 @@ class setname {
 		 * the function is a string reference to this class, the cmd_elmer method (function)
 		 * The last param is expected parameter count for the command
 		 * (both point to the same function which determines)
-        */
+		*/
 
 		if (!CommandAdd($this->name, 'SETNAME', 'setname::cmd_setname', 1))
 			return false;
 
-       
+	   
 
 		return true;
 	}
@@ -74,8 +74,8 @@ class setname {
 	 * In this example (and throughout the source), $u contains an array with
 	 * information passed along by the caller
 	 * $u['nick'] = User object
-     * $u['params'] = Parameters
-     * $u['cmd'] = calling command if needed
+	 * $u['params'] = Parameters
+	 * $u['cmd'] = calling command if needed
 	 */
 	public static function cmd_setname($u)
 	{
@@ -86,5 +86,5 @@ class setname {
 		$prep->bind_param("ss",$gecos,$nick->uid);
 		$prep->execute();
 		return;
-    }
+	}
 }

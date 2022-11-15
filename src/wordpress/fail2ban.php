@@ -32,36 +32,36 @@
 
 function fail2ban($ip, int $s)
 {
-    global $fail2ban,$saslignore;
+	global $fail2ban,$saslignore;
 
-    $sn = Conf::$settings['info']['services-name'];
-    if (!isset($saslignore))
-        $saslignore = array();
+	$sn = Conf::$settings['info']['services-name'];
+	if (!isset($saslignore))
+		$saslignore = array();
 
-    if (!isset($fail2ban))
-        $fail2ban = array();
+	if (!isset($fail2ban))
+		$fail2ban = array();
 
-    /* remove */
-    if ($s == 0)
-    {
-        $fail2ban[$ip] = NULL;
-        unset($fail2ban[$ip]);
-        return false;
-    }
-    if (!isset($fail2ban[$ip]))
-        $fail2ban[$ip] = 1;
+	/* remove */
+	if ($s == 0)
+	{
+		$fail2ban[$ip] = NULL;
+		unset($fail2ban[$ip]);
+		return false;
+	}
+	if (!isset($fail2ban[$ip]))
+		$fail2ban[$ip] = 1;
 
-    else $fail2ban[$ip]++;
+	else $fail2ban[$ip]++;
 
-    if (!isset($cf['fail2ban']) || $cf['fail2ban'] !== true)
-    {
-        return;
-    }
-    $cb = (isset(Config::$settings['security settings']['fail2ban']['count']) && Config::$settings['security settings']['fail2ban']['count'] > 0) ? Config::$settings['security settings']['fail2ban']['count'] : 10; // default value is 10 incorrect attempts
-    $db = (isset(Config::$settings['security settings']['fail2ban']['bantime']) && Config::$settings['security settings']['fail2ban']['bantime'] > 0) ? Config::$settings['security settings']['fail2ban']['bantime'] : 30; // default value is 30 minutes ban
-    $duration = $db * 60; // we want the seconds
-    $expiry = servertime() + $duration;
+	if (!isset($cf['fail2ban']) || $cf['fail2ban'] !== true)
+	{
+		return;
+	}
+	$cb = (isset(Config::$settings['security settings']['fail2ban']['count']) && Config::$settings['security settings']['fail2ban']['count'] > 0) ? Config::$settings['security settings']['fail2ban']['count'] : 10; // default value is 10 incorrect attempts
+	$db = (isset(Config::$settings['security settings']['fail2ban']['bantime']) && Config::$settings['security settings']['fail2ban']['bantime'] > 0) ? Config::$settings['security settings']['fail2ban']['bantime'] : 30; // default value is 30 minutes ban
+	$duration = $db * 60; // we want the seconds
+	$expiry = servertime() + $duration;
 
-    if ($fail2ban[$ip] >= $cb)
-        S2S("TKL + Z * $ip $sn $expiry".servertime()." :Too many bad auth attempts. [".$db."m]");
+	if ($fail2ban[$ip] >= $cb)
+		S2S("TKL + Z * $ip $sn $expiry".servertime()." :Too many bad auth attempts. [".$db."m]");
 }

@@ -62,7 +62,7 @@ chanserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$cs->notice($nick,"HELP                Show this list and gets help on a specific command.");
+	$cs->notice($nick,"HELP				Show this list and gets help on a specific command.");
 	
 });
 

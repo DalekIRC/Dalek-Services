@@ -71,7 +71,7 @@ class PasswordHash {
 	{
 		$output = '';
 		if (@is_readable('/dev/urandom') &&
-		    ($fh = @fopen('/dev/urandom', 'rb'))) {
+			($fh = @fopen('/dev/urandom', 'rb'))) {
 			$output = fread($fh, $count);
 			fclose($fh);
 		}
@@ -80,7 +80,7 @@ class PasswordHash {
 			$output = '';
 			for ($i = 0; $i < $count; $i += 16) {
 				$this->random_state =
-				    md5(microtime() . $this->random_state);
+					md5(microtime() . $this->random_state);
 				$output .= md5($this->random_state, TRUE);
 			}
 			$output = substr($output, 0, $count);
@@ -212,7 +212,7 @@ class PasswordHash {
 		if (CRYPT_BLOWFISH === 1 && !$this->portable_hashes) {
 			$random = $this->get_random_bytes(16);
 			$hash =
-			    crypt($password, $this->gensalt_blowfish($random));
+				crypt($password, $this->gensalt_blowfish($random));
 			if (strlen($hash) === 60)
 				return $hash;
 		}
@@ -220,8 +220,8 @@ class PasswordHash {
 		if (strlen($random) < 6)
 			$random = $this->get_random_bytes(6);
 		$hash =
-		    $this->crypt_private($password,
-		    $this->gensalt_private($random));
+			$this->crypt_private($password,
+			$this->gensalt_private($random));
 		if (strlen($hash) === 34)
 			return $hash;
 

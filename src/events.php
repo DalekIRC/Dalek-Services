@@ -45,13 +45,13 @@ class Events
 			$i = 0;
 			foreach ($ee as $timestamp => &$event)
 			{
-                
+				
 				if ($timestamp <= servertime()) // come, Event... it is time...
 				{
-                    $i = array_search($event, array_keys(Events::$list)); // find our offset
-                    
+					$i = array_search($event, array_keys(Events::$list)); // find our offset
+					
 					if (IsDebugMode()) // let the debugger know ;D
-                        DebugLog("Event triggered: ".$event['modname'], LOG_EVENT);
+						DebugLog("Event triggered: ".$event['modname'], LOG_EVENT);
 
 					$func = ($event['modname']) ? [0 => $event['modname'], 1 => $event['function']] : $event['function'];
 					$params = $event['params'];
@@ -71,15 +71,15 @@ class Events
 
 					elseif ($event['repetitions'] == EVENT_MIN_REPETITIONS) // looks we just ran the last one! good job guys you can go home early today
 					{
-                        array_splice(Events::$list, $i);
-                        return;
-                    }
+						array_splice(Events::$list, $i);
+						return;
+					}
 
 					if ($event['interval']) // bump the timestamp to the next interval
 					{
 						Events::$list[servertime() + $event['interval']] = $event;
-                        array_splice(Events::$list, $i);
-                    }
+						array_splice(Events::$list, $i);
+					}
 				}
 			}
 		}
@@ -134,7 +134,7 @@ class Events
 			SVSLog($error, LOG_EVENT);
 			return false;
 		}
-        $event[$ctime]['function'] = $function; // we should have $function or we scrood, but we returned earlier so it's okay =]
+		$event[$ctime]['function'] = $function; // we should have $function or we scrood, but we returned earlier so it's okay =]
 		$event[$ctime]['interval'] = $interval; // de interval
 		$event[$ctime]['repetitions'] = $repetitions; // add repetitions if we got any   
 		$event[$ctime]['modname'] = $modname; // assign the module name to it if there were any module.

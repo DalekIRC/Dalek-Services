@@ -77,7 +77,7 @@ chanserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$cs->notice($nick,"INFO                List information about a given channel.");
+	$cs->notice($nick,"INFO				List information about a given channel.");
 	
 });
 

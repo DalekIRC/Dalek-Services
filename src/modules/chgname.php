@@ -31,7 +31,7 @@ class chgname {
 	public $description = "Provides CHGNAME command";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -59,7 +59,7 @@ class chgname {
 		 * the function is a string reference to this class, the cmd_elmer method (function)
 		 * The last param is expected parameter count for the command
 		 * (both point to the same function which determines)
-        */
+		*/
 
 		if (!CommandAdd($this->name, 'CHGNAME', 'chgname::cmd_chgname', 1))
 			return false;
@@ -75,20 +75,20 @@ class chgname {
 	 * In this example (and throughout the source), $u contains an array with
 	 * information passed along by the caller
 	 * $u['nick'] = User object
-     * $u['params'] = Parameters
-     * $u['cmd'] = calling command if needed
+	 * $u['params'] = Parameters
+	 * $u['cmd'] = calling command if needed
 	 */
 	public static function cmd_chgname($u)
 	{
 
-        $parv = explode(" :",$u['params']);
-        $gecos = cut_first_from($u['params']);
-        $uid = $parv[0];
+		$parv = explode(" :",$u['params']);
+		$gecos = cut_first_from($u['params']);
+		$uid = $parv[0];
 		$conn = sqlnew();
 		$prep = $conn->prepare("UPDATE ".sqlprefix()."user SET gecos = ? WHERE UID = ?");
 		$prep->bind_param("ss",$gecos,$uid);
 		$prep->execute();
-    }
+	}
 
 
 	public static function rpc_cmd($id, $params)

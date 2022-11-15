@@ -31,7 +31,7 @@ class sjoin {
 	public $description = "Provides SJOIN compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -59,7 +59,7 @@ class sjoin {
 		 * the function is a string reference to this class, the csjoin_elmer method (function)
 		 * The last param is expected parameter count for the command
 		 * (both point to the same function which determines)
-        */
+		*/
 
 		if (!CommandAdd($this->name, 'SJOIN', 'sjoin::cmd_sjoin', 0))
 			return false;
@@ -74,8 +74,8 @@ class sjoin {
 	 * $u['nick'] = User object
 	 */
 	public static function cmd_sjoin($u)
-    {
-        $parv = explode(" ",$u['params']);
+	{
+		$parv = explode(" ",$u['params']);
 		
 		$sid = $u['nick']->uid;
 		$timestamp = $parv[0];
@@ -89,7 +89,7 @@ class sjoin {
 			"modes" => $modes,
 			"full" => ":$sid SJOIN ".$u['params']);
 		hook::run("SJOIN", $array);
-    }
+	}
 	public static function sjoin_add($u)
 	{
 		global $sql;

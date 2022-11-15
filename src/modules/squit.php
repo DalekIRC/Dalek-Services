@@ -31,7 +31,7 @@ class squit {
 	public $description = "Provides SQUIT compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -59,10 +59,10 @@ class squit {
 		 * the function is a string reference to this class, the cmd_elmer method (function)
 		 * The last param is expected parameter count for the command
 		 * (both point to the same function which determines)
-        */
+		*/
 
 		hook::func("raw", 'squit::cmd_squit');
-        hook::func("squit", 'squit::squit');
+		hook::func("squit", 'squit::squit');
 		return true;
 	}
 
@@ -73,17 +73,17 @@ class squit {
 	 * $u['nick'] = User object
 	 */
 	public static function cmd_squit($u)
-    {
-        $parv = explode(" ",$u['string']);
-        if ($parv[0] !== "SQUIT")
-            return;
-        $s = find_serv($parv[1]);
-        hook::run("squit", $s['sid']);
-    }
-    public static function squit($sid)
-    {
-        $r = recurse_serv_attach($sid);
-        foreach ($r as $v)
-	    	del_sid($v);
-    }   
+	{
+		$parv = explode(" ",$u['string']);
+		if ($parv[0] !== "SQUIT")
+			return;
+		$s = find_serv($parv[1]);
+		hook::run("squit", $s['sid']);
+	}
+	public static function squit($sid)
+	{
+		$r = recurse_serv_attach($sid);
+		foreach ($r as $v)
+			del_sid($v);
+	}   
 }

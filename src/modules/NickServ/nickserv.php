@@ -126,7 +126,7 @@ class nickserv {
 		 * @param3 String $hostmask
 		 * @param4 NULL
 		 * @param5 String $gecos
-		 * @param6 String $module_name    (This module)
+		 * @param6 String $module_name	(This module)
 		 */
 		$ns = new Client($nickserv['nick'],$nickserv['ident'],$nickserv['hostmask'],NULL,$nickserv['gecos'],'nickserv');
 

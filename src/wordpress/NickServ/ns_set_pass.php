@@ -78,5 +78,5 @@ nickserv::func("setlist", function($u){
 	if (isset($parv[0])){ return; }
 	if ($nickserv['login_method'] !== "wordpress")
 		return;
-	$ns->notice($u['nick'],"PASSWORD            Change your password.");
+	$ns->notice($u['nick'],"PASSWORD			Change your password.");
 });

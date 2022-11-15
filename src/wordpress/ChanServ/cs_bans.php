@@ -14,7 +14,7 @@
 */
 chanserv::func("privmsg", function($u)
 {
-    global $cs;
+	global $cs;
 	
 	$parv = explode(" ",$u['msg']);
 	if ($parv[0] !== "bans")
@@ -59,17 +59,17 @@ chanserv::func("privmsg", function($u)
 	$result = $prep->get_result();
 	
 	if (!$result->num_rows)
-    {
-        $prep->close();
-        $cs->notice($nick->uid,"There are no bans on channel $chan->chan");
-        return;
-    }
-    
-    $cs->notice($nick->uid,"Listing bans on channel: $chan->chan");
-    $cs->notice($nick->uid,clean_align("Mask:").clean_align("Set by:").clean_align("Timestamp:"));
-    while ($row = $result->fetch_assoc())
-        $cs->notice($nick->uid,clean_align($row['meta_value']).clean_align($row['meta_setby']).clean_align($row['meta_timestamp']));
-    $prep->close();
+	{
+		$prep->close();
+		$cs->notice($nick->uid,"There are no bans on channel $chan->chan");
+		return;
+	}
+	
+	$cs->notice($nick->uid,"Listing bans on channel: $chan->chan");
+	$cs->notice($nick->uid,clean_align("Mask:").clean_align("Set by:").clean_align("Timestamp:"));
+	while ($row = $result->fetch_assoc())
+		$cs->notice($nick->uid,clean_align($row['meta_value']).clean_align($row['meta_setby']).clean_align($row['meta_timestamp']));
+	$prep->close();
 });
 
 
@@ -79,7 +79,7 @@ chanserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$cs->notice($nick,"BANS                View the ban list for a channel.");
+	$cs->notice($nick,"BANS				View the ban list for a channel.");
 	
 });
 

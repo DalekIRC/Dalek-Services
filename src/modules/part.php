@@ -31,7 +31,7 @@ class part {
 	public $description = "Provides PART compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
-    public $official = true;
+	public $official = true;
 
 	/* To run when this class is created/when the module is loaded */
 	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
@@ -59,7 +59,7 @@ class part {
 		 * the function is a string reference to this class, the cpart_elmer method (function)
 		 * The last param is expected parameter count for the command
 		 * (both point to the same function which determines)
-        */
+		*/
 
 		if (!CommandAdd($this->name, 'PART', 'part::cmd_part', 0))
 			return false;
@@ -74,10 +74,10 @@ class part {
 	 * $u['nick'] = User object
 	 */
 	public static function cmd_part($u)
-    {
+	{
 		$parv = explode(" ",$u['params']);
 		$nick = $u['nick'];
 		$chan = strtolower($parv[0]);
 		do_part($chan,$nick);
-    }
+	}
 }

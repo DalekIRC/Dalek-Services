@@ -191,7 +191,7 @@ function IsConnected(){
  */
 function IsUser(User $nick)
 {
-    return $nick->IsUser;
+	return $nick->IsUser;
 }
 
 /* Checks if the User object is an oper.
@@ -204,9 +204,9 @@ function IsUser(User $nick)
  */
 function IsOper(User $nick)
 {
-    if (strpos($nick->usermode,"o") !== false)
-        return true;
-    return false;
+	if (strpos($nick->usermode,"o") !== false)
+		return true;
+	return false;
 }
 
 /* Checks if the User object is connecting to
@@ -916,10 +916,10 @@ function get_string_between($string,$start, $end)
 function ircstrip($string)
 {
 	$_ircstrip = str_replace(array(
-                chr(10),
-                chr(13),
+				chr(10),
+				chr(13),
 				chr(2),
-            ), '', $string);
+			), '', $string);
 	return $_ircstrip;
 }
 

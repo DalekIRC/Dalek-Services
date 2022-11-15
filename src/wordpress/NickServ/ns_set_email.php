@@ -63,5 +63,5 @@ nickserv::func("setlist", function($u){
 		return;
 	if (isset($u['key'])){ return; }
 	if (isset($parv[0])){ return; }
-	$ns->notice($u['nick'],"EMAIL               Set the email address associated with your account.");
+	$ns->notice($u['nick'],"EMAIL			   Set the email address associated with your account.");
 });

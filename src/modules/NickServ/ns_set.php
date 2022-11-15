@@ -46,7 +46,7 @@ nickserv::func("helplist", function($u){
 	
 	$nick = $u['nick'];
 	
-	$ns->notice($nick,"SET                 Set options for your account.");
+	$ns->notice($nick,"SET				 Set options for your account.");
 });
 
 

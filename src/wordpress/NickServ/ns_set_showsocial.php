@@ -185,5 +185,5 @@ nickserv::func("setlist", function($u){
 		return;
 	if (isset($u['key'])){ return; }
 	if (isset($parv[0])){ return; }
-	$ns->notice($u['nick'],"SHOWSOCIAL          Show your social links in your NickServ INFO and /WHOIS.");
+	$ns->notice($u['nick'],"SHOWSOCIAL		  Show your social links in your NickServ INFO and /WHOIS.");
 });

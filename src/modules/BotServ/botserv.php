@@ -126,7 +126,7 @@ class botserv {
 		 * @param3 String $hostmask
 		 * @param4 NULL
 		 * @param5 String $gecos
-		 * @param6 String $module_name    (This module)
+		 * @param6 String $module_name	(This module)
 		 */
 		$bs = new Client($botserv['nick'],$botserv['ident'],$botserv['hostmask'],NULL,$botserv['gecos'],'botserv');
 
