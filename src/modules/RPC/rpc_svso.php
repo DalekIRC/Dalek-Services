@@ -92,20 +92,12 @@ class rpc_svso {
 				SVSLog("[SVSO]: User does not have permission to be opered.", LOG_RPC);
 			}
 			
-			if (in_array("administrator",$user->wp->role_array))
+			foreach($user->wp->role_array as $cap)
 			{
-				$oper_class = config_get_item("opertype::administrator");
-			}
-			if (in_array("irc_admin",$user->wp->role_array))
-			{
-				$oper_class = config_get_item("opertype::irc_admin");
-			}
-			if (in_array("irc_oper",$user->wp->role_array))
-			{
-				$oper_class = config_get_item("opertype::irc_oper");
+				if (strstr($cap,"irc_") || $cap == "administrator")
+					$oper_class = config_get_item("opertype::$cap");
 			}
 
-			
 			svso::send($user, $account, $oper_class);
 			SVSLog("[SVSO.ADD] $user->nick (account: $account) (class: $oper_class)",LOG_RPC);
 			rpc_append_result($reply,"Success");
