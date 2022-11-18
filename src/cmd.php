@@ -32,7 +32,7 @@ class cmd {
 		}
 	}
 
-	public static function func($cmd, Closure $function)
+	public static function func($cmd, $function)
 	{
 		self::$commands[$cmd]['func'] = $function;
 	}
