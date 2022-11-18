@@ -35,6 +35,7 @@ define('HOOKTYPE_RAW', 'raw');
 define('HOOKTYPE_NEW_MESSAGE', 'privmsg');
 /** When a new message is sent to a pseudoclient on our server */
 define('HOOKTYPE_USER_MESSAGE', 'usermsg');
+/** When a TAGMSG is sent to a channel we are in, or sent to a pseudoclient  (somewhere we can see it) */
 define('HOOKTYPE_TAGMSG', 'tagmsg');
 /** When a new message is sent to a channel we can see the messages for */
 define('HOOKTYPE_CHANNEL_MESSAGE', 'chanmsg');
@@ -105,6 +106,8 @@ define('HOOKTYPE_CONFIGTEST', 'cfgtest');
 define('HOOKTYPE_CONFIGRUN', 'cfgrun');
 /** To run as soon as we have connected, while syncing, before sending our own EOS */
 define('HOOKTYPE_BURST', 'servburst');
+/** This is run when a module is unloaded. */
+define('HOOKTYPE_UNLOAD_MODULE', 'unloadmodule');
 
 /** 
  *  Class for "hook"
@@ -129,7 +132,8 @@ class hook {
 	/** A static list of hooks and their associated functions */
 	private static $actions = [];
 
-	/** Runs a hook
+	/** Runs a hook.
+	 * The parameter for $hook should be a "HOOKTYPE_" as defined in hook.php
 	 * @param String $hook The define or string name of the hook. For example, HOOKTYPE_REHASH.
 	 * @param Array &$args The array of information you are sending along in the hook, so that other functions may see and modify things.
 	 * @return void Does not return anything.
@@ -145,7 +149,7 @@ class hook {
 
 	/** Calls a hook
 	 * @param String $hook The define or string name of the hook. For example, HOOKTYPE_REHASH.
-	 * @param Closure $function This is a reference to a function or a class method.
+	 * @param String|Closure $function This is a string reference to a Closure function or a class method.
 	 * @return void Does not return anything.
 	 */
 	public static function func($hook, $function) {

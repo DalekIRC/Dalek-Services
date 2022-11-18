@@ -63,7 +63,7 @@ function AddServCmd
 class ServCmd {
 
 	static $list = array();
-
+	public $client;
 
 	static function add_new_cmd($module, $client, $cmd, $func, $help_cmd_entry, $syntax, $extended_help)
 	{
@@ -83,22 +83,14 @@ class ServCmd {
 		$c['syntax'] = $syntax;
 		$c['extended_help'] = $extended_help;
 
-		self::$list[] = new SCMD($c);
+		self::$list[] = (Object)$c;
 		return true;
 	}
 }
 
-class SCMD
-{
-	function __construct(array $arr)
-	{
-		foreach($arr as $key => $value)
-			$this->$key = $value;
-	}
-}
 
 /* Unload commands associated with a mod we unloaded */
-hook::func("unloadmod",
+hook::func(HOOKTYPE_UNLOAD_MODULE,
 function($mod)
 {
 	foreach (ServCmd::$list as $i => $cmd)

@@ -1,13 +1,13 @@
 <?php
 
-/* Some defines */
+/** Some defines */
 define( "LOG_WARN","[07WARN] ");
 define( "LOG_FATAL","[04FATAL] ");
 define( "LOG_RPC", "[RPC] ");
 define( "CHAN_CONTEXT", "+draft/channel-context");
 define( "RECYCLED_MESSAGE", "dalek/recycled");
 
-/* Returns unix time */
+/** Returns unix time */
 function servertime()
 {
 	$timeget = microtime(true);	
@@ -15,7 +15,7 @@ function servertime()
 	return $timetok[0];
 }
 
-/* Returns microseconds */
+/** Returns microseconds */
 function microsecs()
 {
 	$timeget = microtime(true);	
@@ -25,13 +25,13 @@ function microsecs()
 	return mb_substr($timetok[1],0,3);
 }
 
-/* If the String is our server name or server ID
+/** If the String is our server name or server ID
  *
  * Syntax:
  * IsMe(String $name_or_sid)
  * 
  * Returns:
- * bool
+ * Bool
  */
 function IsMe($srv)
 {
@@ -41,7 +41,7 @@ function IsMe($srv)
 	return true;
 }
 
-/* This function goes through channel modes and deals
+/** This function goes through channel modes and deals
  * with them appropriately.
  * It's called Meatball Factory because this was complex for me lol
  */
@@ -88,7 +88,7 @@ function MeatballFactory(Channel $chan,$modes,$params,$source)
 }
 
 
-/* Function to process bans that are set in channels */
+/** Function to process bans that are set in channels */
 function bie($chan,$item)
 {
 	$tok = explode(",",get_string_between($item,"<",">"));
@@ -129,7 +129,7 @@ function bie($chan,$item)
 	$prep->close();
 }
 
-/* This function takes a string, tokenizes
+/** This function takes a string, tokenizes
  * it by a space (chr 32), removes the first
  * word/token, and returns the result.
  * Mostly used for string manipulation around
@@ -151,7 +151,7 @@ function rparv($string)
 	return false;
 }
 
-/* Does a global notice */
+/** Does a global notice */
 function global_notice($msg) 
 {
 	if (!IsConnected())
@@ -164,14 +164,14 @@ function global_notice($msg)
 	return true;
 }
 
-/* Checks if we are currently fully connected
+/** Checks if we are currently fully connected
  * to an IRC server.
  * 
  * Syntax:
  * IsConnected()
  * 
  * Returns:
- * bool
+ * Bool
  */
 function IsConnected(){
 	global $isconn;
@@ -180,27 +180,27 @@ function IsConnected(){
 	return true;
 }
 
-/* Checks if the User object is connecting to
+/** Checks if the User object is connecting to
  * IRC as a normal user.
  *
  * Syntax:
  * IsUser($user_object)
  * 
  * Returns:
- * bool
+ * Bool
  */
 function IsUser(User $nick)
 {
 	return $nick->IsUser;
 }
 
-/* Checks if the User object is an oper.
+/** Checks if the User object is an oper.
  *
  * Syntax:
  * IsOper($user_object)
  * 
  * Returns:
- * bool
+ * Bool
  */
 function IsOper(User $nick)
 {
@@ -209,14 +209,14 @@ function IsOper(User $nick)
 	return false;
 }
 
-/* Checks if the User object is connecting to
+/** Checks if the User object is connecting to
  * IRC using Services Mode (+S).
  *
  * Syntax:
  * IsServiceBot($user_object)
  * 
  * Returns:
- * bool
+ * Bool
  */
 function IsServiceBot(User $nick)
 {
@@ -225,14 +225,14 @@ function IsServiceBot(User $nick)
 	return false;
 }
 
-/* Checks if the User object is connecting to
+/** Checks if the User object is connecting to
  * IRC as a Bot.
  *
  * Syntax:
  * IsBot($user_object)
  * 
  * Returns:
- * bool
+ * Bool
  */
 function IsBot(User $nick)
 {
@@ -241,14 +241,14 @@ function IsBot(User $nick)
 	return false;
 }
 
-/* Checks if the User object is connecting to
+/** Checks if the User object is connecting to
  * IRC securely.
  *
  * Syntax:
  * IsSecure($user_object)
  * 
  * Returns:
- * bool
+ * Bool
  */
 function IsSecure(User $nick)
 {
@@ -257,14 +257,14 @@ function IsSecure(User $nick)
 	return false;
 }
 
-/* Checks if the User object is connecting to
+/** Checks if the User object is connecting to
  * IRC using WEBIRC protocol.
  *
  * Syntax:
  * IsWebUser($user_object)
  * 
  * Returns:
- * bool
+ * Bool
  */
 function IsWebUser(User $nick)
 {
@@ -272,13 +272,13 @@ function IsWebUser(User $nick)
 }
 
 
-/* Checks if the User object is logged in.
+/** Checks if the User object is logged in.
  *
  * Syntax:
  * IsLoggedIn($user_object)
  * 
  * Returns:
- * bool
+ * Bool
  */
 function IsLoggedIn(User $nick)
 {
@@ -287,35 +287,35 @@ function IsLoggedIn(User $nick)
 	return false;
 }
 
-/* Checks if the User object is a client
+/** Checks if the User object is a client
  * of ours, from this pseudo-server
  *
  * Syntax:
  * MyUser($user_object)
  * 
  * Returns:
- * bool
+ * Bool
  */
 function MyUser(User $nick)
 {
 	return $nick->IsClient;
 }
 
-/* Checks a user object to see if it
+/** Checks a user object to see if it
  * is also a server
  * 
  * Syntax:
  * IsServer($user_object)
  * 
  * Returns:
- * bool
+ * Bool
  */
 function IsServer(User $nick)
 {
 	return $nick->IsServer;
 }
 
-/* Returns bold text from the given
+/** Returns bold text from the given
  * argument.
  * 
  * Syntax:
@@ -329,7 +329,7 @@ function bold($s)
 	return chr(2).$s.chr(2);
 }
 
-/* Returns underlined text from the given
+/** Returns underlined text from the given
  * argument.
  * 
  * Syntax:
@@ -343,7 +343,7 @@ function ul($s)
 	return chr(29).$s.chr(29);
 }
 
-/* 10th May 2022
+/** 10th May 2022
  * 
  * Additions:
  * 1) $type param, uses "" as default
@@ -353,14 +353,14 @@ function ul($s)
  */
 function SVSLog($string, $type = "") : void
 {
-	/* affix a type */
+	/** affix a type */
 	global $serv;
 	$string = $type.$string;
 
-	/* If we have OperServ, use that */
+	/** If we have OperServ, use that */
 	if (!($client = Client::find("OperServ")))
 	{
-		if (!empty(Client::$list)) /* If not, just grab the first available client we can find... */
+		if (!empty(Client::$list)) /** If not, just grab the first available client we can find... */
 			$client = Client::$list[0];
 		else $client = NULL;
 	}
@@ -374,7 +374,7 @@ function SVSLog($string, $type = "") : void
 	log_to_disk($string);
 }
 
-/* Logs to disk =]
+/** Logs to disk =]
  *
  * Syntax: 
  * log_to_disk($string_to_log)
@@ -395,15 +395,15 @@ function log_to_disk($str) : void
 
 
 
-/* Checks if an invitation is valid
+/** Checks if an invitation is valid
  * 
  * Syntax:
  * is_invite($unix_timestamp)
  * 
  * Returns:
- * bool
+ * Bool
 */
-function is_invite($one, $two) : bool
+function is_invite($one, $two) : Bool
 {
 	global $servertime;
 
@@ -411,11 +411,11 @@ function is_invite($one, $two) : bool
 
 	$conn = sqlnew();
 
-	/* quickly clear up any expired invitations (12hrs) */
+	/** quickly clear up any expired invitations (12hrs) */
 
 	$exptime = $servertime - 43200;
 	$result  = $conn->query("DELETE FROM ".sqlprefix()."invite WHERE realtime < $exptime");
-	/* check their credentials */ 
+	/** check their credentials */ 
 	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."invite WHERE timestamp = ?");
 	$prep->bind_param("s",$one);
 	$prep->execute();
@@ -442,16 +442,16 @@ function is_invite($one, $two) : bool
 
 
 
-/* Checks if a user has already been issued with a
+/** Checks if a user has already been issued with a
  * currently valid invitation code.
  * 
  * Syntax:
  * already_invited($username)
  * 
  * Returns:
- * bool 
+ * Bool 
  */
-function already_invited($invitee) : bool
+function already_invited($invitee) : Bool
 {
 	$conn = sqlnew();
 	$ts = $invitee;
@@ -464,7 +464,7 @@ function already_invited($invitee) : bool
 	return true;
 }
 
-/* Generates an invitation code which the invitee can use
+/** Generates an invitation code which the invitee can use
  * as SASL credentials in order to gain a temporary
  * authentication.
  * 
@@ -474,7 +474,7 @@ function already_invited($invitee) : bool
  * Returns:
  * string $code
  */
-function generate_invite_code($invitee)
+function generate_invite_code($invitee) : String
 {
 	global $servertime;
 	$conn = sqlnew();
@@ -483,17 +483,17 @@ function generate_invite_code($invitee)
 	
 	$invite = "";
 
-	/* generate some random ascii 40 chars long */
+	/** generate some random ascii 40 chars long */
 	for ($i = 0; strlen($invite) !== 40; $i++)
 	{
 		$r = rand(32,126);
 		$invite .= chr($r);
 	}
 	
-	/* hash it in, lets say, sha512 */
+	/** hash it in, lets say, sha512 */
 	$hash = hash("sha512",$invite);
 
-	/* put to table */
+	/** put to table */
 	$prep = $conn->prepare("INSERT INTO ".sqlprefix()."invite (code,timestamp,realtime) VALUES (?,?,?)");
 	$prep->bind_param("ssi",$hash,$ts,$servertime);
 	$prep->execute();
@@ -501,7 +501,7 @@ function generate_invite_code($invitee)
 	return $ts.":".$hash;
 }
 
-/* Looks up users who are connected to IRC
+/** Looks up users who are connected to IRC
  * using the account name you specify and returns
  * an array of User objects.
  * 
@@ -511,7 +511,7 @@ function generate_invite_code($invitee)
  * Returns:
  * array $users[0+] => (User)$user
  */
-function list_users_by_account($account)
+function list_users_by_account($account) : Array|Bool
 {
 	if (!$account)
 		return [];
@@ -532,7 +532,7 @@ function list_users_by_account($account)
 	return $users;
 }
 
-/* Splits up a string by a space
+/** Splits up a string by a space
  * (chr 32)
  *
  * Syntax:
@@ -541,12 +541,12 @@ function list_users_by_account($account)
  * Returns:
  * array $tokens
  */
-function split($str, $delimiter = " ") : array
+function split($str, $delimiter = " ") : Array
 {
 	return explode($delimiter,$str);
 }
 
-function mtag_to_array($mtags) : array
+function mtag_to_array($mtags) : Array
 {
 	$mtag = array();
 
@@ -563,7 +563,7 @@ function mtag_to_array($mtags) : array
 	return $mtag;
 }
 
-/* Create a new full set of outgoing message tags
+/** Create a new full set of outgoing message tags
  * for our clients
  * 
  * Syntax:
@@ -573,7 +573,7 @@ function mtag_to_array($mtags) : array
  * array $mtags["name"] => $info
  * 
  */
-function generate_new_mtags(Client $user = NULL)
+function generate_new_mtags(Client $user = NULL) : Array
 {
 	$mtags = [];
 	$mtags["msgid"] = new_msgid();
@@ -584,33 +584,33 @@ function generate_new_mtags(Client $user = NULL)
 	return $mtags;
 }
 
-/* Create a new msgid for outgoing client messages.
+/** Create a new msgid for outgoing client messages.
  * Syntax:
  * new_msgid()
  * 
  * Returns string of md5 based on pseudo-random generators
  * and current server time.
 */
-function new_msgid() : string
+function new_msgid() : String
 {
 	$s = random_bytes(24);
 	return base64_encode($s);
 }
 
-/* 
+/** 
  * Returns timestamp used in places like server-time
  * mtags, like @time=2022-07-25T16:51:40.009Z
  * 
  * Syntax:
  * irc_timestamp()
  */
-function irc_timestamp()
+function irc_timestamp() : String
 {
 	$thing = microsecs();
 	return date("Y-m-d\TH:i:s.".$thing."\Z");
 }
 
-/* Add mtag to mtag list with tag and value
+/** Add mtag to mtag list with tag and value
  * by reference.
  * 
  * Doesn't return anything.
@@ -623,7 +623,7 @@ function add_mtag(&$list, $tag, $value) : void
 	$list[$tag] = $value;
 }
 
-/* Merges our current mtags to the target mtags
+/** Merges our current mtags to the target mtags
  * by reference.
  * 
  * Doesn't return anything.
@@ -640,8 +640,8 @@ function duplicate_mtags(&$target, $current) : void
 	
 }
 
-/* Checks if the token provided is a bad pointer, by reference
- * Returns bool value true if it IS bad
+/** Checks if the token provided is a bad pointer, by reference
+ * Returns Bool value true if it IS bad
  *
  * Syntax:
  * BadPtr($variable)
@@ -657,7 +657,7 @@ function BadPtr(&$tok)
 }
 
 
-/* You can pass a string or an array as $notice
+/** You can pass a string or an array as $notice
  * It forwards to a splat operator which deals
  * with it
  */
@@ -676,7 +676,7 @@ function sendnotice(User $user, Client $me = NULL, $mtags = [], ...$notice)
 	}
 }
 
-function sendmsg(User $user, Client $me = NULL, $mtags = [], ...$msg)
+function sendmsg(User $user, Client $me = NULL, $mtags = [], ...$msg) : void
 {
 	if ($me)
 		foreach($msg as $n)
@@ -688,8 +688,8 @@ function sendmsg(User $user, Client $me = NULL, $mtags = [], ...$msg)
 			S2S(array_to_mtag($mtags)."PRIVMSG $user->uid :$n");
 	}
 }
-/* Dalek's char counting function */
-function dcount_chars($haystack, $needle)
+/** Dalek's char counting function */
+function dcount_chars($haystack, $needle) : int
 {
 	$count = 0;
 	
@@ -699,8 +699,8 @@ function dcount_chars($haystack, $needle)
 
 	return $count;
 }
-/* Dalek's case-insensitive char counting function */
-function dcasecount_chars($haystack, $needle)
+/** Dalek's case-insensitive char counting function */
+function dcasecount_chars($haystack, $needle) : int
 {
 	$count = 0;
 	
@@ -710,20 +710,20 @@ function dcasecount_chars($haystack, $needle)
 	return $count;
 }
 
-/* Some functions from C to make things easier */
-function strcat(&$targ,$string)
+/** Some functions from C to make things easier */
+function strcat(&$targ,$string) : void
 { $targ .= $string; }
 
-function strlcat(&$targ,$string,$size)
+function strlcat(&$targ,$string,$size) : void
 {
 	strcat($targ,$string);
 	$targ = mb_substr($targ,0,$size);
 }
 
-function strprefix(&$targ,$string)
+function strprefix(&$targ,$string) : void
 { $targ = $string.$targ; }
 
-function strlprefix(&$targ,$string,$size)
+function strlprefix(&$targ,$string,$size) : void
 {
 	$s = $size;
 	if (sizeof($targ) >= $s)
@@ -733,7 +733,7 @@ function strlprefix(&$targ,$string,$size)
 	$targ = mb_substr($targ,0,$s);
 }
 
-function svslogin($uid, $account, $by = NULL)
+function svslogin($uid, $account, $by = NULL) : void
 {
 
 	$by = ($by) ? $by->uid : Conf::$settings['info']['SID'];
@@ -741,7 +741,7 @@ function svslogin($uid, $account, $by = NULL)
 	
 }
 
-/* must be logged in
+/** must be logged in
  * placeholders:
  * %n = network
  * %a = account
@@ -752,7 +752,7 @@ function svslogin($uid, $account, $by = NULL)
  * "Chatsite/staff/Bob" or
  * "Chatsite/user/Alice"
 */
-function DoCloak($uid,$account)
+function DoCloak($uid,$account) : void
 {
 	$u = new WPUser($account);
 	$au = new User($uid);
@@ -771,30 +771,37 @@ function DoCloak($uid,$account)
 	}
 	if ($au->cloak == $cloak) // if this is already their cloak, abort
 		return;
-	/* actually set the cloak */
+	/** actually set the cloak */
 	$send = "CHGHOST $uid $cloak";
 	S2S($send); // send it out
 	Buffer::add_to_buffer($send); // we also need to process it, this is the quickest way	
 }
 
 // for quick check with the function above
-function cloak_rank(WPUser $u)
+function cloak_rank(WPUser $u) : String
 {
 	$rank = ($u->IsAdmin) ? "staff" : "user"; // staff or user?
 	$rank = (isset($u->user_meta->robot) && strstr($u->user_meta->robot,"IRC Bot")) ? "bot" : $rank; // but wait? what if bot?
 	return $rank;
 }
-function send_numeric($target, $numeric, ...$string)
+
+/**
+ * Send targetted numerics to a user
+ * 
+ */
+function send_numeric($target, $numeric, ...$string) : void
 {
 	foreach($string as $str)
 		S2S("$numeric $target :$string");
 }
 
-/* Send notice to users with mode:
- * @argv1 $mode : Can be a string of modes to send to
- * @argv2+ $string: One or more strings to send to these usermodes
+/** Send notice to users who have the specified mode.
+ * For example, to send a two lines of messages to all users who have a vhost:
+ * sendto_umode("t", "Nice vhost!", "It really brings out your eyes");
+ * @param String $mode Can be a string of modes to send to
+ * @param Array $string One or more strings to send to these usermodes
  */
-function sendto_umode($mode, ...$string)
+function sendto_umode($mode, ...$string) : void
 {
 	for ($i = 0; isset($mode[$i]); $i++)
 		foreach ($string as $str)
@@ -858,7 +865,7 @@ function IsRPCCall()
 	die(); // if we can't tell if we're an RPC user or not, what the hell even happened?
 }
 
-/* some basic validation checking */
+/** some basic validation checking */
 function is_valid_hostmask($string)
 {
 	for ($i = 0; isset($string[$i]); $i++)
@@ -873,7 +880,7 @@ function is_invalid_hostmask_char($char)
 	return false;
 }
 
-/* If we are running in debug mode */
+/** If we are running in debug mode */
 function IsDebugMode()
 {
 	if (isset(Conf::$settings['log']['debug']) && Conf::$settings['log']['debug'])

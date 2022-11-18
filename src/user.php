@@ -245,7 +245,9 @@ class UserMeta {
 		}
 		else
 			while($row = $result->fetch_assoc())
+			{
 				$this->{$row['meta_key']} = $row['meta_data'];
+			}
 
 		$prep->close();
 	}

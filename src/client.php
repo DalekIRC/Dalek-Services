@@ -27,7 +27,10 @@
 class Client {
 	
 	static $list = array();
-
+	public $nick;
+	public $uid;
+	public $modinfo;
+	public $cmds;
 	function __construct($nick,$ident,$hostmask,$uid = NULL, $gecos ,$modinfo = NULL)
 	{
 		global $servertime;

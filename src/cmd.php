@@ -22,7 +22,7 @@
 class cmd {
 
 	static $commands = array();
-
+	public $mod_handle;
 	public static function run($cmd, $args = array())
 	{
 		if (isset(self::$commands[$cmd]))
