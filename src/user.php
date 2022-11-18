@@ -26,13 +26,36 @@
 
 
 class User {
-	
+	public $IsClient = false;
+	public $IsWordPressUser = false;
+	public $IsServer = false;
+	public $IsUser = false;
+	public $nick = NULL;
+	public $uid = NULL;
+	public $ts = 0;
+	public $ident = NULL;
+	public $usermode = NULL;
+	public $realhost = NULL;
+	public $gecos = NULL;
+	public $cloak = NULL;
+	public $ip = NULL;
+	public $channels = [];
+	public $account = NULL;
+	public $fingerprint = NULL;
+	public $sid = NULL;
+	public $tls = NULL;
+	public $last = 0;
+	public $server = NULL;
+	public $meta = NULL;
+	public $IsService = false;
+	public $wp = NULL;
+	public $serv = NULL;
+	public $client = NULL;
+	public $IsBotServBot = false;
+	public $bot = NULL;
 	public function __construct($user)
 	{
-		$this->IsClient = false;
-		$this->IsWordPressUser = false;
-		$this->IsServer = false;
-		$this->IsUser = false;
+		
 	
 		$u = find_person($user);
 		if ($u)
@@ -78,7 +101,7 @@ class User {
 			if (($b = Bot::find($this->nick)) !== false)
 			{
 				$this->IsBotServBot = true;
-				$this->bsb = $b;
+				$this->bot = $b;
 			}
 		}
 		elseif (!$this->IsUser)
@@ -219,10 +242,10 @@ class UserMeta {
 		if (!$result)
 		{
 			$prep->close();
-			return NULL;
 		}
-		while($row = $result->fetch_assoc())
-			$this->{$row['meta_key']} = $row['meta_data'];
+		else
+			while($row = $result->fetch_assoc())
+				$this->{$row['meta_key']} = $row['meta_data'];
 
 		$prep->close();
 	}

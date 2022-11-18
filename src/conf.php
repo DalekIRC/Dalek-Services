@@ -207,7 +207,7 @@ class Conf
 /**
  * 2nd November 2022
  * Added to easily get/find a config item.
- * @param item String of config block directory, example:
+ * @param String item String of config block directory, example:
  * config_get_item("info::network-name")
  * will return your network name.
  * @return mixed Will return config item if not, or return DebugLog("") (which ultimately returns false)

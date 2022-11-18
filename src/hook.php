@@ -145,7 +145,7 @@ class hook {
 
 	/** Calls a hook
 	 * @param String $hook The define or string name of the hook. For example, HOOKTYPE_REHASH.
-	 * @param String $function This is a reference to a function or a class method.
+	 * @param Closure $function This is a reference to a function or a class method.
 	 * @return void Does not return anything.
 	 */
 	public static function func($hook, $function) {

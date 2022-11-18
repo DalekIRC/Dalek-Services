@@ -19,7 +19,7 @@ if (!isset($wpconfig['siteurl']) || empty($wpconfig['siteurl']))
 }
 
 
-hook::func("preconnect", function($u)
+hook::func("preconnect", function()
 {
 	global $wpconfig;
 	$conn = sqlnew();
@@ -168,6 +168,7 @@ hook::func("preconnect", function($u)
 		$up = serialize($roles);
 		$conn->query("UPDATE ".$wpconfig['dbprefix']."options SET option_value = '$up' WHERE option_name = '".$wpconfig['dbprefix']."user_roles'");
 	}
+	return "";
 });
 /* WordPress plugin "Disable User Account" compatibility" */
 include "_is_disabled.php";
@@ -179,6 +180,20 @@ define("LOOKUP_BY_ACCOUNT_NAME", "0-002");
 define("LOOKUP_BY_EMAIL", "0-003");
 class WPUser {
 
+	public $IsUser = false;
+	public $user_id = NULL;
+	public $user_login = NULL;
+	public $user_nicename = NULL;
+	public $user_pass = NULL;
+	public $user_email = NULL;
+	public $user_url = NULL;
+	public $user_registered = NULL;
+	public $user_status = NULL;
+	public $display_name = NULL;
+	public $confirmed = false;
+	public $user_meta = NULL;
+	public $role_array = array();
+	public $IsAdmin = false;
 	function __construct($account = "", $searchType = NULL)
 	{
 		global $wpconfig;
@@ -340,7 +355,7 @@ class WPUser {
 }
 
 class WPUserMeta {
-
+	public $num_posts = 0;
 	function __construct(WPUser $account)
 	{
 		$this->lookup($account->user_id);
@@ -435,7 +450,7 @@ function wp_get_caps($nicename)
 	$option = $wpconfig['dbprefix']."capabilities";
 	
 	$prep = $conn->prepare("SELECT * FROM $table WHERE meta_key = ? AND user_id = ?");
-	$prep->bind_param("si",$option,$user->id);
+	$prep->bind_param("si",$option,$user->user_id);
 	$prep->execute();
 	$result = $prep->get_result();
 	

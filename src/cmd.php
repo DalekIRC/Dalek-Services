@@ -32,7 +32,7 @@ class cmd {
 		}
 	}
 
-	public static function func($cmd, $function)
+	public static function func($cmd, Closure $function)
 	{
 		self::$commands[$cmd]['func'] = $function;
 	}
@@ -85,7 +85,7 @@ hook::func(HOOKTYPE_RAW, function($u)
 	$params = (isset($parv[3])) ? mb_substr($u['string'], strlen($parv[0]) + strlen($parv[1]) + 2) : NULL;
 	cmd::run($str, array(
 		'raw' => $u['string'],
-		'mtags' => $mtag ?? NULL,
+		'mtags' => $mtags ?? NULL,
 		'nick' => $user,
 		'dest' => $dest,
 		'cmd' => $str,
@@ -95,13 +95,11 @@ hook::func(HOOKTYPE_RAW, function($u)
 
 class Command {
 
+	public $success = false;
 	function __construct($modname,$cmd,$func,$parc)
 	{
-		if ($this->command_exists($cmd))
-		{
-			$this->success = false;
-		}
-		else $this->register_new_command($modname,$cmd,$func,$parc);
+		if (!$this->command_exists($cmd))
+			$this->register_new_command($modname,$cmd,$func,$parc);
 	}
 	function command_exists($cmd)
 	{

@@ -15,7 +15,19 @@
 
 class Channel
 {
-	
+	public $chan = NULL;
+	public $IsChan = false;
+	public $owner = false;
+	public $modes = false;
+	public $topic = false;
+	public $timestamp = 0;
+	public $userlist = NULL;
+	public $IsReg = false;
+	public $RegDate = 0;
+	public $url = NULL;
+	public $email = NULL;
+	/** The access list */
+	public $access = array();
 	function __construct($chan)
 	{
 		$u = find_channel($chan);
@@ -128,7 +140,7 @@ class Channel
 	}
 	function SetMode($mode)
 	{
-		S2S("MODE $this->chan $mode",Conf::$settings['info']['services-name']);
+		S2S("MODE $this->chan $mode");
 		$tok = explode(" ",$mode);
 		if (isset($tok[1]))
 		{
@@ -215,6 +227,7 @@ class Channel
 			$sql->update_chmode($this->chan,$switch,$chr);
 		}
 	}
+	
 	
 	function CheckReg()
 	{
