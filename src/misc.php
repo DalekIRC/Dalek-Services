@@ -511,7 +511,7 @@ function generate_invite_code($invitee) : String
  * Returns:
  * array $users[0+] => (User)$user
  */
-function list_users_by_account($account) : Array|Bool
+function list_users_by_account($account)
 {
 	if (!$account)
 		return [];
