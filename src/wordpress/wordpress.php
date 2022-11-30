@@ -5,11 +5,9 @@ include "wp-phpass.php";
 
 if (!isset($wpconfig['siteurl']) || empty($wpconfig['siteurl']))
 {
-	if (!isset($wpconfig['dbprefix']) || empty($wpconfig['dbprefix']))
-		return;
-
+	
 	$conn = sqlnew();
-	$result = $conn->query("SELECT option_value FROM ".$wpconfig['dbprefix']."options WHERE option_name = 'siteurl'");
+	$result = $conn->query("SELECT option_value FROM ".config_get_item("wordpress::prefix")."options WHERE option_name = 'siteurl'");
 	if (!$result)
 		die("Couldn't query the siteurl");
 
@@ -24,7 +22,7 @@ hook::func("preconnect", function()
 	global $wpconfig;
 	$conn = sqlnew();
 	
-	$result = $conn->query("SELECT option_value FROM ".$wpconfig['dbprefix']."options WHERE option_name = '".$wpconfig['dbprefix']."user_roles'");
+	$result = $conn->query("SELECT option_value FROM ".config_get_item("wordpress::prefix")."options WHERE option_name = '".config_get_item("wordpress::prefix")."user_roles'");
 	if (!$result)
 		die();
 	
@@ -166,7 +164,7 @@ hook::func("preconnect", function()
 	if ($roles !== $roles_origin)
 	{
 		$up = serialize($roles);
-		$conn->query("UPDATE ".$wpconfig['dbprefix']."options SET option_value = '$up' WHERE option_name = '".$wpconfig['dbprefix']."user_roles'");
+		$conn->query("UPDATE ".config_get_item("wordpress::prefix")."options SET option_value = '$up' WHERE option_name = '".config_get_item("wordpress::prefix")."user_roles'");
 	}
 	return "";
 });
@@ -224,7 +222,7 @@ class WPUser {
 
 		if ($this->IsUser)
 		{
-			$caps = $wpconfig['dbprefix']."capabilities";
+			$caps = config_get_item("wordpress::prefix")."capabilities";
 			$this->user_id = intval($nick['ID']);
 			$this->user_login = $nick['user_login'];
 			$this->user_nicename = $nick['user_nicename'];
@@ -254,7 +252,7 @@ class WPUser {
 		global $wpconfig;
 		$account = strtolower($account);
 		$conn = sqlnew();
-		$prep = $conn->prepare("SELECT * FROM ".$wpconfig['dbprefix']."users WHERE user_login = ?");
+		$prep = $conn->prepare("SELECT * FROM ".config_get_item("wordpress::prefix")."users WHERE user_login = ?");
 		$prep->bind_param("s",$account);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -273,7 +271,7 @@ class WPUser {
 		global $wpconfig;
 		$account = strtolower($account);
 		$conn = sqlnew();
-		$prep = $conn->prepare("SELECT * FROM ".$wpconfig['dbprefix']."users WHERE ID = ?");
+		$prep = $conn->prepare("SELECT * FROM ".config_get_item("wordpress::prefix")."users WHERE ID = ?");
 		$prep->bind_param("s",$account);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -295,7 +293,7 @@ class WPUser {
 			return false;
 		$account = strtolower($email);
 		$conn = sqlnew();
-		$prep = $conn->prepare("SELECT * FROM ".$wpconfig['dbprefix']."users WHERE LOWER(user_email) = ?");
+		$prep = $conn->prepare("SELECT * FROM ".config_get_item("wordpress::prefix")."users WHERE LOWER(user_email) = ?");
 		$prep->bind_param("s",$email);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -316,7 +314,7 @@ class WPUser {
 		if (!$this->IsUser)
 			return false;
 		$conn = sqlnew();
-		$prep = $conn->prepare("UPDATE ".$wpconfig['dbprefix']."users SET user_email = ? WHERE ID = ?");
+		$prep = $conn->prepare("UPDATE ".config_get_item("wordpress::prefix")."users SET user_email = ? WHERE ID = ?");
 		$prep->bind_param("ss",$email,$this->user_id);
 		$prep->execute();
 		$prep->close();
@@ -335,7 +333,7 @@ class WPUser {
 		if (!$conn)
 			return false;
 
-		$prep = $conn->prepare("UPDATE ".$wpconfig['dbprefix']."users SET user_pass = ? WHERE user_nicename = ?");
+		$prep = $conn->prepare("UPDATE ".config_get_item("wordpress::prefix")."users SET user_pass = ? WHERE user_nicename = ?");
 		$prep->bind_param("ss",$password,$this->user_nicename);
 		$prep->execute();
 		$prep->close();
@@ -366,7 +364,7 @@ class WPUserMeta {
 	{
 		global $wpconfig;
 		$conn = sqlnew();
-		$prep = $conn->prepare("SELECT * FROM ".$wpconfig['dbprefix']."usermeta WHERE user_id = ?");
+		$prep = $conn->prepare("SELECT * FROM ".config_get_item("wordpress::prefix")."usermeta WHERE user_id = ?");
 		$prep->bind_param("i",$id);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -385,7 +383,7 @@ class WPUserMeta {
 	{
 		global $wpconfig;
 		$conn = sqlnew();
-		$prep = $conn->prepare("SELECT * FROM ".$wpconfig['dbprefix']."posts WHERE post_author = ?");
+		$prep = $conn->prepare("SELECT * FROM ".config_get_item("wordpress::prefix")."posts WHERE post_author = ?");
 		$prep->bind_param("i",$id);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -406,8 +404,8 @@ function wp_get_privs($role)
 	$conn = sqlnew();
 	if (!$conn) { return false; }
 	
-	$table = $wpconfig['dbprefix']."options";
-	$option = $wpconfig['dbprefix']."user_roles";
+	$table = config_get_item("wordpress::prefix")."options";
+	$option = config_get_item("wordpress::prefix")."user_roles";
 	$prep = $conn->prepare("SELECT * FROM $table WHERE option_name = ?");
 	$prep->bind_param("s",$option);
 	$prep->execute();
@@ -446,8 +444,8 @@ function wp_get_caps($nicename)
 	if (!$conn) { return false; }
 	
 	$user = new WPUser($nicename);
-	$table = $wpconfig['dbprefix']."usermeta";
-	$option = $wpconfig['dbprefix']."capabilities";
+	$table = config_get_item("wordpress::prefix")."usermeta";
+	$option = config_get_item("wordpress::prefix")."capabilities";
 	
 	$prep = $conn->prepare("SELECT * FROM $table WHERE meta_key = ? AND user_id = ?");
 	$prep->bind_param("si",$option,$user->user_id);
@@ -539,7 +537,7 @@ function WPNewUser(array $user) : bool
 	$code = activation_code();
 
 	$conn = sqlnew();
-	$prep = $conn->prepare("INSERT INTO ".$wpconfig['dbprefix']."users (user_login, user_pass, user_nicename, user_email, user_registered, user_activation_key, user_status, display_name)
+	$prep = $conn->prepare("INSERT INTO ".config_get_item("wordpress::prefix")."users (user_login, user_pass, user_nicename, user_email, user_registered, user_activation_key, user_status, display_name)
 							VALUES (?,?,?,?,?,?,?,?)");
 	$prep->bind_param("ssssssis", $username, $pass, $nicename, $email, $date, $code, $status, $username);
 	$prep->execute();
@@ -550,7 +548,7 @@ function WPNewUser(array $user) : bool
 function wp_user_list()
 {
 	global $wpconfig;
-	$table = $wpconfig['dbprefix']."users";
+	$table = config_get_item("wordpress::prefix")."users";
 	$users = [];
 	$conn = sqlnew();
 	if (!($result = $conn->query("SELECT * FROM $table")))
@@ -574,7 +572,7 @@ function IsRegUser($user){
 	$conn = sqlnew();
 	if (!$conn) { return "ERROR"; }
 	else {
-		$prep = $conn->prepare("SELECT * FROM ".$wpconfig['dbprefix']."users WHERE user_nicename = lower(?)");
+		$prep = $conn->prepare("SELECT * FROM ".config_get_item("wordpress::prefix")."users WHERE user_nicename = lower(?)");
 		$prep->bind_param("s",$user);
 		$prep->execute();
 		$result = $prep->get_result();
@@ -678,3 +676,4 @@ function ValidatePermissionsForPath(String $path, User $user, User $victim = NUL
 	}
 	return false;
 }
+
