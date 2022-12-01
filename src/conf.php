@@ -59,7 +59,6 @@ class Conf
 	private function parse_config($string, &$error)
 	{
 		$tok = split($string);
-		$n = 0;
 		$blockstring = "";
 		$full = "";
 		foreach($tok as $str)
@@ -70,7 +69,6 @@ class Conf
 			
 			elseif (!strcmp($str,"}"))
 			{
-				$p = $blockstring;
 				$split = split($blockstring,"::");
 				if (BadPtr($split[sizeof($split) - 1]))
 					unset($split[sizeof($split) - 1]);

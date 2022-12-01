@@ -67,7 +67,7 @@ $mypass = config_get_item("link::password");
 // SQL config
 $arr = [];
 $sql = new SQL();
-hook::run("preconnect", $arr);
+hook::run(HOOKTYPE_PRE_CONNECT, $arr);
 /* Okay, we've established all the information lmao, let's load the modules */
 
 
@@ -75,7 +75,7 @@ include DALEK_CONF_DIR . '/modules.conf';
 
 start:
 $serv = new Server($server,$port,$mypass);
-
+post_start:
 if (!$socket || !$server)
 	die("oops");
 
@@ -116,37 +116,15 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 	}
 	elseif ($splittem[0] == 'ERROR')
 	{
-		
-		if (strpos($input,'Throttled') !== false)
-		{
-			$serv->hear("Uh-oh, we've been throttled! Waiting 40 seconds and starting again.");
-			sleep(40);
-			$serv->shout("Reconnecting...");
-			$serv = NULL;
+		$arr['parv'] = $splittem;
+		$arr['serv_obj'] = &$serv;
+		hook::run(HOOKTYPE_ERROR, $arr);
+		hook::run(HOOKTYPE_PRE_CONNECT, $arr);
+
+		if (!$serv) // if we did not find a new uplink, try the original
 			goto start;
-		}
-		elseif (strpos($input,'Timeout') !== false)
-		{
-			if (IsConnected())
-			{
-				$serv->hear("Connection issue. Trying again in 30 seconds");
-				sleep(30);
-				$serv = NULL;
-				goto start;
-			}
-			else
-			{
-				die($serv->hear("Connection issue. Please check dalek.conf"));					
-			}
-			
-		}
-		else
-		{
-			$serv->hear("Unknown exit issue! Waiting 40 seconds and restarting");
-			usleep(400000);
-			$serv = NULL;
-			goto start;
-		}
+
+		goto post_start;
 	}
 	else
 	{

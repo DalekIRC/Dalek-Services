@@ -28,7 +28,9 @@
 
 class Server
 {
-	public $sid, $name;
+	public static $isConnected = 0;
+
+	public $sid, $name, $host;
 	function __construct($server,$port,$password)
 	{
 				
@@ -48,7 +50,6 @@ class Server
 		$this->name = Conf::$settings['info']['services-name'];
 		/* pre connect shit */
 		
-		// we are disabling verification for now until built upon more :>
 		// create ssl context
 		$context = stream_context_create(['ssl' => [
 			'verify_peer'  => true,
@@ -59,10 +60,7 @@ class Server
 
 		//opening socket YO
 		$socket = stream_socket_client($server.':'.$port, $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $context);
-		
-		
-		
-		
+		$this->host = $server;
 		$this->sendraw("PASS $password");
 		$this->sendraw("PROTOCTL EAUTH=$this->name,6000 SID=$this->sid");
 		$this->sendraw("PROTOCTL NOQUIT NICKv2 SJOIN SJOIN2 SJ3 CLK TKLEXT2 NICKIP ESVID MLOCK NEXTBANS EXTSWHOIS SJSBY MTAGS");
@@ -72,7 +70,6 @@ class Server
 		hook::run(HOOKTYPE_BURST, $this);
 		//$this->sendraw("MD client $this->sid regkeylist :before-connect,email-required,custom-account-name");
 		$this->sendraw("EOS");
-		
 
 	}
 	function svs2mode($nick,$string)
@@ -131,7 +128,9 @@ hook::func(HOOKTYPE_RAW, function($u)
 		"intro_by" => $us);
 	hook::run(HOOKTYPE_SERVER_CONNECT, $array);
 	$var = [];
+	SVSLog("Services is now online and synced. Starting...");
 	hook::run(HOOKTYPE_START, $var);
+	Server::$isConnected = 1;
 	
 });
 

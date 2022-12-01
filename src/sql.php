@@ -542,6 +542,7 @@ hook::func(HOOKTYPE_PRE_CONNECT, function($u)
 	);
 	TRUNCATE TABLE ".sqlprefix()."user;
 	TRUNCATE TABLE ".sqlprefix()."channels;
+	TRUNCATE TABLE ".sqlprefix()."channel_meta;
 	TRUNCATE TABLE ".sqlprefix()."server;
 	TRUNCATE TABLE ".sqlprefix()."swhois;
 	TRUNCATE TABLE ".sqlprefix()."ison;
@@ -560,7 +561,7 @@ hook::func(HOOKTYPE_WELCOME, function($u)
 	$sql->user_insert($u);
 	update_last($u['nick']);
 
-	if (isset($fsync))
+	if (Server::$isConnected)
 		SVSLog($u['nick']." (".$u['ident']."@".$u['realhost'].") [".$u['ip']."] connected to the network (".$u['sid'].")");
 });
 

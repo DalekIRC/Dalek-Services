@@ -630,40 +630,10 @@ function ValidatePermissionsForPath(String $path, User $user, User $victim = NUL
 		/* If nobody has privs, let checks happen later */
 		
 	}
-	$path_int = ChanAccess2Int($path);
-	
+	/* If it's a channel, send it off to the channel check */
 	if ($chan)
-	{
-		if ($victim)
-		{
-			if (IsOper($victim))
-					return false;
-			$v_access = ChanAccessAsInt($chan,$victim);
-			$u_access = ChanAccessAsInt($chan,$user);
+		return vpfp_channel_check($path, $user, $victim, $chan, $extra);
 
-			if ($u_access)
-				return false;
-
-			if ($v_access >= $u_access)
-				return false;
-
-			if ($path == "can_kick" || $path == "can_ban" || $path == "can_unban" || $path == "can_topic")
-			{
-				if ($u_access > $v_access && $u_access >= ChanAccess2Int("operator"))
-					return true;
-				return false;
-			}
-			return true;
-		}
-
-		else
-		{
-			if ($path_int <= ChanAccessAsInt($chan, $user))
-			{
-				return true;
-			}
-		}
-	}
 
 	elseif (isset($user->account) && strlen($user->account) && isset($user->wp))
 	{
@@ -677,3 +647,31 @@ function ValidatePermissionsForPath(String $path, User $user, User $victim = NUL
 	return false;
 }
 
+/**
+ * ValidatePermissionsForPath extended channel check
+ * This assumes the $user has no overrides
+ */
+function vpfp_channel_check(String $path, User $user, User $victim = NULL, Channel $chan = NULL, $extra = NULL) : bool
+{
+	if ($victim && !IsAdmin($user) && IsAdmin($victim)) // if victim was services staff, deny it
+		return false;
+	/* Get the access of each */
+	$v_access = ($victim) ? ChanAccessAsInt($chan, $victim) : 0; // no victim no access
+	$u_access = ChanAccessAsInt($chan, $user);
+
+	if (!$u_access)
+		return false;
+
+	if ($v_access >= $u_access)
+		return false;
+
+	else if (($path == "can_kick" || $path == "can_ban" || $path == "can_unban" || $path == "can_topic") && $u_access >= ChanAccess2Int("operator")) // require at least chanops privileges
+			return true;
+
+	/* otherwise we simply check if they have permission to do the thing */
+	$path_int = ChanAccess2Int($path);
+	if ($path_int <= ChanAccessAsInt($chan, $user))
+		return true;
+
+	return false;
+}

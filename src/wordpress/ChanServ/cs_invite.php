@@ -26,7 +26,7 @@ chanserv::func("privmsg", function($u)
 	$wpnick = new WPUser($u['nick']);
 	if (!$nick->account)
 	{
-		$eu->notice($nick->uid,"You need to login use that command.");
+		$cs->notice($nick->uid,"You need to login use that command.");
 		return;
 	}
 	

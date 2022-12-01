@@ -108,6 +108,8 @@ define('HOOKTYPE_CONFIGRUN', 'cfgrun');
 define('HOOKTYPE_BURST', 'servburst');
 /** This is run when a module is unloaded. */
 define('HOOKTYPE_UNLOAD_MODULE', 'unloadmodule');
+/** When a connection error occurred */
+define('HOOKTYPE_ERROR', 'conn_err');
 
 /** 
  *  Class for "hook"
