@@ -629,7 +629,6 @@ function get_num_online_users() : int
 		$count = $result->num_rows;
 		return $count;
 	}
-	return 0;
 }
 
 function get_num_servers() : int
@@ -645,7 +644,6 @@ function get_num_servers() : int
 		$count = $result->num_rows;
 		return $count;
 	}
-	return 0;
 }
 
 function get_num_channels() : int
@@ -661,7 +659,6 @@ function get_num_channels() : int
 		$count = $result->num_rows;
 		return $count;
 	}
-	return 0;
 }
 
 function get_num_swhois() : int
@@ -677,7 +674,6 @@ function get_num_swhois() : int
 		$count = $result->num_rows;
 		return $count;
 	}
-	return 0;
 }
 
 function get_num_meta() : int
@@ -693,7 +689,6 @@ function get_num_meta() : int
 		$count = $result->num_rows;
 		return $count;
 	}
-	return 0;
 }
 
 

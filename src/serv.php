@@ -28,7 +28,7 @@
 
 class Server
 {
-	
+	public $sid, $name;
 	function __construct($server,$port,$password)
 	{
 				

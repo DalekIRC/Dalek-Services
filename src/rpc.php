@@ -230,6 +230,7 @@ function rpc_dir()
 */
 class RPCpipe
 {
+	public $pipe, $responder;
 	/** Finds our pipe */
 	static function find_pipe()
 	{
@@ -249,9 +250,9 @@ class RPCpipe
 	}
 
 	/** Add information to our pipe
-	 * @param id ID of the request
-	 * @param method Method of the request
-	 * @param params The parameters associated with the method
+	 * @param String $id of the request
+	 * @param String $method Method of the request
+	 * @param String $params The parameters associated with the method
 	 */
 	function add($id, $method, $params)
 	{
@@ -271,7 +272,7 @@ class RPCpipe
 		return true;
 	}
 	/** Looks up an RPC request by ID
-	 * @param id
+	 * @param $id
 	 */
 	function lookup($id)
 	{
@@ -288,7 +289,7 @@ class RPCpipe
 		return false;
 	}
 	/** Look up a reply by ID
-	 * @param id ID of the RPC command we are replying to
+	 * @param String id ID of the RPC command we are replying to
 	 */
 	function get_reply($id)
 	{
