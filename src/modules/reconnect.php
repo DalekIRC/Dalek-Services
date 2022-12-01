@@ -2,19 +2,16 @@
 /*				
 //	(C) 2022 DalekIRC Services
 \\				
-//			pathweb.org
+//			dalek.services
 \\				
 //	GNU GENERAL PUBLIC LICENSE
 \\				v3
 //				
 \\				
 //				
-\\	Title:		MODULE
+\\	Title:		Reconnect
 //				
-\\	Desc:		MODULE compatibility
-\\				
-//				
-\\				
+\\	Desc:		Reconnects to alternative uplinks
 //				
 \\	Version:	1
 //				
