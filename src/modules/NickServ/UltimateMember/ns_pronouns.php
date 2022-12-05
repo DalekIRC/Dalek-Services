@@ -167,8 +167,6 @@ class ns_pronouns {
 			specialwhois::del_swhois($user->uid,"pronouns");
 			self::set_pronoun($user->uid,$array,1);
 		}
-		if (in_array("Use pronouns in METADATA",$show_options))
-			ns_metadata::send_usermeta(NULL,$user->nick,"pronouns",$pronouns);
 	}
 	public static function set_pronoun($uid,$p = NULL,$i = 0)
 	{
@@ -180,6 +178,7 @@ class ns_pronouns {
 
 		$pronouns = rtrim($pronouns,", ")." pronouns";
 		specialwhois::send_swhois($uid,"pronouns",$pronouns);
+		metadata::send_usermeta(NULL,$uid,"pronouns",$pronouns);
 	}
 
 	public static function del_user_cache($wpid)

@@ -113,7 +113,6 @@ define('HOOKTYPE_ERROR', 'conn_err');
 
 /** 
  *  Class for "hook"
- *
  * This is the main function which gets called whenever you want to use a hook.
  * Example:
  * Calling the hook:
@@ -128,6 +127,9 @@ define('HOOKTYPE_ERROR', 'conn_err');
  * Running a hook:
  * $array = ["sid" => "69L"]; // the information to pass through the hook
  * hook::run(HOOKTYPE_EOS, $array);
+ * 
+ * 4th December 2022:
+ * Moving this over to internal use only, see HookAdd() instead.
  */
 class hook {
 
@@ -171,3 +173,97 @@ class hook {
 	}
 }
 
+/** UnrealIRCd inspired HookAdd()
+ * Validate hooks when adding them
+ * @param object $mod The module for which this hook was added.
+ * @param String $hook The HOOKTYPE
+ * @param int $priority The priority of the hook.
+ * @param callable $priority
+ * 
+ * @return bool Whether or not the hook was added successfully
+ */
+
+ function HookAdd(object $mod = NULL, String $hook, int $priority, callable $callback)
+ {
+	if ($mod)
+	{
+		$found = 0; // keep track of whether the module was loaded
+		foreach (Module::$modules as $m) // $m = Module in the list
+			if ($m == $mod)
+				$found = 1;
+
+		if (!$found) {
+			DebugLog("Could not find module $mod->name, hook for type $hook not added.");
+			return false;
+		}
+	}
+
+	$h = (object)[];
+	$h->type = $hook;
+	$h->modname = $mod->name ?? NULL;
+	$h->priority = $priority;
+	$h->callback = $callback;
+
+	if (!empty(Hooks::$list[$h->type]))
+	{
+		$i = 0;
+		foreach(Hooks::$list[$h->type] as $lhook)
+		{
+			if ($lhook->priority > $h->priority)
+			{
+				array_splice(Hooks::$list[$h->type], $i, 0, $h);
+				break;
+			}
+			$i++;
+		}
+	}
+	else
+		Hooks::$list[$h->type][] = $h;
+
+	return true;
+}
+
+/**
+ * HOOK_DENY
+ * Deny the hook
+ */
+define('HOOK_DENY', -1);
+/**
+ * HOOK_ALWAYS_DENY
+ * Deny the hook even if the user has override
+ */
+define('HOOK_ALWAYS_DENY', -2);
+/**
+ * HOOK_CONTINUE
+ * Continue onto the next hook
+ */
+define('HOOK_CONTINUE', 0);
+/**
+ *  HOOK_ALLOW
+ * Allow the hook, stop processing further
+ */
+define('HOOK_ALLOW', 1);
+
+/**
+ * Runs the hook with the specified parameters
+ * @param string $hook
+ * @param array[] $params
+ * @return void
+ */
+function RunHook(String $hook, Array &...$params) : void
+{
+	if (!isset(Hooks::$list[$hook]) || !is_array(Hooks::$list[$hook]))
+		DebugLog("Attempted to run non-existent/unregistered hook: $hook.");
+
+	else foreach(Hooks::$list[$hook] as $h)
+			call_user_func_array($h->callback, $params);
+}
+
+/**
+ * Hooks 
+ */
+class Hooks
+ {
+	public static $list = [];
+	
+ }

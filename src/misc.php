@@ -890,14 +890,23 @@ function IsDebugMode()
 
 function DebugLog($string, $type = "")
 {
-
-	if (!IsDebugMode())
-		return;
 	$string = "[DEBUG]".trim($type)." ".$string."\n";
-	strcat($string,"Calling function: ".debug_backtrace()[1]['function']);
-	echo $string."\n";
+	strcat($string,generate_backtrace(debug_backtrace()));
 	log_to_disk($string);
+	if (!IsDebugMode())
+		echo $string."\n";
 	return false;
+}
+
+function generate_backtrace(array $backtrace)
+{
+	$str = "Backtrace:\n";
+	for ($i = 1; isset($backtrace[$i]); $i++)
+	{
+		$bt = (object) $backtrace[$i];
+		strcat($str, "#$i => Call to " . $bt->function . "(" . glue($bt->args, ",") . ") in file $bt->file on line #$bt->line\n");
+	}
+	return $str;
 }
 
 function LogChan()

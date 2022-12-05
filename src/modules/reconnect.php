@@ -37,8 +37,6 @@ class reconnect {
 	
 	function __init()
 	{
-		
-
 		hook::func(HOOKTYPE_ERROR, 'reconnect::do');
 		hook::func(HOOKTYPE_CONFIGTEST, 'reconnect::config');
 		if (IsConnected())

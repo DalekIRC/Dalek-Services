@@ -524,6 +524,7 @@ function RPCHandlerAdd($modinfo = NULL, $handler, $function, &$error)
 		$error = "Something went wrong adding the RPC handler, beats the hell out of me, sorry";
 		SVSLog($error);
 		SVSLog("Here's some extra info anyway lol. Handler: $handler / Function (should be class method): $function / Module: $modinfo");
+		DebugLog(generate_backtrace(debug_backtrace()));
 		return false;
 	}
 	return true;

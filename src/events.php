@@ -49,24 +49,27 @@ class Events
 				if ($timestamp <= servertime()) // come, Event... it is time...
 				{
 					$i = array_search($event, array_keys(Events::$list)); // find our offset
-					
-					if (IsDebugMode()) // let the debugger know ;D
-						DebugLog("Event triggered: ".$event['modname'], LOG_EVENT);
 
+					
 					$func = ($event['modname']) ? [0 => $event['modname'], 1 => $event['function']] : $event['function'];
-					$params = $event['params'];
-					if ($params)
+					$params = $event['params'] ?? [];
+					$str = "Event triggered: ";
+
+					DebugLog($str, LOG_EVENT);
+
+					if (is_array($params))
 					{
 						call_user_func_array($func,$params);
+						SVSLog("Called array function");
 					}
 					else
 					{
-						call_user_func($func, null);
+						call_user_func($func, $params);
+						SVSLog("Called string function");
 					}				
 					if ($event['repetitions'] > EVENT_MIN_REPETITIONS) // if they are bigger than 1, decrement
 					{
-						$event['repetitions'];
-						$event_i--;
+						$event['repetitions']--;
 					}
 
 					elseif ($event['repetitions'] == EVENT_MIN_REPETITIONS) // looks we just ran the last one! good job guys you can go home early today
@@ -109,7 +112,7 @@ class Events
 		}
 		elseif ($ctime && $ctime < servertime()) // if the thing is asking to put a timer for something in the past?
 		{
-			$error = "trying to change things in the past, not even Doctor Who could do that..\nour time = ".servertime()."\their time $ctime\n";
+			$error = "trying to change things in the past, not even Doctor Who could do that..\nour time = ".servertime()."\ntheir time $ctime\n";
 		}
 		elseif ($repetitions && !is_numeric($repetitions)) // repetitions was not a number
 		{
@@ -125,7 +128,7 @@ class Events
 			{
 				$error = "not a valid interval numeric: $interval";
 			}
-			elseif ($repetitions != "0") // needs repetition to use interval... lol
+			elseif ($repetitions < 0) // needs repetition to use interval... lol
 				$error = "not a valid repetition numeric: $repetitions";
 		}
 		if (!BadPtr($error))

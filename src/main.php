@@ -106,15 +106,7 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 	$strippem = ircstrip(str_replace('\\','\\\\',$input));
 	$splittem = explode(' ',$strippem);
 	
-	// If the server pings us
-	if ($splittem[0] == 'PING')
-	{
-		/* hook into ping lol */
-		$arr = ['token' => $splittem[1]];
-		hook::run(HOOKTYPE_PING, $arr);
-		S2S("PONG ".$splittem[1]); 	// Ping it back
-	}
-	elseif ($splittem[0] == 'ERROR')
+	if ($splittem[0] == 'ERROR')
 	{
 		$arr['parv'] = $splittem;
 		$arr['serv_obj'] = &$serv;
