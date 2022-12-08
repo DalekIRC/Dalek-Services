@@ -1,15 +1,18 @@
-# <img width="50" height="35" src="https://i.imgur.com/w6cScKo.png"> Dalek IRC Services
+# <div align="center"><img width="50" height="35" src="https://i.imgur.com/w6cScKo.png"> Dalek IRC Services</div>
+<div align="center">
 
 [![Version](https://img.shields.io/badge/Extermin-8-red.svg)]()
-[![Version](https://img.shields.io/badge/Beta-0.1-blue.svg)]()
-[![Version](https://img.shields.io/badge/Status-Work%20In%20Progress-cyan.svg)]()
-[![Maintained](https://img.shields.io/badge/Maintained-yes-green.svg)]()
-[![Maintainer](https://img.shields.io/badge/Developer-Valware-purple.svg)](https://github.com/ValwareIRC/)
-[![Unreal](https://img.shields.io/badge/UnrealIRCd-6.0.4_or_later-green.svg)](https://unrealircd.org)
-[![WP](https://img.shields.io/badge/WordPress-6.0_or_later-green.svg)](https://wordpress.com)
+[![Version](https://img.shields.io/badge/Version-0.1_beta-blue.svg)]()
+[![Maintained](https://img.shields.io/badge/Maintained-yes-darkgreen.svg)]()
+[![Unreal](https://img.shields.io/badge/UnrealIRCd-6.0.4_or_later-darkgreen.svg)](https://unrealircd.org)
+[![WP](https://img.shields.io/badge/WordPress-6.0_or_later-darkgreen.svg)](https://wordpress.com)
+<a href="https://github.com/DalekIRC/Dalek-Services/actions/workflows/irctest.yml">
+        <img alt="Validation by irctest" src="https://github.com/DalekIRC/Dalek-Services/actions/workflows/irctest.yml/badge.svg" />
+
 
 Dalek IRC Services with UnrealIRCd & WordPress integration tailored to you.<br><br>
 ### <img width="50" height="35" src="https://i.imgur.com/w6cScKo.png"> + <a href="https://github.com/unrealircd/unrealircd/"><img width="160" height="35" src="https://i.ibb.co/dB6H5Zq/Screenshot-from-2022-09-26-00-20-15.png"> </a> + <a href="https://github.com/wordpress/wordpress/"><img width="160" height="35" src="https://i.ibb.co/0c5NpSV/Word-Press-Logo-2003-2008.png"></a> = The <img width="60" height="35" src="https://www.seekpng.com/png/full/9-91160_future-services-inc.png"> 👉😎👉
+</div>
 
 ### Why do I need Dalek? ###
 * Dalek is a set of IRC Services with the best WordPress integration AND the best UnrealIRCd integration on the market.
@@ -25,17 +28,17 @@ With WordPress + Dalek + UnrealIRCd, you have more creative control over things 
   * Add and remove Services staff via website, simply by adding or revoking their permission in the WordPress `Users` tab. You can oper them from the WordPress dashboard.
   * With our WordPress plugin, you have an overview of all the users, channels, network bans, servers. Additionally, you can oper staff on IRC from the website, rehash servers, remove bans, WHOIS users, WHOIS IPs, and more.
   
-## Planned Pseudoservices ##
+## Planned Services ##
 
 - [x] NickServ
 - [x] ChanServ
 - [x] OperServ
 - [x] BotServ
 - [x] Global
-- [ ] Inbox (MemoServ replacement with extra features)
 - [ ] MetaServ (HostServ replacement with extra features)
 - [x] bbServ (Optional: bbForums notification bot)
 
+<i>Although DalekIRC currently uses bots (NickServ, ChanServ etc), we would like to move everything to server-side, eliminating need to message a bot to ask what you need.</i>
 ### Knows how to talk with ###
 - [x] WordPress
 - [x] JSON-RPC (remote procedure calls)
