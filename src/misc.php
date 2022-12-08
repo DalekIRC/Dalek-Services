@@ -805,7 +805,13 @@ function sendto_umode($mode, ...$string) : void
 {
 	for ($i = 0; isset($mode[$i]); $i++)
 		foreach ($string as $str)
-			S2S("SENDUMODE ".$mode[$i]." :$str");
+			S2S("SENDUMODE ".$mode[$i]." :[Services] $str");
+}
+
+function sendto_sno($sno, ...$string) : void
+{
+	foreach ($string as $str)
+		S2S("SENDSNO ".$sno." :[Services] $str");
 }
 
 function log_to_opers($string)
@@ -988,3 +994,4 @@ function local_rpc_call($json)
 	$json = json_decode($server_output, true);
 	return $json;
 }
+
