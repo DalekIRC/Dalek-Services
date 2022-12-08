@@ -911,7 +911,7 @@ function generate_backtrace(array $backtrace)
 	for ($i = 1; isset($backtrace[$i]); $i++)
 	{
 		$bt = (object) $backtrace[$i];
-		strcat($str, "#$i => Call to " . $bt->function . "(" . glue(var_export($bt->args, true), ",") . ") in file $bt->file on line #$bt->line\n");
+		strcat($str, "#$i => Call to " . $bt->function . "(" . var_export($bt->args, true) . ") in file $bt->file on line #$bt->line\n");
 	}
 	return $str;
 }
