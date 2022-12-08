@@ -904,13 +904,14 @@ function DebugLog($string, $type = "")
 	return false;
 }
 
+
 function generate_backtrace(array $backtrace)
 {
 	$str = "Backtrace:\n";
 	for ($i = 1; isset($backtrace[$i]); $i++)
 	{
 		$bt = (object) $backtrace[$i];
-		strcat($str, "#$i => Call to " . $bt->function . "(" . glue($bt->args, ",") . ") in file $bt->file on line #$bt->line\n");
+		strcat($str, "#$i => Call to " . $bt->function . "(" . glue(var_export($bt->args, true), ",") . ") in file $bt->file on line #$bt->line\n");
 	}
 	return $str;
 }
