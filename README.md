@@ -11,7 +11,6 @@
 
 
 DalekIRC Services with UnrealIRCd & WordPress integration tailored to you.<br><br>
-### <img width="50" height="35" src="https://i.imgur.com/w6cScKo.png"> + <a href="https://github.com/unrealircd/unrealircd/"><img width="160" height="35" src="https://i.ibb.co/dB6H5Zq/Screenshot-from-2022-09-26-00-20-15.png"> </a> + <a href="https://github.com/wordpress/wordpress/"><img width="160" height="35" src="https://i.ibb.co/0c5NpSV/Word-Press-Logo-2003-2008.png"></a> = The <img width="60" height="35" src="https://www.seekpng.com/png/full/9-91160_future-services-inc.png"> 👉😎👉
 </div>
 
 ### Why do I need Dalek? ###
@@ -38,7 +37,7 @@ With WordPress + Dalek + UnrealIRCd, you have more creative control over things 
 - [ ] MetaServ (HostServ replacement with extra features)
 - [x] bbServ (Optional: bbForums notification bot)
 
-<i>Although DalekIRC currently uses bots (NickServ, ChanServ etc), we would like to move everything to server-side, eliminating need to message a bot to ask what you need.</i>
+<i>Although DalekIRC currently uses bots (NickServ, ChanServ etc), the ball is rolling to move things to a more "server-side command" environment, eliminating need to message a bot to ask what you need.</i>
 ### Knows how to talk with ###
 - [x] WordPress
 - [x] JSON-RPC (remote procedure calls)
@@ -46,33 +45,14 @@ With WordPress + Dalek + UnrealIRCd, you have more creative control over things 
 - [x] SQL Databases
 - [x] You!
 
-__NickServ__
 
-As always, you can use NickServ to manage your account settings. These services support [`SASL`](https://ircv3.net/specs/extensions/sasl-3.2) and [`draft/account-registration`](https://ircv3.net/specs/extensions/account-registration), and so registering your account directly over IRC is also possible. The only main differences are you can't register an account by messaging NickServ, and the `IDENTIFY` command takes one of `PLAIN` or `EXTERNAL` based on however you have your client set up, and it will take this to mean that you would like to start/continue a SASL flow.
+## IRCv3 ##
+DalekIRC has a keen interest in the advancement of IRC specifically, and so aims to add as many IRCv3 features as is workable from a services point of view, as well as suggest a few things in return.
 
-__ChanServ__
+To learn more about IRCv3, what it means, and how it's used, [check out their website](https://ircv3.net).
 
-As always, you can use ChanServ to register and manage your channels, give op to people and whatnot.
-
-__OperServ__
-
-As always, you can use OperServ to manage opery things.
-
-__BotServ__
-As always, you can create and assign special bots in place of ChanServ in a channel.
-
-__Global__
-
-Global noticer
-
-__Inbox__
-
-Yes, I know an inbox isn't an outbox! Even though this provides outbox features, it's just how it is. Deal with it.
-
-__MetaServ__
-
-MetaServ will replace HostServ, and the reason for the name change is because it'll let you request and set more than just vHosts (swhois and other things)
-
-## Requirements ##
-- UnrealIRCd 6.0 or later
-- WordPress 6.0 or later
+To learn more about how DalekIRC uses IRCv3, [check out the support table](IRCv3.md)
+	
+<div align="center">
+	
+### <a href="https://github.com/unrealircd/unrealircd/"><img width="210" height="50" src="https://i.ibb.co/dB6H5Zq/Screenshot-from-2022-09-26-00-20-15.png"></a><a href="https://ircv3.net/"><img width="160" height="35" src="https://d33wubrfki0l68.cloudfront.net/27a59ae6bb716a8d8aa13ab8abdd2933ade16546/0a308/img/logo-forwhite.svg"></a><a href="https://github.com/wordpress/wordpress/"><img width="210" height="50" src="https://i.ibb.co/0c5NpSV/Word-Press-Logo-2003-2008.png"></a></div>
