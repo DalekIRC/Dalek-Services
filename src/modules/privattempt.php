@@ -88,8 +88,8 @@ class privattempt {
 		}
 		else
 		{
-			S2S(ERR_NOSUCHNICK." $nick->nick ".$parv[1]." :That nick is not online right now, but you can send them a message for when they're online later.");
-			S2S(RPL_MOTD." $nick->nick :Use /MESSAGE <nick> <message>");
+			S2S(ERR_NOSUCHNICK." $nick->nick :That nick is not online right now, but you can send them a message for when they're online later.");
+			S2S(RPL_MOTD." $nick->nick :Use /MAIL ".$parv[1]." <message>");
 		}
 	}
 }

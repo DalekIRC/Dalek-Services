@@ -604,10 +604,10 @@ function new_msgid() : String
  * Syntax:
  * irc_timestamp()
  */
-function irc_timestamp() : String
+function irc_timestamp($timestamp = NULL) : String
 {
 	$thing = microsecs();
-	return date("Y-m-d\TH:i:s.".$thing."\Z");
+	return date("Y-m-d\TH:i:s.".$thing."\Z", $timestamp);
 }
 
 /** Add mtag to mtag list with tag and value
@@ -822,7 +822,7 @@ function log_to_opers($string)
 
 function array_to_mtag($mtags)
 {
-	$mtags_to_send = NULL;
+	$mtags_to_send = "";
 	if ($mtags)
 	{
 		$mtags_to_send = "@";

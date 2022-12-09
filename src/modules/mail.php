@@ -114,7 +114,7 @@ class mail {
 
 		if (!($target = new WPUser($dest))->IsUser)
 		{
-			S2S("292 $nick->$nick :That account does not exist.");
+			S2S("292 $nick->nick :That account does not exist.");
 			return;
 		}
 		self::sendto($nick, $target, $msg);
@@ -126,6 +126,7 @@ class mail {
 		$ts = servertime();
 		$conn = sqlnew();
 		$cloak = "$from->nick!$from->ident@$from->cloak";
+		$message = base64_encode($message);
 		$prep = $conn->prepare("INSERT INTO " . sqlprefix() . "mail (from_account, from_cloak, timestamp, message, account) VALUES (?,?,?,?,?)");
 		$prep->bind_param("ssiss", $from->account, $cloak, $ts, $message, $to->user_nicename);
 		$prep->execute();
@@ -150,8 +151,20 @@ class mail {
 	{
 		if (!($mail = self::check_for_new($u['account'])))
 			return;
+		$account = "";
+		S2S("SPRIVMSG IRC " . $u['nick'] . " :Playing back messages you received while offline.");
 		while ($row = $mail->fetch_assoc())
-			S2S("292 " . $u['nick'] . " :<" . $row['from_account'] . "> " . $row['message']);
-		
+		{
+			$account = $row['account'];
+			$mtags = generate_new_mtags();
+			$mtags["time"] = irc_timestamp($row['timestamp']);
+			$mtags["account"] = $row['from_account'];
+			$mtag = array_to_mtag($mtags);
+			S2S($mtag . "SPRIVMSG " . $row['from_cloak'] . " " . $u['nick'] . " :" . str_replace("\\", "\\\\", base64_decode($row['message'])) . " [to: " . $u['account'] . "]");
+		}
+		$conn = sqlnew();
+		$prep = $conn->prepare("DELETE FROM " . sqlprefix() . "mail WHERE account = ?");
+		$prep->bind_param("s", $account);
+		$prep->execute();
 	}
 }

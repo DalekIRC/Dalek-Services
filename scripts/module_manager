@@ -1,6 +1,6 @@
 <?php
 include "src/misc.php";
-var_dump(phpinfo());
+
 if (count($argv) < 2)
 	die("Parameters: ./dalek module list|load|unload|install|delete [<module>]");
 
