@@ -136,7 +136,7 @@ class mail {
 	{
 		$account = strtolower($account);
 		$conn = sqlnew();
-		$prep = $conn->prepare("SELECT * FROM " . sqlprefix() . "mail WHERE account = ?");
+		$prep = $conn->prepare("SELECT * FROM " . sqlprefix() . "mail WHERE account = ? ORDER BY timestamp ASC");;
 		$prep->bind_param("s", $account);
 		$prep->execute();
 
@@ -153,8 +153,11 @@ class mail {
 			return;
 		$account = "";
 		S2S("SPRIVMSG IRC " . $u['nick'] . " :Playing back messages you received while offline.");
+		$latest_ts = 0;
 		while ($row = $mail->fetch_assoc())
 		{
+			if ($row['timestamp'] > $latest_ts)
+				$latest_ts = $row['timestamp'];
 			$account = $row['account'];
 			$mtags = generate_new_mtags();
 			$mtags["time"] = irc_timestamp($row['timestamp']);
@@ -163,8 +166,8 @@ class mail {
 			S2S($mtag . "SPRIVMSG " . $row['from_cloak'] . " " . $u['nick'] . " :" . str_replace("\\", "\\\\", base64_decode($row['message'])) . " [to: " . $u['account'] . "]");
 		}
 		$conn = sqlnew();
-		$prep = $conn->prepare("DELETE FROM " . sqlprefix() . "mail WHERE account = ?");
-		$prep->bind_param("s", $account);
+		$prep = $conn->prepare("DELETE FROM " . sqlprefix() . "mail WHERE account = ? AND timestamp < ?");
+		$prep->bind_param("si", $account, $latest_ts);
 		$prep->execute();
 	}
 }
