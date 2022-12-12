@@ -9,9 +9,9 @@
 //				
 \\				
 //				
-\\	Title:		PRIVATTEMPT
+\\	Title:		MOTD
 //				
-\\	Desc:		PRIVATTEMPT command
+\\	Desc:		MOTD command
 \\				
 //				
 \\				
@@ -23,12 +23,12 @@
 */
 
 /* class name needs to be the same name as the file */
-class privattempt {
+class info2whois {
 
 	/* Module handle */
 	/* $name needs to be the same name as the class and file lol */
-	public $name = "privattempt";
-	public $description = "Provides PRIVATTEMPT compatibility";
+	public $name = "info2whois";
+	public $description = "Provides MOTD compatibility";
 	public $author = "Valware";
 	public $version = "1.0";
 	public $official = true;
@@ -61,8 +61,7 @@ class privattempt {
 		 * (both point to the same function which determines)
 		*/
 
-		if (!CommandAdd($this->name, 'PRIVATTEMPT', 'privattempt::cmd_privattempt', 0))
-			return false;
+		hook::func(HOOKTYPE_WELCOME, 'info2whois::hook');
 
 		return true;
 	}
@@ -73,16 +72,24 @@ class privattempt {
 	 * information passed along by the caller
 	 * $u['nick'] = User object
 	 */
-	public static function cmd_privattempt($u)
+	public static function hook($u)
 	{
-		$parv = split($u['params']);
-		$nick = new User($parv[0]);
-		$target = new WPUser($parv[1]);
+		$uid = $u['uid'];
+		if (($nick = new User($uid))->IsUser)
+			if (IsServiceBot($nick) || (!IsLoggedIn($nick))) // only for normal users who are logged in
+				return;
 
-		if (!$nick->IsUser)
-			return DebugLog("Casting user did not exist");
-		elseif ($target->IsUser)
-			S2S(RPL_MOTD." $nick->nick :You may send ".$parv[1]." a message for when they're online later. Use /MAIL ".$parv[1]." <message>");
+		elseif (is_null($u['account']))
+				return;
+
+		$wpuser = new WPUser($u['account']);
+		if (!$wpuser->IsUser)
+			return; // shouldn't happen
+
+		specialwhois::send_swhois($uid, "regdate", "registered on $wpuser->user_registered");
+		specialwhois::send_swhois($uid, "numwebp", "has made " . $wpuser->user_meta->num_posts . " website posts");
+		if ($wpuser->IsAdmin)
+			specialwhois::send_swhois($uid, "staff", "is a member of staff on this network.");
 		
 	}
 }

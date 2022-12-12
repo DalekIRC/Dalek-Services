@@ -138,7 +138,7 @@ class ns_ajoin {
 			$ns->sendraw("SVSJOIN $user->nick $chan");
 	}
 	
-	function IsAjoin($account,$channel){
+	static function IsAjoin($account,$channel){
 		
 		$list = ns_ajoin::ajoin_list($account) ?? NULL;
 		
@@ -148,7 +148,7 @@ class ns_ajoin {
 				return true;
 		return false;
 	}
-	function ajoin_list($account){
+	static function ajoin_list($account){
 		
 		$conn = sqlnew();
 		if (!$conn) { return false; }
@@ -168,7 +168,7 @@ class ns_ajoin {
 			return $chans;
 		}
 	}
-	function ajoin_add($account,$channel){
+	static function ajoin_add($account,$channel){
 		
 		$conn = sqlnew();
 		if (!$conn) { return false; }
@@ -183,12 +183,12 @@ class ns_ajoin {
 			return "$channel has been added to your autojoin list";
 		}
 	}
-	function ajoin_del($account,$channel)
+	static function ajoin_del($account,$channel)
 	{		
 		$conn = sqlnew();
 		if (!$conn) { return false; }
 		
-		if (!ns_ajoin::IsAjoin($account,$channel)){ return "That channel is not on your list."; return; }
+		if (!ns_ajoin::IsAjoin($account,$channel)){ return "That channel is not on your list."; }
 		
 		else {
 			$prep = $conn->prepare("DELETE FROM ".sqlprefix()."ajoin WHERE account = ? AND channel = ?");

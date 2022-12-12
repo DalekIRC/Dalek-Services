@@ -106,7 +106,6 @@ class smod {
 			if ($key == "third/dalek")
 				$found++;
 
-		var_dump(self::$list);
 		if (!$found)
 		{
 			sendto_sno("S", "Warning: UnrealIRCd module \"third/dalek\" is not present on our uplink. This will cause features to stop working properly.");

@@ -117,9 +117,27 @@ class mail {
 			S2S("292 $nick->nick :That account does not exist.");
 			return;
 		}
+		if (self::num_of_current($target->user_nicename, $nick->account) >= 10)
+		{
+			S2S("292 $nick->nick :You have sent the maximum number of mail messages you can send to that user.");
+			return;
+		}
 		self::sendto($nick, $target, $msg);
 		S2S("292 $nick->nick :Your message has been sent.");
 
+	}
+	public static function num_of_current($to, $from)
+	{
+		$conn = sqlnew();
+		$to = strtolower($to);
+		$from = strtolower($from);
+		$prep = $conn->prepare("SELECT * FROM " . sqlprefix() . "mail WHERE LOWER(account) = ? AND LOWER(from_account) = ? ORDER BY timestamp ASC");
+		$prep->bind_param("ss", $to, $from);
+		$prep->execute();
+		$result = $prep->get_result();
+		if (!$result || !$result->num_rows)
+			return 0;
+		return $result->num_rows;
 	}
 	public static function sendto(User $from, WPUser $to, String $message)
 	{
@@ -136,7 +154,7 @@ class mail {
 	{
 		$account = strtolower($account);
 		$conn = sqlnew();
-		$prep = $conn->prepare("SELECT * FROM " . sqlprefix() . "mail WHERE account = ? ORDER BY timestamp ASC");;
+		$prep = $conn->prepare("SELECT * FROM " . sqlprefix() . "mail WHERE lower(account) = ? ORDER BY timestamp ASC");
 		$prep->bind_param("s", $account);
 		$prep->execute();
 
@@ -149,7 +167,7 @@ class mail {
 
 	public static function showlist($u)
 	{
-		if (!($mail = self::check_for_new($u['account'])))
+		if (!isset($u['account']) || !($mail = self::check_for_new($u['account'])))
 			return;
 		$account = "";
 		S2S("SPRIVMSG IRC " . $u['nick'] . " :Playing back messages you received while offline.");
@@ -158,7 +176,7 @@ class mail {
 		{
 			if ($row['timestamp'] > $latest_ts)
 				$latest_ts = $row['timestamp'];
-			$account = $row['account'];
+			$account = strtolower($row['account']);
 			$mtags = generate_new_mtags();
 			$mtags["time"] = irc_timestamp($row['timestamp']);
 			$mtags["account"] = $row['from_account'];
@@ -166,7 +184,9 @@ class mail {
 			S2S($mtag . "SPRIVMSG " . $row['from_cloak'] . " " . $u['nick'] . " :" . str_replace("\\", "\\\\", base64_decode($row['message'])) . " [to: " . $u['account'] . "]");
 		}
 		$conn = sqlnew();
-		$prep = $conn->prepare("DELETE FROM " . sqlprefix() . "mail WHERE account = ? AND timestamp < ?");
+		$prep = $conn->prepare("DELETE FROM " . sqlprefix() . "mail WHERE LOWER(account) = ? AND timestamp <= ?");
+		var_dump($account);
+		var_dump($latest_ts);
 		$prep->bind_param("si", $account, $latest_ts);
 		$prep->execute();
 	}
