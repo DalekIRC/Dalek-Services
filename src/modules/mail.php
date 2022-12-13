@@ -93,37 +93,30 @@ class mail {
 		$dest = $tok[2];
 		$tok[2] = NULL;
 
+		/* If the user wants to list their mail */
 		if (!isset($tok[3]) && !strcasecmp($dest,"-list"))
 		{
+			/* No mail found */
 			if (!($mail = self::check_for_new($nick->account)))
-			{
-				S2S("292 $nick->nick :No new mail =]");
-				return;
-			}
-			S2S("292 $nick->nick :Showing your mail =]");
-			while($row = $mail->fetch_assoc())
-				S2S("292 $nick->nick :<" . $row['from_account'] . "> " . $row['message']);
+				sendnotice($nick, NULL, $u['mtags'], "No new mail");
+			else
+				self::showlist(['account' => $nick->account, 'nick' => $nick->nick]);
+			return;
 		}
 		$msg = mb_substr(glue($tok),1);
 
-		if (($target = new User($dest))->IsUser && !strcasecmp($target->account,$target->nick))
-		{
-			S2S("292 $nick->nick :That user is online and logged in. Try messaging them instead.");
-			return;
-		}
-
 		if (!($target = new WPUser($dest))->IsUser)
 		{
-			S2S("292 $nick->nick :That account does not exist.");
+			sendnotice($nick, NULL, $u['mtags'], "That account does not exist.");
 			return;
 		}
 		if (self::num_of_current($target->user_nicename, $nick->account) >= 10)
 		{
-			S2S("292 $nick->nick :You have sent the maximum number of mail messages you can send to that user.");
+			sendnotice($nick, NULL, $u['mtags'], "You have sent the maximum number of mail messages you can send to that user.");
 			return;
 		}
 		self::sendto($nick, $target, $msg);
-		S2S("292 $nick->nick :Your message has been sent.");
+		sendnotice($nick, NULL, $u['mtags'], "Your message has been sent.");
 
 	}
 	public static function num_of_current($to, $from)
@@ -185,8 +178,6 @@ class mail {
 		}
 		$conn = sqlnew();
 		$prep = $conn->prepare("DELETE FROM " . sqlprefix() . "mail WHERE LOWER(account) = ? AND timestamp <= ?");
-		var_dump($account);
-		var_dump($latest_ts);
 		$prep->bind_param("si", $account, $latest_ts);
 		$prep->execute();
 	}
