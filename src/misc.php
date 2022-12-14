@@ -613,6 +613,8 @@ function new_msgid() : String
  */
 function irc_timestamp($timestamp = NULL) : String
 {
+	if (!$timestamp)
+		$timestamp = servertime();
 	$thing = microsecs();
 	return date("Y-m-d\TH:i:s.".$thing."\Z", $timestamp);
 }
