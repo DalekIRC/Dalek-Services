@@ -59,10 +59,9 @@ class cregister {
 		self::do_register($chan->chan, $nick->account);
 		$chan->SetMode("+qr " . $nick->nick);
 		$mtags = generate_new_mtags();
-		$mtags['draft/reply'] = $u['mtags']['msgid'];
+		$mtags['+draft/reply'] = $u['mtags']['msgid'];
 		SVSLog("User $nick->nick ($nick->ident@$nick->realhost) registered channel $chan->chan under account $nick->account","[CREGISTER] ");
-		$tags = array_to_mtag($mtags);
-		S2S($tags . "NOTICE $nick->uid :Channel $chan->chan registered under your account: $nick->account");
+		sendnotice($nick, NULL, $mtags, "Channel $chan->chan registered under your account: $nick->account");
 	}
 	public static function do_register($chan, $owner)
 	{

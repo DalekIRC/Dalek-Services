@@ -82,7 +82,7 @@ class privattempt {
 		if (!$nick->IsUser)
 			return DebugLog("Casting user did not exist");
 		elseif ($target->IsUser)
-			S2S(RPL_MOTD." $nick->nick :You may send ".$parv[1]." a message for when they're online later. Use /MAIL ".$parv[1]." <message>");
+			S2S(RPL_MAILPROMPT." $nick->nick :You may send ".$parv[1]." a message for when they're online later. Use /MAIL ".$parv[1]." <message>");
 		
 	}
 }

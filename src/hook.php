@@ -59,6 +59,8 @@ define('HOOKTYPE_CTCP', 'ctcp');
 define('HOOKTYPE_CTCPREPLY', 'ctcpreply');
 /** When one or more channel modes were set */
 define('HOOKTYPE_CHANNELMODE', 'mode');
+/** Individual channel mode with params */
+define('HOOKTYPE_CHANNELMODE_PARAM', 'cmodeparam');
 /** When one or more usermodes were set */
 define('HOOKTYPE_UMODE_CHANGE', 'umode');
 /** When a user gets kicked from a channel */

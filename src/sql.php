@@ -308,7 +308,7 @@ class SQL {
 	function delete_ison($chan,$uid,$modes = "")
 	{
 		$sql_modestring = "+"; // what modes to set dem as in de databass
-
+		$chan = strtolower($chan);
 		if (!BadPtr($modes)) // figure out them modes
 		{
 			

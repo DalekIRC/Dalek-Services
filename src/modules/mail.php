@@ -79,10 +79,9 @@ class mail {
 	}
 
 
-	/* The public command function that we are calling with CommandAdd in __init.
-	 * In this example (and throughout the source), $u contains an array with
-	 * information passed along by the caller
-	 * $u['nick'] = User object
+	/** MAIL
+	 * This needs the DalekIRC module for UnrealIRCd in order to work.
+	 * Lets users send offline messages with /MAIL <account> <message>
 	 */
 	public static function cmd_mail($u)
 	{
@@ -93,30 +92,36 @@ class mail {
 		$dest = $tok[2];
 		$tok[2] = NULL;
 
+		$mtags = generate_new_mtags();
+		$mtags["+draft/reply"] = (isset($u['mtags']['msgid'])) ? $u['mtags']['msgid'] : NULL;
 		/* If the user wants to list their mail */
 		if (!isset($tok[3]) && !strcasecmp($dest,"-list"))
 		{
 			/* No mail found */
 			if (!($mail = self::check_for_new($nick->account)))
-				sendnotice($nick, NULL, $u['mtags'], "No new mail");
+				sendnotice($nick, NULL, $mtags, "No new mail");
 			else
 				self::showlist(['account' => $nick->account, 'nick' => $nick->nick]);
 			return;
 		}
 		$msg = mb_substr(glue($tok),1);
 
+		/* Couldn't find their WordPress account! */
 		if (!($target = new WPUser($dest))->IsUser)
 		{
-			sendnotice($nick, NULL, $u['mtags'], "That account does not exist.");
+			sendnotice($nick, NULL, $mtags, "That account does not exist.");
 			return;
 		}
+
+		/* User has already sent 10 messages to this person. Don't allow it */
 		if (self::num_of_current($target->user_nicename, $nick->account) >= 10)
 		{
-			sendnotice($nick, NULL, $u['mtags'], "You have sent the maximum number of mail messages you can send to that user.");
+			sendnotice($nick, NULL, $mtags, "You have sent the maximum number of mail messages you can send to that user.");
 			return;
 		}
+		/* send the mail */
 		self::sendto($nick, $target, $msg);
-		sendnotice($nick, NULL, $u['mtags'], "Your message has been sent.");
+		sendnumeric("%i %c :%s", RPL_MAIL_MSGSENT, $nick, "Your message has been sent.");
 
 	}
 	public static function num_of_current($to, $from)

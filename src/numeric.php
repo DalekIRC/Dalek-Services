@@ -180,6 +180,8 @@ define("ERR_NOMATCHINGKEY", 766);
 define("ERR_KEYINVALID", 767);
 define("ERR_KEYNOTSET", 768);
 define("ERR_KEYNOPERMISSION", 769);
+define("RPL_MAILPROMPT", 801); // dalek specific
+define("RPL_MAIL_MSGSENT", 802); // dalek specific
 define("RPL_LOGGEDIN", 900);
 define("RPL_LOGGEDOUT", 901);
 define("ERR_NICKLOCKED", 902);

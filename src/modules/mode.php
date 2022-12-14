@@ -92,7 +92,7 @@ class mode {
 		 * @modes (String)
 		 * @oldmodes (String)
 		 */
-		$array = ["nick" => $u['nick'], "chan" => $chan, "modes" => $modes, "oldmodes" => $oldmodes];
+		$array = ["nick" => $u['nick'], "chan" => $chan, "modes" => $modes, "oldmodes" => $oldmodes, "params" => $params];
 		hook::run(HOOKTYPE_CHANNELMODE, $array);
 	}
 

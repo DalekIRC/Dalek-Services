@@ -226,6 +226,11 @@ class Channel
 		{
 			$sql->update_chmode($this->chan,$switch,$chr);
 		}
+		$hook['channel'] = $this;
+		$hook['switch'] = $switch;
+		$hook['char'] = $chr;
+		$hook['param'] = $param;
+		hook::run(HOOKTYPE_CHANNELMODE_PARAM, $hook);
 	}
 	
 	
@@ -322,4 +327,50 @@ function channel_list() : array
 		$chanlist[] = new Channel($row['channel']);
 
 	return $chanlist;
+}
+
+function get_channel_setting(Channel $channel, String $setting)
+{
+	$conn = sqlnew();
+	$chan = strtolower($channel->chan);
+	$prep = $conn->prepare("SELECT * FROM " . sqlprefix() . "channel_settings WHERE LOWER(channel) = ? AND setting_key = ? LIMIT 1");
+	$prep->bind_param("ss", $chan, $setting);
+	$prep->execute();
+	$result = $prep->get_result();
+	if (!$result || !$result->num_rows)
+		return false;
+
+	else while ($row = $result->fetch_assoc())
+		return $row['setting_value']; // return the first result
+}
+
+function set_channel_setting(Channel $channel, String $setting, String $value = NULL)
+{
+	$conn = sqlnew();
+	$chan = strtolower($channel->chan);
+	$prep = $conn->prepare("SELECT * FROM " . sqlprefix() . "channel_settings WHERE LOWER(channel) = ? AND setting_key = ? LIMIT 1");
+	$prep->bind_param("ss", $chan, $setting);
+	$prep->execute();
+	$result = $prep->get_result();
+	if (!$result || !$result->num_rows)
+	{
+		if (!$value)
+			return;
+
+		$prep = $conn->prepare("INSERT INTO " . sqlprefix(). "channel_settings (channel, setting_key, setting_value) VALUES (?, ?, ?)");
+		$prep->bind_param("sss", $chan, $setting, $value);
+		$prep->execute();
+	}
+	elseif ($value)
+	{
+		$prep = $conn->prepare("UPDATE " . sqlprefix(). "channel_settings SET setting_value = ? WHERE channel = ? AND setting_key = ?");
+		$prep->bind_param("sss", $value, $chan, $setting);
+		$prep->execute();
+	}
+	else
+	{
+		$prep = $conn->prepare("DELETE FROM " . sqlprefix(). "channel_settings WHERE channel = ? AND setting_key = ?");
+		$prep->bind_param("ss", $chan, $setting);
+		$prep->execute();
+	}
 }
