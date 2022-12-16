@@ -21,10 +21,16 @@
 */
 require_once("hook.php");
 require_once("misc.php");
+if (!defined('DALEK_CONF_DIR'))
+{
+	define("DALEK_CONF_DIR", getenv("DALEK_CONF_DIR") ?: __DIR__."/../conf");
+	define("DALEK_LOG_DIR", getenv("DALEK_LOG_DIR") ?: __DIR__."/../logs");
+}
 define("DALEK_VERSION", "Dalek-Services-0.1.1-git");
 define("CONF_SYMBOL", "[CONFIG] ");
+
 $error = [];
-new Conf(DALEK_CONF_DIR . "/dalek.conf", $error);
+new Conf(DALEK_CONF_DIR."/dalek.conf", $error);																																																																																																																																																																												
 if (!empty($error))
 {
 	echo "Configuration test failed. Dalek encountered the following error(s):\n";
