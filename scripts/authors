@@ -4,4 +4,6 @@ require_once("src/conf.php");
 
 echo "Using version ".DALEK_VERSION."\n";
 echo "Licence: GPLv3 or later\n";
-echo "Author: Valware (https://github.com/ValwareIRC)\n\n";
+echo "DalekIRC is brought to you by:\n";
+echo "Valerie Pond (Valware)\n";
+echo "and Val Lorentz (progval)\n\n";
