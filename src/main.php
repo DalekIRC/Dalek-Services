@@ -100,7 +100,7 @@ for ($input = Buffer::do_buf(stream_get_line($socket, 0, "\n"));;$input = Buffer
 
 	log_to_disk($input);
 	if (Conf::$settings['log']['debug'] == "yes")
-		echo "[\e[0;30;47mRECV\e[0m] ".$input."\n";
+		$serv->hear($input);
 	
 	flush();
 	$strippem = ircstrip(str_replace('\\','\\\\',$input));
