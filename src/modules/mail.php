@@ -95,10 +95,10 @@ class mail {
 		$mtags = generate_new_mtags();
 		$mtags["+draft/reply"] = (isset($u['mtags']['msgid'])) ? $u['mtags']['msgid'] : NULL;
 		/* If the user wants to list their mail */
-		if (!isset($tok[3]) && !strcasecmp($dest,"-list"))
+		if (!strcasecmp($dest,"-list"))
 		{
 			/* No mail found */
-			if (!($mail = self::check_for_new($nick->account)))
+			if (!self::check_for_new($nick->account))
 				sendnotice($nick, NULL, $mtags, "No new mail");
 			else
 				self::showlist(['account' => $nick->account, 'nick' => $nick->nick]);
@@ -123,19 +123,24 @@ class mail {
 		self::sendto($nick, $target, $msg);
 		sendnumeric("%i %c :%s", RPL_MAIL_MSGSENT, $nick, "Your message has been sent.");
 
+		// if someone is logged in with that account, let them know they've got mail =]
+		foreach (user_list_by_account($dest) as $user)
+					if ($user->account != NULL && !strcasecmp($user->account,$dest))
+						sendnumeric("%i %c :%s", RPL_MAIL_YOUVEGOTMAIL, $user, "You've got mail! Type ".bold("/MAIL -list")." to view");
 	}
-	public static function num_of_current($to, $from)
+	public static function num_of_current($to)
 	{
 		$conn = sqlnew();
 		$to = strtolower($to);
-		$from = strtolower($from);
-		$prep = $conn->prepare("SELECT * FROM " . sqlprefix() . "mail WHERE LOWER(account) = ? AND LOWER(from_account) = ? ORDER BY timestamp ASC");
-		$prep->bind_param("ss", $to, $from);
+		$prep = $conn->prepare("SELECT * FROM " . sqlprefix() . "mail WHERE LOWER(account) = ? ORDER BY timestamp ASC");
+		$prep->bind_param("s", $to);
 		$prep->execute();
 		$result = $prep->get_result();
 		if (!$result || !$result->num_rows)
 			return 0;
 		return $result->num_rows;
+
+		
 	}
 	public static function sendto(User $from, WPUser $to, String $message)
 	{

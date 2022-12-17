@@ -216,11 +216,41 @@ class User {
 		
 }
 
+/**
+ * Queries the user table in the SQL database for users all users
+ * @param void No parameters
+ * @return false|array Returns either false for no users found, or an array of users of class User
+ */
 function user_list()
 {
 	$users = [];
 	$conn = sqlnew();
 	if (!($result = $conn->query("SELECT * FROM ".sqlprefix()."user")))
+		return false;
+	while ($row = $result->fetch_assoc())
+	{
+		$newUser = new User($row['UID']);
+		$users[] = $newUser;
+	}
+	return $users;
+}
+
+/**
+ * Queries the user table in the SQL database for users logged in with a specific account name
+ * @param $account The account name for lookup
+ * @return false|array Returns either false for no users found, or an array of users of class User
+ * 
+ */
+function user_list_by_account(String $account)
+{
+	$users = [];
+	$conn = sqlnew();
+	$account = strtolower($account);
+	$prep = $conn->prepare("SELECT * FROM ".sqlprefix()."user WHERE LOWER(account) = ?");
+	$prep->bind_param("s", $account);
+	$prep->execute();
+	$result = $prep->get_result();
+	if (!$result || !$result->num_rows)
 		return false;
 	while ($row = $result->fetch_assoc())
 	{
@@ -252,6 +282,8 @@ class UserMeta {
 		$prep->close();
 	}
 }
+
+/** Alias for setting a usermode on someone */
 function sendumode($uid,$mode)
 {
 	global $serv;
@@ -260,7 +292,11 @@ function sendumode($uid,$mode)
 	return;
 }
 
-/* Figure out if the user already has the modes, and strip any duplicates */
+/**
+ * Internal function to figure out what modes we should actually be sending
+ * based on whether or not they already have a mode or something.
+ * If you want to send usermodes to a user, see the function `sendumode()` 
+ */
 function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 {
 	$AddModeString = NULL;
@@ -270,12 +306,8 @@ function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 	$NewModes = $modesThatWeHave;
 	
 	for ($i = 0; $i < strlen($modesToAdd); $i++)
-	{
-
 		if (!strpos($modesThatWeHave,$modesToAdd[$i]))
-		{
 			$SetTheMode .= $modesToAdd[$i];
-		}
 	}
 	
 	if (strlen($SetTheMode))
@@ -285,31 +317,21 @@ function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
 	}
 	
 	for ($i = 0; $i < strlen($modesToDel); $i++)
-	{
-		
 		if (strpos($NewModes,$modesToDel[$i]))
-		{
 			$UnsetTheMode .= $modesToDel[$i];
-		}
-	}
-	
+		
 	if (strlen($UnsetTheMode))
 	{
 		$DelModeString = "-".$UnsetTheMode ?? NULL;
 		
 		for ($i = 0; $i < strlen($UnsetTheMode); $i++)
-		{
 			if (strpos($NewModes,$UnsetTheMode[$i]))
-			{
 				$NewModes = str_replace($UnsetTheMode[$i],"",$NewModes);
-			}
-		}
-	}
+
 	$TheEntireStringOfModesThatWeAreGoingToSetOnTheUser = $AddModeString.$DelModeString;
 	if (!$TheEntireStringOfModesThatWeAreGoingToSetOnTheUser)
-	{
 		return false;
-	}
+
 	$return = [
 		'ToSet' => $TheEntireStringOfModesThatWeAreGoingToSetOnTheUser,
 		'NewModes' => $NewModes
@@ -325,8 +347,7 @@ function validate_nick($string)
 	for ($i = 0; $i < strlen($string); $i++)
 	{
 		$val = $string[$i];
-		if ($i == 0){
-			
+		if ($i == 0)
 			if (!ctype_alpha($val))
 			{
 				
@@ -336,7 +357,7 @@ function validate_nick($string)
 				else 
 					return false;
 			}
-		}
+		
 		else
 		{
 			if ((ord($val) >= 65 && ord($val) <= 125) || (ord($val) >= 48 && ord($val) <= 57) || ord($val) == 45)
