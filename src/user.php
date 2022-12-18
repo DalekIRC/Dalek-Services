@@ -297,37 +297,35 @@ function sendumode($uid,$mode)
  * based on whether or not they already have a mode or something.
  * If you want to send usermodes to a user, see the function `sendumode()` 
  */
-function validate_modechange($modesThatWeHave,$modesToAdd,$modesToDel)
+function validate_modechange($modesThatWeHave,$modesToAdd,$ModesToDel)
 {
 	$AddModeString = NULL;
 	$DelModeString = NULL;
 	$SetTheMode = "";
-	$UnsetTheMode = "";
+	$UnsetTheMode = [];
 	$NewModes = $modesThatWeHave;
 	
-	for ($i = 0; $i < strlen($modesToAdd); $i++)
+	for ($i = 0; $i < count($modesToAdd); $i++)
 		if (!strpos($modesThatWeHave,$modesToAdd[$i]))
 			$SetTheMode .= $modesToAdd[$i];
-	}
-	
-	if (strlen($SetTheMode))
+
+	if (isset($SetTheMode) && $SetTheMode && strlen($SetTheMode))
 	{	
 		$AddModeString = "+".$SetTheMode ?? NULL;
 		$NewModes = $modesThatWeHave.$SetTheMode;
 	}
-	
-	for ($i = 0; $i < strlen($modesToDel); $i++)
-		if (strpos($NewModes,$modesToDel[$i]))
-			$UnsetTheMode .= $modesToDel[$i];
+	for ($i = 0, $ModesToDel = []; $i < count($ModesToDel); $i++)
+		if (strpos($NewModes, $ModesToDel[$i]))
+			$UnsetTheMode .= $ModesToDel[$i];
 		
-	if (strlen($UnsetTheMode))
+	if (count($UnsetTheMode) > 0)
 	{
 		$DelModeString = "-".$UnsetTheMode ?? NULL;
 		
-		for ($i = 0; $i < strlen($UnsetTheMode); $i++)
+		for ($i = 0; $i < count($UnsetTheMode); $i++)
 			if (strpos($NewModes,$UnsetTheMode[$i]))
 				$NewModes = str_replace($UnsetTheMode[$i],"",$NewModes);
-
+	}
 	$TheEntireStringOfModesThatWeAreGoingToSetOnTheUser = $AddModeString.$DelModeString;
 	if (!$TheEntireStringOfModesThatWeAreGoingToSetOnTheUser)
 		return false;

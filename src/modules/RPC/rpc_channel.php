@@ -122,7 +122,7 @@ class rpc_channel {
 			rpc_append_error($reply, "Channel not found", RPC_ERR_NOT_FOUND);
 
 		elseif (strlen($channel->topic) + strlen($params['topic']) > self::TOPIC_LEN)
-			rpc_append_error($reply, "'topic' length must not exceed 360 characters. Current topic is ".strlen($channel->topic).". You tried to append ".strlen($params['topic'])." chars. (".strlen($channel->topic) + strlen($params['topic']).")", RPC_ERR_INVALID_PARAMS);
+			rpc_append_error($reply, "'topic' length must not exceed 360 characters. Current topic is ".strlen($channel->topic).". You tried to append ".strlen($params['topic'])." chars. (".(strlen($channel->topic) + strlen($params['topic'])).")", RPC_ERR_INVALID_PARAMS);
 
 		else 
 		{

@@ -109,14 +109,14 @@ class mail {
 		/* Couldn't find their WordPress account! */
 		if (!($target = new WPUser($dest))->IsUser)
 		{
-			sendnotice($nick, NULL, $mtags, "That account does not exist.");
+			sreply::send_fail($nick, "MAIL", "ACCOUNT_DOES_NOT_EXIST", "", "That account does not exist.");
 			return;
 		}
 
 		/* User has already sent 10 messages to this person. Don't allow it */
 		if (self::num_of_current($target->user_nicename, $nick->account) >= 10)
 		{
-			sendnotice($nick, NULL, $mtags, "You have sent the maximum number of mail messages you can send to that user.");
+			sreply::send_fail($nick, "MAIL", "MAIL_LIMIT_REACHED", "10", "You have sent the maximum number of mail messages you can send to that user.");
 			return;
 		}
 		/* send the mail */
@@ -125,8 +125,8 @@ class mail {
 
 		// if someone is logged in with that account, let them know they've got mail =]
 		foreach (user_list_by_account($dest) as $user)
-					if ($user->account != NULL && !strcasecmp($user->account,$dest))
-						sendnumeric("%i %c :%s", RPL_MAIL_YOUVEGOTMAIL, $user, "You've got mail! Type ".bold("/MAIL -list")." to view");
+			if ($user->account != NULL && !strcasecmp($user->account,$dest))
+				sendnumeric("%i %c :%s", RPL_MAIL_YOUVEGOTMAIL, $user, "You've got mail! Type ".bold("/MAIL -list")." to view");
 	}
 	public static function num_of_current($to)
 	{

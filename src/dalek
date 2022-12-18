@@ -1,2 +1,10 @@
 <?php
+
+error_reporting(E_ALL); // Error/Exception engine, always use E_ALL
+ini_set('ignore_repeated_errors', true); // always use true
+ini_set('display_errors', true); 
+ini_set('log_errors', true); // Error/Exception file logging engine.
+ini_set('error_log', 'logs/errors/phperrs.log'); // Logging file path
+
+
 include "main.php";
