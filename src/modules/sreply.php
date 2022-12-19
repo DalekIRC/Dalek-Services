@@ -61,8 +61,10 @@ class sreply {
 	 * @param parv[3]		The rest of the message
 	
 	 */
-	/** Sends a Standard Reply message as if it came from the client's server. */
-	public static function send(
+	/** Sends a Standard Reply message as if it came from the client's server.
+	 * Internal use only. Please see use ::send_fail, ::send_warn and ::send_note
+	*/
+	private static function send(
 		User $client,
 		String $type,
 		String $command,
@@ -74,14 +76,38 @@ class sreply {
 		S2S("SREPLY $client->uid $type $command $code $c:$message");
 	}
 
+	/**
+	 * Send FAIL to the user
+	 * @param User $client The User object of the client to whom we're sending the FAIL
+	 * @param String $command Indicates the user command which this reply is related to, or is * for messages initiated outside client commands (for example, an on-connect message).
+	 * @param String $code Machine-readable reply code representing the meaning of the message to client software.
+	 * @param String $context Optional parameters that give humans extra context as to where and why the reply was spawned (for example, a particular subcommand or sub-process).
+	 * @param String $message A required plain-text message which is shown to users.
+	 */
 	public static function send_fail(User $client, String $command, String $code, String $context = "", String $message)
 	{
 		self::send($client, SRPL_FAIL, $code, $command, $context, $message);
 	}
+	/**
+	 * Send WARN to the user
+	 * @param User $client The User object of the client to whom we're sending the WARN
+	 * @param String $command Indicates the user command which this reply is related to, or is * for messages initiated outside client commands (for example, an on-connect message).
+	 * @param String $code Machine-readable reply code representing the meaning of the message to client software.
+	 * @param String $context Optional parameters that give humans extra context as to where and why the reply was spawned (for example, a particular subcommand or sub-process).
+	 * @param String $message A required plain-text message which is shown to users.
+	 */
 	public static function send_warn(User $client, String $command, String $code, String $context = "", String $message)
 	{
 		self::send($client, SRPL_WARN, $code, $command, $context, $message);
 	}
+	/**
+	 * Send NOTE to the user
+	 * @param User $client The User object of the client to whom we're sending the NOTE
+	 * @param String $command Indicates the user command which this reply is related to, or is * for messages initiated outside client commands (for example, an on-connect message).
+	 * @param String $code Machine-readable reply code representing the meaning of the message to client software.
+	 * @param String $context Optional parameters that give humans extra context as to where and why the reply was spawned (for example, a particular subcommand or sub-process).
+	 * @param String $message A required plain-text message which is shown to users.
+	 */
 	public static function send_note(User $client, String $command, String $code, String $context = "", String $message)
 	{
 		self::send($client, SRPL_NOTE, $code, $command, $context, $message);
