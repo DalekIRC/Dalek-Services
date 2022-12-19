@@ -96,11 +96,11 @@ class voteban {
 		$error = NULL;
 		if (!self::make_vote_against($chan, $targ, $u['nick'], $error) && $error)
 		{
-			sendnotice($u['nick'], NULL, [], $error);
+			sreply::send_fail($u['nick'], "VOTEBAN", "VOTE_LIMIT_REACHED", "$chan->chan $targ->nick", $error);
 			return;
 		}
 		
-		sendnotice($u['nick'], NULL, [], "Thank you for your vote.");
+		sreply::send_note($u['nick'], "VOTEBAN", "SUCCESSFUL", "$chan->chan $targ->nick", "Thank you for your vote.");
 		$votes = self::get_num_votes($chan, $targ);
 		$req = (int)get_channel_setting($chan, "voteban");
 		if ($votes >= $req)

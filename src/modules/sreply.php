@@ -67,10 +67,11 @@ class sreply {
 		String $type,
 		String $command,
 		String $code,
-		String $context = "",
+		String $context = NULL,
 		String $message
 	){
-		S2S("SREPLY $client->uid $type $command $code ".(strlen($context)) ? "$context " : "$context"." :$message");
+		$c = ($context) ? "$context " : "";
+		S2S("SREPLY $client->uid $type $command $code $c:$message");
 	}
 
 	public static function send_fail(User $client, String $command, String $code, String $context = "", String $message)

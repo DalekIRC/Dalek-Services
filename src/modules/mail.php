@@ -121,12 +121,12 @@ class mail {
 		}
 		/* send the mail */
 		self::sendto($nick, $target, $msg);
-		sendnumeric("%i %c :%s", RPL_MAIL_MSGSENT, $nick, "Your message has been sent.");
+		sreply::send_note($nick, "MAIL", "MAIL_SENT", $dest, "Your message has been sent.");
 
 		// if someone is logged in with that account, let them know they've got mail =]
 		foreach (user_list_by_account($dest) as $user)
 			if ($user->account != NULL && !strcasecmp($user->account,$dest))
-				sendnumeric("%i %c :%s", RPL_MAIL_YOUVEGOTMAIL, $user, "You've got mail! Type ".bold("/MAIL -list")." to view");
+				sreply::send_note($nick, "MAIL", "YOUVE_GOT_MAIL", NULL, "You've got mail! Type ".bold("/MAIL -list")." to view");
 	}
 	public static function num_of_current($to)
 	{
