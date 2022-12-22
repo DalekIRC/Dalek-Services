@@ -26,6 +26,15 @@ define('SRPL_WARN', 'W');
 define('SRPL_NOTE', 'N');
 
 /* class name needs to be the same name as the file */
+/**
+ * SREPLY is for sending Standard Replies to users. If you think this is useful \
+ * please see methods send_fail, send_warn and send_note.
+ * Syntax: `:123 SREPLY NICK F TOO_SPICY :WEE WOO`
+ * 
+ * @param parv[1]		Nick|UID
+ * @param parv[2]		`F`, `W` or `N` for `FAIL`, `WARN` and `NOTE`.
+ * @param parv[3]		The rest of the message
+ */
 class sreply {
 
 	/* Module handle */
@@ -54,13 +63,8 @@ class sreply {
 	{
 		return true;
 	}
-
-	/** SREPLY
-	 * @param parv[1]		Nick|UID
-	 * @param parv[2]		"F", "W" or "N" for FAIL, WARN and NOTE.
-	 * @param parv[3]		The rest of the message
 	
-	 */
+	
 	/** Sends a Standard Reply message as if it came from the client's server.
 	 * Internal use only. Please see use ::send_fail, ::send_warn and ::send_note
 	*/

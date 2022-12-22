@@ -33,20 +33,6 @@ class info2whois {
 	public $version = "1.0";
 	public $official = true;
 
-	/* To run when this class is created/when the module is loaded */
-	/* Construction: Here's where you'll wanna initialise any globals or databases or anything */
-	function __construct()
-	{
-	
-	}
-
-	/* To run when the class is destroyed/when the module is unloaded */
-	/* Destruction: Here's where to clear up your globals or databases or anything */
-	function __destruct()
-	{
-		
-	}
-
 
 	/* Initialisation: Here's where to run things that should be run 
 	 * after the module has been successfully registered.

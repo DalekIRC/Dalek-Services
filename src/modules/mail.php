@@ -94,6 +94,7 @@ class mail {
 
 		$mtags = generate_new_mtags();
 		$mtags["+draft/reply"] = (isset($u['mtags']['msgid'])) ? $u['mtags']['msgid'] : NULL;
+		$mtags["label"] = (isset($u['mtags']['label'])) ? $u['mtags']['label'] : NULL;
 		/* If the user wants to list their mail */
 		if (!strcasecmp($dest,"-list"))
 		{
@@ -109,24 +110,24 @@ class mail {
 		/* Couldn't find their WordPress account! */
 		if (!($target = new WPUser($dest))->IsUser)
 		{
-			sreply::send_fail($nick, "MAIL", "ACCOUNT_DOES_NOT_EXIST", "", "That account does not exist.");
+			sreply::send_fail($nick, "MAIL", "ACCOUNT_DOES_NOT_EXIST", "", "That account \"$dest\" does not exist.");
 			return;
 		}
 
 		/* User has already sent 10 messages to this person. Don't allow it */
 		if (self::num_of_current($target->user_nicename, $nick->account) >= 10)
 		{
-			sreply::send_fail($nick, "MAIL", "MAIL_LIMIT_REACHED", "10", "You have sent the maximum number of mail messages you can send to that user.");
+			sreply::send_fail($nick, "MAIL", "MAIL_LIMIT_REACHED", "10", "You have sent the maximum number of mail messages you can send to users who are logged in as $dest.");
 			return;
 		}
 		/* send the mail */
 		self::sendto($nick, $target, $msg);
-		sreply::send_note($nick, "MAIL", "MAIL_SENT", $dest, "Your message has been sent.");
+		sreply::send_note($nick, "MAIL", "MAIL_SENT", $dest, "Your message has been sent to $dest.");
 
 		// if someone is logged in with that account, let them know they've got mail =]
 		foreach (user_list_by_account($dest) as $user)
 			if ($user->account != NULL && !strcasecmp($user->account,$dest))
-				sreply::send_note($nick, "MAIL", "YOUVE_GOT_MAIL", NULL, "You've got mail! Type ".bold("/MAIL -list")." to view");
+				sreply::send_note($nick, "MAIL", "YOUVE_GOT_MAIL", "", "You've got mail! Type ".bold("/MAIL -list")." to view");
 	}
 	public static function num_of_current($to)
 	{
@@ -183,6 +184,7 @@ class mail {
 			$mtags = generate_new_mtags();
 			$mtags["time"] = irc_timestamp($row['timestamp']);
 			$mtags["account"] = $row['from_account'];
+			$mtags["dalek.services/mail"] = "yes";
 			$mtag = array_to_mtag($mtags);
 			S2S($mtag . "SPRIVMSG " . $row['from_cloak'] . " " . $u['nick'] . " :" . str_replace("\\", "\\\\", base64_decode($row['message'])) . " [to: " . $u['account'] . "]");
 		}

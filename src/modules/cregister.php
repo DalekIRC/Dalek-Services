@@ -40,8 +40,6 @@ class cregister {
 
 		return true;
 	}
-
-
 	/* The public command function that we are calling with CommandAdd in __init.
 	 * In this example (and throughout the source), $u contains an array with
 	 * information passed along by the caller
