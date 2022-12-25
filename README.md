@@ -1,4 +1,4 @@
-# <div align="center"><img width="50" height="35" src="https://i.imgur.com/w6cScKo.png"> DalekIRC Services</div>
+# <div align="center"><img width="100" height="35" src="https://dalek.services/wp-content/uploads/2022/12/dalek.png"> DalekIRC Services</div>
 <div align="center">
 
 [![Version](https://img.shields.io/badge/Extermin-8-red.svg)]()
