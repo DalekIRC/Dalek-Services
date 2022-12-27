@@ -91,6 +91,7 @@ class version {
 	static function version_response(User $nick)
 	{
 		global $cf;
-		S2S("351 $nick->nick ".DALEK_VERSION." ".$cf['servicesname']." 0 [". (IsOper($nick)) ? php_uname() : "*" ."=6000]");
+		$phpinfo = (IsOper($nick)) ? php_uname() : "*";
+		S2S("351 $nick->nick ".DALEK_VERSION." ".config_get_item("info::services-name")." 0 [$phpinfo=6000]");
 	}
 }
