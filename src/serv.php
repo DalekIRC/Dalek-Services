@@ -62,7 +62,7 @@ class Server
 		$socket = stream_socket_client($server.':'.$port, $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $context);
 		$this->host = $server;
 		$this->sendraw("PASS $password");
-		$this->sendraw("PROTOCTL EAUTH=$this->name,6000 SID=$this->sid");
+		$this->sendraw("PROTOCTL EAUTH=$this->name,6000,,Dalek-1.0 SID=$this->sid");
 		$this->sendraw("PROTOCTL NOQUIT NICKv2 SJOIN SJOIN2 SJ3 CLK TKLEXT2 NICKIP ESVID MLOCK NEXTBANS EXTSWHOIS SJSBY MTAGS");
 		$this->sendraw("SERVER $this->name 1 :Dalek IRC Services");
 		$this->sendraw("MD client $this->sid saslmechlist :PLAIN,EXTERNAL");

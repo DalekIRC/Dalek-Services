@@ -140,8 +140,8 @@ class hook {
 
 	/** Runs a hook.
 	 * The parameter for $hook should be a "HOOKTYPE_" as defined in hook.php
-	 * @param String $hook The define or string name of the hook. For example, HOOKTYPE_REHASH.
-	 * @param Array &$args The array of information you are sending along in the hook, so that other functions may see and modify things.
+	 * @param string $hook The define or string name of the hook. For example, HOOKTYPE_REHASH.
+	 * @param array &$args The array of information you are sending along in the hook, so that other functions may see and modify things.
 	 * @return void Does not return anything.
 	 * 
 	 */
@@ -154,8 +154,8 @@ class hook {
 	}
 
 	/** Calls a hook
-	 * @param String $hook The define or string name of the hook. For example, HOOKTYPE_REHASH.
-	 * @param String|Closure $function This is a string reference to a Closure function or a class method.
+	 * @param string $hook The define or string name of the hook. For example, HOOKTYPE_REHASH.
+	 * @param string|Closure $function This is a string reference to a Closure function or a class method.
 	 * @return void Does not return anything.
 	 */
 	public static function func($hook, $function) {
@@ -163,8 +163,8 @@ class hook {
 	}
 
 	/** Deletes a hook
-	 * @param String $hook The hook from which we are removing a function reference.
-	 * @param String $function The name of the function that we are removing.
+	 * @param string $hook The hook from which we are removing a function reference.
+	 * @param string $function The name of the function that we are removing.
 	 * @return void Does not reuturn anything.
 	 */
 
@@ -178,7 +178,7 @@ class hook {
 /** UnrealIRCd inspired HookAdd()
  * Validate hooks when adding them
  * @param object $mod The module for which this hook was added.
- * @param String $hook The HOOKTYPE
+ * @param string $hook The HOOKTYPE
  * @param int $priority The priority of the hook.
  * @param callable $priority
  * 
