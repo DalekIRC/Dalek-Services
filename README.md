@@ -11,6 +11,7 @@
 
 
 DalekIRC Services with UnrealIRCd & WordPress integration tailored to you.<br><br>
+
 </div>
 
 ### Why do I need Dalek? ###
@@ -57,4 +58,5 @@ To learn more about how DalekIRC uses IRCv3, [check out the support table](docs/
 	
 <div align="center">
 	
-### <a href="https://github.com/unrealircd/unrealircd/"><img width="210" height="50" src="https://i.ibb.co/dB6H5Zq/Screenshot-from-2022-09-26-00-20-15.png"></a><a href="https://ircv3.net/"><img width="160" height="35" src="https://d33wubrfki0l68.cloudfront.net/27a59ae6bb716a8d8aa13ab8abdd2933ade16546/0a308/img/logo-forwhite.svg"></a><a href="https://github.com/wordpress/wordpress/"><img width="210" height="50" src="https://i.ibb.co/0c5NpSV/Word-Press-Logo-2003-2008.png"></a></div>
+### <a href="https://github.com/unrealircd/unrealircd/"><img width="210" height="50" src="https://i.ibb.co/dB6H5Zq/Screenshot-from-2022-09-26-00-20-15.png"></a><a href="https://ircv3.net/"><img width="160" height="35" src="https://d33wubrfki0l68.cloudfront.net/27a59ae6bb716a8d8aa13ab8abdd2933ade16546/0a308/img/logo-forwhite.svg"></a><a href="https://github.com/wordpress/wordpress/"><img width="210" height="50" src="https://i.ibb.co/0c5NpSV/Word-Press-Logo-2003-2008.png"></a>
+<a href="https://www.murphysec.com/accept?code=2741a17ce762f4717246640d3d6f0c83&type=1&from=2&t=2" alt="Security Status"><img src="https://v3-hkylzjk.murphysec.com/platform3/v3/badge/1619314406144389120.svg" /></a></div>
