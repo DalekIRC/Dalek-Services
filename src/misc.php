@@ -746,7 +746,7 @@ function strlprefix(&$targ,$string,$size) : void
 
 function svslogin($uid, $account, $by = NULL) : void
 {
-
+	DoCloak($uid, $account);
 	$by = ($by) ? $by->uid : Conf::$settings['info']['SID'];
 	S2S(":$by SVSLOGIN * $uid $account");
 	
