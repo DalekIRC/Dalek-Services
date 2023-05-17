@@ -88,7 +88,7 @@ class sreply {
 	 * @param String $context Optional parameters that give humans extra context as to where and why the reply was spawned (for example, a particular subcommand or sub-process).
 	 * @param String $message A required plain-text message which is shown to users.
 	 */
-	public static function send_fail(User $client, String $command, String $code, String $context = "", String $message)
+	public static function send_fail(User $client, String $command, String $code, String $context, String $message)
 	{
 		self::send($client, SRPL_FAIL, $code, $command, $context, $message);
 	}
@@ -100,7 +100,7 @@ class sreply {
 	 * @param String $context Optional parameters that give humans extra context as to where and why the reply was spawned (for example, a particular subcommand or sub-process).
 	 * @param String $message A required plain-text message which is shown to users.
 	 */
-	public static function send_warn(User $client, String $command, String $code, String $context = "", String $message)
+	public static function send_warn(User $client, String $command, String $code, String $context, String $message)
 	{
 		self::send($client, SRPL_WARN, $code, $command, $context, $message);
 	}
@@ -112,7 +112,7 @@ class sreply {
 	 * @param String $context Optional parameters that give humans extra context as to where and why the reply was spawned (for example, a particular subcommand or sub-process).
 	 * @param String $message A required plain-text message which is shown to users.
 	 */
-	public static function send_note(User $client, String $command, String $code, String $context = "", String $message)
+	public static function send_note(User $client, String $command, String $code, String $context, String $message)
 	{
 		self::send($client, SRPL_NOTE, $code, $command, $context, $message);
 	}

@@ -299,9 +299,9 @@ class Bot extends Client
 {
 	public static $botlist = [];
 	
-	function __construct($nick,$ident,$hostmask,$uid = NULL, $gecos ,$modinfo = NULL)
+	function __construct($nick,$ident,$hostmask,$uid, $gecos ,$modinfo = NULL)
 	{
-		Client::__construct($nick,$ident,$hostmask,$uid = NULL, $gecos ,$modinfo = NULL);
+		Client::__construct($nick,$ident,$hostmask,$uid, $gecos ,$modinfo = NULL);
 		$this->IsBotServBot = true;
 		self::add_to_bot_list($this);
 	}
