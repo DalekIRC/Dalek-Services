@@ -61,7 +61,7 @@ hook::func(HOOKTYPE_RAW, function($u)
 	$mtags = NULL;
 	
 	
-	if (strlen($u['mtags']))
+	if (strlen($u['mtags'] ?? ""))
 			$mtags = mtag_to_array($u['mtags']);
 		
 	/* one of those commands without a 'sender', spoof it as our uplink */
@@ -89,7 +89,7 @@ hook::func(HOOKTYPE_RAW, function($u)
 		'nick' => $user,
 		'dest' => $dest,
 		'cmd' => $str,
-		'params' => ltrim($params," :"),
+		'params' => $params ? ltrim($params," :") : NULL,
 		'parc' => cmd::$commands[$str]['parc']));
 });
 
