@@ -261,6 +261,11 @@ function user_list_by_account(String $account)
 }
 
 class UserMeta {
+	private $properties;
+
+	function __get($prop_name) {
+		return $this->properties[$prop_name];
+	}
 
 	function __construct(User $nick)
 	{
@@ -269,6 +274,7 @@ class UserMeta {
 		$prep->bind_param("s",$nick->uid);
 		$prep->execute();
 		$result = $prep->get_result();
+		$this->properties = array();
 		if (!$result)
 		{
 			$prep->close();
@@ -276,7 +282,7 @@ class UserMeta {
 		else
 			while($row = $result->fetch_assoc())
 			{
-				$this->{$row['meta_key']} = $row['meta_data'];
+				$this->properties[$row['meta_key']] = $row['meta_data'];
 			}
 
 		$prep->close();
