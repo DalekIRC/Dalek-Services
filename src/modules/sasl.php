@@ -174,10 +174,16 @@ if (!function_exists('SendSasl'))
 class IRC_SASL {
 	static $list = [];
 	static $ignore = [];
+	public $account;
+	public $uid;
+	public $source;
+	public $banned;
+	public $reason;
+	public $check;
 
 	function __construct($source,$uid,$cmd,$param1 = "", $param2 = "")
 	{
-		
+		$this->account = NULL;
 		$this->uid = $uid;
 		$this->source = $source;
 		$this->banned = "";

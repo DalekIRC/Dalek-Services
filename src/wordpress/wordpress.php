@@ -354,10 +354,16 @@ class WPUser {
 
 class WPUserMeta {
 	public $num_posts = 0;
+	private $properties;
 	function __construct(WPUser $account)
 	{
+		$this->properties = array();
 		$this->lookup($account->user_id);
 		$this->num_posts = $this->GetNumPosts($account->user_id);
+	}
+
+	function __get($prop_name) {
+		return $this->properties[$prop_name];
 	}
 
 	function lookup(int $id)
@@ -374,7 +380,7 @@ class WPUserMeta {
 			return false;
 		}
 		while($row = $result->fetch_assoc())
-			$this->{$row['meta_key']} = $row['meta_value'];
+			$this->properties[$row['meta_key']] = $row['meta_value'];
 
 		$prep->close();
 		
