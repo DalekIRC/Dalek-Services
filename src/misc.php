@@ -391,10 +391,9 @@ function SVSLog($string, $type = "") : void
 */
 function log_to_disk($str) : void
 {
-	if (!is_dir(DALEK_LOG_DIR))
+	if (!is_dir(DALEK_LOG_DIR."/logs/errors"))
 	{
-		mkdir(DALEK_LOG_DIR);
-		mkdir(DALEK_LOG_DIR."/logs/errors/phperrs.log");
+		mkdir(DALEK_LOG_DIR."/logs/errors", 0777, true);
 	}
 	$lfile = DALEK_LOG_DIR . "/dalek.".date("d-m-Y").".log";
 	$logfile = fopen($lfile, "a") or die("Unable to log to disk. Please check directory permissions.");
