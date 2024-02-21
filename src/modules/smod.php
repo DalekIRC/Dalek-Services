@@ -95,7 +95,6 @@ class smod {
 			$obj->name = $tok[1];
 			$obj->version = $tok[2];
 			self::$list[$obj->name] = $obj;
-			$str = var_export($obj);
 		}
 	}
 
