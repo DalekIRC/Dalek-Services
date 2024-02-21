@@ -52,7 +52,7 @@ class Filter
 	/* 
 	 * Filters a given string
 	 */
-	static function String($nick,&$mtags = NULL,&$haystack) : void
+	static function String($nick,&$mtags,&$haystack) : void
 	{
 		foreach(self::$filter_list as $filter)
 		{

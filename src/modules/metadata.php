@@ -83,7 +83,7 @@ class metadata {
 		hook::run(HOOKTYPE_METADATA, $array);
 	}
 	/* Send USERMETA command */
-	public static function send_usermeta($from = NULL, $to, $key, $value)
+	public static function send_usermeta($from, $to, $key, $value)
 	{
 		if (!$from)
 			$from = Conf::$settings['info']['SID'];

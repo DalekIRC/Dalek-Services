@@ -496,7 +496,7 @@ class RPC {
 }
 
 
-function RPCHandlerAdd($modinfo = NULL, $handler, $function, &$error)
+function RPCHandlerAdd($modinfo, $handler, $function, &$error)
 {
 	if (RPC::IsHandler($handler))
 	{

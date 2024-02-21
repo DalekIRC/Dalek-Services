@@ -184,7 +184,7 @@ function get_tkl($type,$mask,$ut = "*")
 /* wrapper for other *-line commands */
 define('TKL_ADD','+');
 define('TKL_DEL','-');
-function _line($op,$type,$user = "*",$host,$from,$expiry = 0,$reason = "No reason")
+function _line($op,$type,$user,$host,$from,$expiry = 0,$reason = "No reason")
 {
 	if (!$op || !$type || !$host) /* Minimum requirements */
 		return false;
@@ -372,7 +372,7 @@ function gline_add($host,$from = NULL,$reason = NULL,$expiry = 0,$ut = NULL)
 	if (!$from)
 		$from = Conf::$settings['info']['SID'];
 
-	if (_line(TKL_GLOBAL,TKL_ADD,$ut,$from,$expiry,$reason))
+	if (_line(TKL_GLOBAL,TKL_ADD,"*",$ut,$from,$expiry,$reason))
 		return true;
 	return false;
 }
@@ -385,7 +385,7 @@ function gline_del($host,$ut = NULL)
 	if (!$from)
 		$from = Conf::$settings['info']['SID'];
 
-	if (_line(TKL_GLOBAL,TKL_DEL,$ut,$from,$expiry,$reason))
+	if (_line(TKL_GLOBAL,TKL_DEL,"*",$ut,$from,$expiry,$reason))
 		return true;
 	return false;
 	
@@ -400,7 +400,7 @@ function gzline_add($host,$from = NULL,$reason = NULL,$expiry = 0,$ut = NULL)
 	if (!$from)
 		$from = Conf::$settings['info']['SID'];
 
-	if (_line(TKL_GZAP,TKL_ADD,$ut,$from,$expiry,$reason))
+	if (_line(TKL_GZAP,TKL_ADD,"*",$ut,$from,$expiry,$reason))
 		return true;
 	return false;
 	
@@ -414,7 +414,7 @@ function gzline_del($host,$ut = NULL)
 	if (!$from)
 		$from = Conf::$settings['info']['SID'];
 
-	if (_line(TKL_ZAP,TKL_DEL,$ut,$from,$expiry,$reason))
+	if (_line(TKL_ZAP,TKL_DEL,"*",$ut,$from,$expiry,$reason))
 		return true;
 	return false;
 	

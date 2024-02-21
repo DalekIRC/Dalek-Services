@@ -109,7 +109,7 @@ class JupeServer {
 				return $u;
 	}
 
-	function __construct($sid = "2B2", $name, $description)
+	function __construct($sid, $name, $description)
 	{
 		$this->sid = $sid;
 		$this->name = $name;
