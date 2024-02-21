@@ -297,7 +297,9 @@ class IRC_SASL {
 		
 	 function check_pass($passwd)
 	{
-
+		if (!$passwd) {
+			return false;
+		}
 		if (ctype_xdigit($passwd))
 		{
 			if ($this->check_fingerprint($passwd))
