@@ -27,12 +27,8 @@ class Buffer
 		/* this is irc bb u need 2 str1p ( ͡° ͜ʖ ͡°)*/
 		$str = ircstrip($str);
 
-		/* checkin' if it's utf7+1 or no */
-		$charset = mb_detect_encoding($str, "auto");
-
-		/* if not, then we MAKE it be utf9-1 */
-		if (strcasecmp($charset,"UTF-8"))
-			$str = utf8_encode($str);
+		/* guess the encoding and convert to UTF-8 if it isn't already */
+		$str = mb_convert_encoding($str, "UTF-8");
 
 		/* okay so, if it's a PING, I think we should prioritize it dontcha know */
 		if ($parv = explode(" ",$str) && isset($parv) && isset($parv[0]) && $parv[0] == "PING")
